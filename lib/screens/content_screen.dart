@@ -1,5 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:video_player/video_player.dart';
 
@@ -11,8 +12,9 @@ enum SampleItem { itemOne, itemTwo, itemThree }
 
 class ContentScreen extends StatefulWidget {
   final Uri? src;
+  final List<Uri> videos;
 
-  const ContentScreen({Key? key, this.src}) : super(key: key);
+  const ContentScreen({Key? key, this.src, required this.videos}) : super(key: key);
 
   @override
   _ContentScreenState createState() => _ContentScreenState();
@@ -20,9 +22,12 @@ class ContentScreen extends StatefulWidget {
 
 class _ContentScreenState extends State<ContentScreen> {
   late VideoPlayerController _videoPlayerController;
+  VideoPlayerController? _nextVideoController;
   final TextEditingController _messageController = TextEditingController();
 
   ChewieController? _chewieController;
+  ChewieController? _nextChewieController;
+
   bool isliked = false;
   bool isHeartAnimating = false;
   SampleItem? selectedMenu;
@@ -37,13 +42,17 @@ class _ContentScreenState extends State<ContentScreen> {
     try {
       _videoPlayerController = VideoPlayerController.networkUrl(widget.src!);
       await Future.wait([_videoPlayerController.initialize()]);
+
       _chewieController = ChewieController(
-          videoPlayerController: _videoPlayerController,
-          autoPlay: true,
-          showControls: false,
-          looping: true,
-          
-          allowFullScreen: true);
+        videoPlayerController: _videoPlayerController,
+        autoPlay: true,
+        showControls: false,
+        looping: true,
+        allowFullScreen: true,
+      );
+
+      // Preload the next video
+      _loadNextVideo();
 
       setState(() {});
     } catch (e) {
@@ -51,14 +60,34 @@ class _ContentScreenState extends State<ContentScreen> {
     }
   }
 
-  @override
+  Future<void> _loadNextVideo() async {
+    final nextIndex = 1; // Change this to load the appropriate next video
+    if (nextIndex < widget.videos.length) {
+      final nextVideoSource = widget.videos[nextIndex].toString();
+
+      // Use flutter_cache_manager to get the cached video file
+      final file = await DefaultCacheManager().getSingleFile(nextVideoSource);
+      
+      _nextVideoController = VideoPlayerController.file(file);
+      await _nextVideoController!.initialize();
+      
+      _nextChewieController = ChewieController(
+        videoPlayerController: _nextVideoController!,
+        autoPlay: false,
+        showControls: false,
+        looping: true,
+        allowFullScreen: true,
+      );
+    }
+  }
+ @override
   void dispose() {
     _videoPlayerController.dispose();
     _chewieController?.dispose();
-    _chewieController = null;
+    _nextVideoController?.dispose();
+    _nextChewieController?.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

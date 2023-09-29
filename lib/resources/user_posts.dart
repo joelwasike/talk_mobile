@@ -195,7 +195,7 @@ class _UserPostState extends State<UserPost> {
                         imageUrl: widget.image.imageUrl,
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
-                            CircularProgressIndicator(), // Placeholder while loading
+                            Text(""), // Placeholder while loading
                       ),
 
               ),

@@ -258,7 +258,7 @@ class DrawerWidget extends StatelessWidget {
       },
       icon: const Icon(
         Icons.menu,
-        color: LightColor.maincolor,
+        color: LightColor.background,
       ),
     );
   }

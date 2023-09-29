@@ -23,6 +23,7 @@ class Reels extends StatelessWidget {
               Swiper(
                 itemBuilder: (BuildContext context, int index) {
                   return ContentScreen(
+                    videos: videos,
                     src: videos[index],
                   );
                 },

@@ -1,8 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import 'heartanimationwidget.dart';
@@ -13,9 +17,13 @@ enum SampleItem { itemOne, itemTwo, itemThree }
 class UserrPost extends StatefulWidget {
   final String name;
   final ImageData image;
-    final ScrollController scrollController; // Add this line
+  final ScrollController scrollController; // Add this line
 
-  const UserrPost({super.key, required this.name, required this.image, required this.scrollController});
+  const UserrPost(
+      {super.key,
+      required this.name,
+      required this.image,
+      required this.scrollController});
 
   @override
   State<UserrPost> createState() => _UserrPostState();
@@ -27,18 +35,16 @@ class _UserrPostState extends State<UserrPost> {
   SampleItem? selectedMenu;
   final TextEditingController _messageController = TextEditingController();
   VideoPlayerController? _videoPlayerController;
-    bool _isPlaying = false;
-
-
+  bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
     if (isVideoLink(widget.image.imageUrl)) {
       _videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(widget.image.imageUrl) )
+          VideoPlayerController.networkUrl(Uri.parse(widget.image.imageUrl))
             ..initialize().then((_) {
-               _videoPlayerController!.setLooping(true);
+              _videoPlayerController!.setLooping(true);
               // Ensure the first frame is shown
               setState(() {});
             });
@@ -46,7 +52,6 @@ class _UserrPostState extends State<UserrPost> {
     widget.scrollController.addListener(_handleScroll); // Add this line
   }
 
- 
   bool isVideoLink(String link) {
     final videoExtensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv'];
     for (final extension in videoExtensions) {
@@ -57,6 +62,16 @@ class _UserrPostState extends State<UserrPost> {
     return false;
   }
 
+Future<String> generateVideoThumbnail(String videoUrl) async {
+    final thumbnailPath = await VideoThumbnail.thumbnailFile(
+      video: videoUrl,
+      quality: 75, // Adjust the quality (0 - 100)
+      maxHeight: 128, // Maximum height of the thumbnail
+    );
+
+    return thumbnailPath!;
+  }
+
   bool _isVideoVisible() {
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     final videoPosition = renderBox.localToGlobal(Offset.zero).dy;
@@ -65,7 +80,6 @@ class _UserrPostState extends State<UserrPost> {
 
     return videoPosition > 0 && videoPosition < screenHeight - videoHeight;
   }
-
 
   // Handle video auto-play based on visibility
   void _handleScroll() {
@@ -79,7 +93,6 @@ class _UserrPostState extends State<UserrPost> {
     }
   }
 
-
   List people = [
     "Joel",
     "Delan",
@@ -91,13 +104,14 @@ class _UserrPostState extends State<UserrPost> {
     "Fello"
   ];
 
-   @override
+  @override
   void dispose() {
     _videoPlayerController?.dispose();
     _videoPlayerController = null;
     widget.scrollController.removeListener(_handleScroll); // Remove listener
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -166,21 +180,20 @@ class _UserrPostState extends State<UserrPost> {
             });
           },
           child: Stack(alignment: Alignment.center, children: [
-
-         VisibilityDetector(
-                key: Key(widget.image.imageUrl), // Key must be unique
-                onVisibilityChanged: (visibilityInfo) {
-                  _isPlaying = visibilityInfo.visibleFraction >= 0.5;
-                  _handleScroll();
-                },
-                child: _videoPlayerController != null &&
-                        _videoPlayerController!.value.isInitialized
-                    ? AspectRatio(
-                        aspectRatio: _videoPlayerController!.value.aspectRatio,
-                        child: VideoPlayer(_videoPlayerController!),
-                      )
-                    : Image.network(widget.image.imageUrl, fit: BoxFit.cover),
-              ),
+            VisibilityDetector(
+              key: Key(widget.image.imageUrl), // Key must be unique
+              onVisibilityChanged: (visibilityInfo) {
+                _isPlaying = visibilityInfo.visibleFraction >= 0.5;
+                _handleScroll();
+              },
+              child: _videoPlayerController != null &&
+                      _videoPlayerController!.value.isInitialized
+                  ? AspectRatio(
+                      aspectRatio: _videoPlayerController!.value.aspectRatio,
+                      child: VideoPlayer(_videoPlayerController!),
+                    )
+                  : Image.network(widget.image.imageUrl, fit: BoxFit.cover),
+            ),
             Opacity(
               opacity: isHeartAnimating ? 1 : 0,
               child: HeartAnimationWidget(

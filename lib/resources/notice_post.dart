@@ -1,15 +1,22 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'heartanimationwidget.dart';
-import 'image_data.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 
 class NoticePost extends StatefulWidget {
-  final String name;
-  final ImageData image;
-  const NoticePost({super.key, required this.name, required this.image});
+  final String? name;
+  final String? image;
+  final String? content;
+  final int? likes;
+  const NoticePost(
+      {super.key,
+      required this.name,
+      required this.image,
+      this.content,
+      required this.likes});
 
   @override
   State<NoticePost> createState() => _NoticePostState();
@@ -31,17 +38,19 @@ class _NoticePostState extends State<NoticePost> {
             children: [
               Row(
                 children: [
-                 Icon(Icons.notification_important, color: LightColor.maincolor,),
+                  Icon(
+                    Icons.notification_important,
+                    color: LightColor.maincolor,
+                  ),
                   const SizedBox(
                     width: 10,
                   ),
                   Text(
-                    widget.name,
+                    widget.name!,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-             
             ],
           ),
         ),
@@ -53,9 +62,16 @@ class _NoticePostState extends State<NoticePost> {
             });
           },
           child: Stack(alignment: Alignment.center, children: [
-            
-              Image.network(widget.image.imageUrl, fit: BoxFit.cover),
-            
+            Container(
+              height: MediaQuery.of(context).size.height / 1.3,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: CachedNetworkImageProvider(widget.image!),
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
             Opacity(
               opacity: isHeartAnimating ? 1 : 0,
               child: HeartAnimationWidget(
@@ -190,38 +206,31 @@ class _NoticePostState extends State<NoticePost> {
                   ),
                 ],
               ),
-               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child:  IconButton(
-                  onPressed: () {
-                     
-                  },
-                  icon: Icon(
-                    Icons.download_rounded,
-                    color: LightColor.maincolor,
-                  ))
-              ),
+              Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.download_rounded,
+                        color: LightColor.background,
+                      ))),
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(left: 8),
           child: Row(
             children: [
               const Text(
                 "Liked by ",
               ),
               Text(
-                "${widget.name} ",
+                "${widget.likes} ",
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const Text(
-                "and ",
+                "students",
               ),
-              const Text(
-                "others",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              )
             ],
           ),
         ),
@@ -230,14 +239,10 @@ class _NoticePostState extends State<NoticePost> {
           child: Padding(
             padding: const EdgeInsets.only(left: 8),
             child: RichText(
-                text: const TextSpan(children: [
+                text: TextSpan(children: [
               TextSpan(
-                  text: "Wiky_Akumu ",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              TextSpan(
-                  text:
-                      "This guy really like to eat. I found him at the hotel taking a big fish. Bad person.",
-                  style: TextStyle(color: Colors.white)),
+                  text: widget.content,
+                  style: TextStyle(color: Colors.grey.shade200, fontSize: 12)),
             ])),
           ),
         )

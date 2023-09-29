@@ -66,7 +66,6 @@ dependencies:
   transparent_image: ^2.0.1
   grouped_list: ^5.1.2
   flutter_chat_ui: ^1.6.9
-  file_picker: ^5.3.3
   open_filex: ^4.3.2
   webview_flutter: ^4.2.2
   uuid: ^3.0.7
@@ -74,6 +73,10 @@ dependencies:
   video_thumbnail: ^0.5.3
   visibility_detector: ^0.4.0+2
   flutter_inappwebview: ^6.0.0-beta.24+1
+  flutter_cache_manager: ^3.3.1
+  file_picker: ^5.5.0
+  dio: ^5.3.3
+  getwidget: ^4.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
