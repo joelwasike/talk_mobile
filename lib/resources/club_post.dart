@@ -2,7 +2,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:usersms/resources/user_posts.dart';
+import 'package:usersms/resources/photo_user_posts.dart';
 import 'package:usersms/utils/colors.dart';
 
 import 'image_data.dart';
@@ -25,6 +25,14 @@ class _ClubpostState extends State<Clubpost> {
     "Chalo",
     "Wasike",
     "Fello"
+  ];
+   List imagelist = [
+    'https://picsum.photos/seed/image001/500/500',
+    'https://picsum.photos/seed/image001/500/500',
+    'https://picsum.photos/seed/image001/500/500',
+    'https://picsum.photos/seed/image001/500/500',
+    'https://picsum.photos/seed/image001/500/500',
+
   ];
 
     ScrollController _scrollController = ScrollController(); // Add this line
@@ -66,8 +74,10 @@ class _ClubpostState extends State<Clubpost> {
               itemBuilder: (context, index) {
                   return UserPost(
                     scrollController: _scrollController,
+                    likes: 2,
+                    content: "Today we gonna dance",
                     name: people[index],
-                    image: imageList[index] ,
+                    image: imagelist[index] ,
                   );
                 
               },

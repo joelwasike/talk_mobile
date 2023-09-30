@@ -1,9 +1,7 @@
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'package:video_player/video_player.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'heartanimationwidget.dart';
 import 'image_data.dart';
@@ -12,10 +10,18 @@ enum SampleItem { itemOne, itemTwo, itemThree }
 
 class UserPost extends StatefulWidget {
   final String name;
-  final ImageData image;
-    final ScrollController scrollController; // Add this line
+  final String content;
+  final int likes;
+  final String? image;
+  final ScrollController scrollController; // Add this line
 
-  const UserPost({super.key, required this.name, required this.image, required this.scrollController});
+  const UserPost(
+      {super.key,
+      required this.name,
+      required this.image,
+      required this.scrollController,
+      required this.content,
+      required this.likes});
 
   @override
   State<UserPost> createState() => _UserPostState();
@@ -26,59 +32,6 @@ class _UserPostState extends State<UserPost> {
   bool isHeartAnimating = false;
   SampleItem? selectedMenu;
   final TextEditingController _messageController = TextEditingController();
-  VideoPlayerController? _videoPlayerController;
-    bool _isPlaying = false;
-
-
-
-  @override
-  void initState() {
-    super.initState();
-    if (isVideoLink(widget.image.imageUrl)) {
-      _videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(widget.image.imageUrl) )
-            ..initialize().then((_) {
-               _videoPlayerController!.setLooping(true);
-              // Ensure the first frame is shown
-              setState(() {});
-            });
-    }
-    widget.scrollController.addListener(_handleScroll); // Add this line
-  }
-
- 
-  bool isVideoLink(String link) {
-    final videoExtensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv'];
-    for (final extension in videoExtensions) {
-      if (link.toLowerCase().endsWith(extension)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  bool _isVideoVisible() {
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
-    final videoPosition = renderBox.localToGlobal(Offset.zero).dy;
-    final videoHeight = renderBox.size.height;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    return videoPosition > 0 && videoPosition < screenHeight - videoHeight;
-  }
-
-
-  // Handle video auto-play based on visibility
-  void _handleScroll() {
-    if (_videoPlayerController != null &&
-        _videoPlayerController!.value.isInitialized &&
-        _isPlaying &&
-        _isVideoVisible()) {
-      _videoPlayerController?.play();
-    } else {
-      _videoPlayerController?.pause();
-    }
-  }
-
 
   List people = [
     "Joel",
@@ -89,7 +42,7 @@ class _UserPostState extends State<UserPost> {
     "Chalo",
     "Wasike",
     "Fello",
-     "Joel",
+    "Joel",
     "Delan",
     "Wicky",
     "Salim",
@@ -99,13 +52,6 @@ class _UserPostState extends State<UserPost> {
     "Fello"
   ];
 
-   @override
-  void dispose() {
-    _videoPlayerController?.dispose();
-    _videoPlayerController = null;
-    widget.scrollController.removeListener(_handleScroll); // Remove listener
-    super.dispose();
-  }
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -174,31 +120,12 @@ class _UserPostState extends State<UserPost> {
             });
           },
           child: Stack(alignment: Alignment.center, children: [
-
-         VisibilityDetector(
-                key: Key(widget.image.imageUrl), // Key must be unique
-                onVisibilityChanged: (visibilityInfo) {
-                  _isPlaying = visibilityInfo.visibleFraction >= 0.5;
-                  _handleScroll();
-                },
-                child: _videoPlayerController != null &&
-                        _videoPlayerController!.value.isInitialized
-                    ? AspectRatio(
-                        aspectRatio: _videoPlayerController!.value.aspectRatio,
-                        child: GestureDetector(
-                          onTap: () {
-                            print("object taped");
-                          },
-                          child: VideoPlayer(_videoPlayerController!)),
-                      )
-                    : CachedNetworkImage(
-                        imageUrl: widget.image.imageUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Text(""), // Placeholder while loading
-                      ),
-
-              ),
+            CachedNetworkImage(
+              imageUrl: widget.image!,
+              fit: BoxFit.cover,
+              placeholder: (context, url) =>
+                  Text(""), // Placeholder while loading
+            ),
             Opacity(
               opacity: isHeartAnimating ? 1 : 0,
               child: HeartAnimationWidget(
@@ -446,11 +373,11 @@ class _UserPostState extends State<UserPost> {
                 "${widget.name} ",
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              const Text(
-                "and ",
+              Text(
+                widget.likes.toString(),
               ),
               const Text(
-                "others",
+                "students",
                 style: TextStyle(fontWeight: FontWeight.bold),
               )
             ],
@@ -461,14 +388,12 @@ class _UserPostState extends State<UserPost> {
           child: Padding(
             padding: const EdgeInsets.only(left: 8),
             child: RichText(
-                text: const TextSpan(children: [
+                text: TextSpan(children: [
               TextSpan(
                   text: "Wiky_Akumu ",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
-                  text:
-                      "This guy really like to eat. I found him at the hotel taking a big fish. Bad person.",
-                  style: TextStyle(color: Colors.white)),
+                  text: widget.content, style: TextStyle(color: Colors.white)),
             ])),
           ),
         )

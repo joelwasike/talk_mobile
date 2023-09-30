@@ -16,13 +16,7 @@ class Notices extends StatefulWidget {
 }
 
 class _NoticesState extends State<Notices> {
-  List people = [
-    "Fee Notice",
-    "Cultural night",
-    "Campus Night",
-    "Hostel Cleaning",
-    "Strike Notice",
-  ];
+
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
   String? content;
@@ -39,7 +33,7 @@ class _NoticesState extends State<Notices> {
       isloading = true;
     });
     final url = Uri.parse(
-        'https://7290-197-232-22-252.ngrok-free.app/getnotices'); // Replace with your JSON URL
+        'https://5335-197-232-22-252.ngrok-free.app/getnotices'); // Replace with your JSON URL
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

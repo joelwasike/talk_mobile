@@ -12,7 +12,7 @@ import 'package:usersms/menu/messenger.dart';
 import 'package:usersms/menu/notices.dart';
 import 'package:usersms/menu/portal.dart';
 import 'package:usersms/menu/tv.dart';
-import 'package:usersms/resources/user_posts.dart';
+import 'package:usersms/resources/photo_user_posts.dart';
 import '../resources/image_data.dart';
 import '../utils/colors.dart';
 
@@ -25,7 +25,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   int currentIndex = 0;
-
+ 
   @override
   Widget build(BuildContext context) {
     return ZoomDrawer(
@@ -93,6 +93,16 @@ class _HomeScreenState extends State<HomeScreen> {
     "Wasike",
     "Fello"
   ];
+   List imagelist = [
+    'https://picsum.photos/seed/image001/500/500',
+    'https://picsum.photos/seed/image001/500/500',
+    'https://picsum.photos/seed/image001/500/500',
+    'https://picsum.photos/seed/image001/500/500',
+    'https://picsum.photos/seed/image001/500/500',
+
+  ];
+  
+
 
     ScrollController _scrollController = ScrollController(); // Add this line
 
@@ -142,12 +152,14 @@ class _HomeScreenState extends State<HomeScreen> {
             
             Expanded(
               child: ListView.builder(
-                itemCount: people.length,
+                itemCount: imagelist.length,
                 itemBuilder: (context, index) {
                     return UserPost(
                       scrollController: _scrollController,
+                      likes: 4,
+                      content: "This is nature",
                       name: people[index],
-                      image: imageList[index] ,
+                      image: imagelist[index] ,
                     );
                   
                 },
