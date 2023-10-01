@@ -29,13 +29,7 @@ class GlassBox extends StatelessWidget {
               ),
               child: Container(),
             ),
-             BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 2,
-                sigmaY: 2,
-              ),
-              child: Container(),
-            ),
+            
             
             Container(
               decoration: BoxDecoration(
