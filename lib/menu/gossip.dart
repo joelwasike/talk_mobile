@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inview_notifier_list/inview_notifier_list.dart';
 import 'package:usersms/resources/addgossip.dart';
 import 'package:usersms/resources/video_user_post.dart';
 import '../resources/photo_user_posts.dart';
@@ -61,7 +62,8 @@ class _GossipState extends State<Gossip> {
       throw Exception('Failed to load data');
     }
   }
-   bool isVideoLink(String link) {
+
+  bool isVideoLink(String link) {
     final videoExtensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv'];
     for (final extension in videoExtensions) {
       if (link.toLowerCase().endsWith(extension)) {
@@ -110,27 +112,45 @@ class _GossipState extends State<Gossip> {
               ),
             ),
           ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  final item = data[index];
-                  return isVideoLink(item["media"])? VUserPost(
-                    scrollController: _scrollController,
-                    name: item['title'],
-                    image: item['media'],
-                    content: item['content'],
-                    likes: item['likes'],
-                  ):UserPost(
-                    scrollController: _scrollController,
-                    name: item['title'],
-                    image: item['media'],
-                    content: item['content'],
-                    likes: item['likes'],
+          InViewNotifierList(
+            scrollDirection: Axis.vertical,
+            initialInViewIds: ['0'],
+            isInViewPortCondition: (double deltaTop, double deltaBottom,
+                double viewPortDimension) {
+              return deltaTop < (0.5 * viewPortDimension) &&
+                  deltaBottom > (0.5 * viewPortDimension);
+            },
+            itemCount: data.length,
+            builder: (BuildContext context, int index) {
+              return LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  return InViewNotifierWidget(
+                    id: '$index',
+                    builder:
+                        (BuildContext context, bool isInView, Widget? child) {
+                      final item = data[index];
+                      return isVideoLink(item["media"])
+                          ? VUserPost(
+                              scrollController: _scrollController,
+                              play: isInView,
+                              name: item['title'],
+                              url: item['media'],
+                              content: item['content'],
+                              likes: item['likes'],
+                            )
+                          : UserPost(
+                              scrollController: _scrollController,
+                              name: item['title'],
+                              image: item['media'],
+                              content: item['content'],
+                              likes: item['likes'],
+                            );
+                    },
                   );
                 },
-                childCount: data.length,
-              ),
-            ),
+              );
+            },
+          ),
         ],
       ),
       floatingActionButton: Padding(

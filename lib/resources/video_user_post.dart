@@ -13,15 +13,15 @@ class VUserPost extends StatefulWidget {
   final String name;
   final String content;
   final int likes;
-  final String? image;
+  final String? url;
+  final bool play;
   final ScrollController scrollController;
 
   const VUserPost({
     required this.name,
-    required this.image,
     required this.scrollController,
     required this.content,
-    required this.likes,
+    required this.likes,required this.url, required this.play,
   });
 
   @override
@@ -34,6 +34,9 @@ class _UserPostState extends State<VUserPost> {
   SampleItem? selectedMenu;
   final TextEditingController _messageController = TextEditingController();
   VideoPlayerController? _videoPlayerController;
+   late VideoPlayerController _controller;
+  late Future<void> _initializeVideoPlayerFuture;
+
 
 
   List people = [
@@ -54,18 +57,41 @@ class _UserPostState extends State<VUserPost> {
     "Wasike",
     "Fello"
   ];
-@override
+
+  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _videoPlayerController =
-    VideoPlayerController.networkUrl(Uri.parse(widget.image!))
-      ..initialize().then((_) {
-        _videoPlayerController!.setLooping(true);
-        // Ensure the first frame is shown
-        setState(() {});
-      });
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url!));
+    _initializeVideoPlayerFuture = _controller.initialize().then((_) {
+      // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+      setState(() {});
+    });
+
+    if (widget.play) {
+      _controller.play();
+      _controller.setLooping(true);
+    }
   }
+
+  @override
+  void didUpdateWidget(VUserPost oldWidget) {
+    if (oldWidget.play != widget.play) {
+      if (widget.play) {
+        _controller.play();
+        _controller.setLooping(true);
+      } else {
+        _controller.pause();
+      }
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -137,33 +163,26 @@ class _UserPostState extends State<VUserPost> {
           child: Stack(
   alignment: Alignment.center,
   children: [
-   InViewNotifierWidget(
-    
-          id: widget.image ?? '',
-          builder: (BuildContext context, bool isInView, Widget? child) {
-            if (isInView) {
-              // Video is visible, play it
-              if (!_videoPlayerController!.value.isPlaying) {
-                _videoPlayerController?.play();
-              }
-            } else {
-              // Video is not visible, pause it
-              if (_videoPlayerController!.value.isPlaying) {
-                _videoPlayerController?.pause();
-              }
-            }
-            return child!;
-          },
-          child: AspectRatio(
-            aspectRatio: _videoPlayerController!.value.aspectRatio,
-            child: GestureDetector(
-              onTap: () {
-                print("object taped");
-              },
-              child: VideoPlayer(_videoPlayerController!),
-            ),
-          ),
-        ),
+   AspectRatio(
+     aspectRatio: _videoPlayerController!.value.aspectRatio,
+     child: GestureDetector(
+       onTap: () {
+         print("object taped");
+       },
+       child: FutureBuilder(
+      future: _initializeVideoPlayerFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return VideoPlayer(_controller);
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    ),
+     ),
+   ),
     Opacity(
       opacity: isHeartAnimating ? 1 : 0,
       child: HeartAnimationWidget(
@@ -300,7 +319,7 @@ class _UserPostState extends State<VUserPost> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: EdgeInsets.only(
+                                            padding: const EdgeInsets.only(
                                                 top: 16, left: 16, right: 16),
                                             child: TextField(
                                               decoration: InputDecoration(
@@ -318,7 +337,7 @@ class _UserPostState extends State<VUserPost> {
                                                 fillColor:
                                                     LightColor.maincolor1,
                                                 contentPadding:
-                                                    EdgeInsets.all(8),
+                                                    const EdgeInsets.all(8),
                                                 enabledBorder:
                                                     OutlineInputBorder(
                                                         borderRadius:
@@ -330,7 +349,7 @@ class _UserPostState extends State<VUserPost> {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(height: 20),
+                                          const SizedBox(height: 20),
                                           Expanded(
                                             child: ListView.builder(
                                               physics:
@@ -430,12 +449,12 @@ class _UserPostState extends State<VUserPost> {
             padding: const EdgeInsets.only(left: 8),
             child: RichText(
                 text:  TextSpan(children: [
-              TextSpan(
+              const TextSpan(
                   text: "Wiky_Akumu ",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
                   text:widget.content,
-                  style: TextStyle(color: Colors.white)),
+                  style: const TextStyle(color: Colors.white)),
             ])),
           ),
         )
@@ -512,18 +531,18 @@ class _LongPressSelectableTileState extends State<LongPressSelectableTile> {
         title: Text(widget.name),
         subtitle: Text(
           "Followers: ${widget.followers}",
-          style: TextStyle(color: Colors.grey, fontSize: 13),
+          style: const TextStyle(color: Colors.grey, fontSize: 13),
         ),
         leading: CircleAvatar(
           maxRadius: 30,
           backgroundImage: NetworkImage(widget.image),
         ),
         trailing: widget.isSelected
-            ? Icon(
+            ? const Icon(
                 Icons.check_circle,
                 color: LightColor.maincolor,
               )
-            : SizedBox(),
+            : const SizedBox(),
       ),
     );
   }
