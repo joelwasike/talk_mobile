@@ -13,7 +13,6 @@ import 'package:usersms/menu/notices.dart';
 import 'package:usersms/menu/portal.dart';
 import 'package:usersms/menu/tv.dart';
 import 'package:usersms/resources/photo_user_posts.dart';
-import '../resources/image_data.dart';
 import '../utils/colors.dart';
 
 class Homepage extends StatefulWidget {
@@ -104,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
   
 
 
-    ScrollController _scrollController = ScrollController(); // Add this line
+    final ScrollController _scrollController = ScrollController(); // Add this line
 
   @override
   void dispose() {

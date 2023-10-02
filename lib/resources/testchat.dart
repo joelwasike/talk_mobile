@@ -10,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:usersms/utils/colors.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatPagee extends StatefulWidget {
@@ -211,25 +210,25 @@ class _ChatPageeState extends State<ChatPagee> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: Color(0xff1f1c38),
+        backgroundColor: const Color(0xff1f1c38),
         appBar: AppBar(
-          iconTheme: IconThemeData(
+          iconTheme: const IconThemeData(
             color: Colors.white, 
           ),
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(20),
                   bottomRight: Radius.circular(20))),
           elevation: 0,
           automaticallyImplyLeading: true,
-          backgroundColor: Color(0xff2b2250),
+          backgroundColor: const Color(0xff2b2250),
           flexibleSpace: SafeArea(
             child: Container(
               padding: const EdgeInsets.only(right: 16),
               child: Row(
 
                 children: <Widget>[
-                 SizedBox(width: 50,),
+                 const SizedBox(width: 50,),
                   const SizedBox(
                     width: 2,
                   ),
@@ -248,7 +247,7 @@ class _ChatPageeState extends State<ChatPagee> {
                       children: <Widget>[
                         Text(
                           widget.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(

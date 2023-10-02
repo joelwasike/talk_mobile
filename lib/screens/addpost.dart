@@ -8,11 +8,12 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_gallery/photo_gallery.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:usersms/utils/colors.dart';
-import 'package:video_player/video_player.dart';
 
 import '../resources/postupload.dart';
 
 class AlbumPage extends StatefulWidget {
+  const AlbumPage({super.key});
+
   @override
   State<StatefulWidget> createState() => AlbumPageState();
 }
@@ -147,7 +148,7 @@ class AlbumPageState extends State<AlbumPage>
                                       if (_media![index].mediumType ==
                                           MediumType
                                               .video) // Check if it's a video
-                                        Icon(
+                                        const Icon(
                                           Icons.play_circle_filled,
                                           size: 40,
                                           color: Colors.white,

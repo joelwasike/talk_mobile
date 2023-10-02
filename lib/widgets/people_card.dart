@@ -16,7 +16,7 @@ class _PeopleCardState extends State<PeopleCard> {
   Widget build(BuildContext context) {
     return  Column(
       children: [
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         ListTile(
          leading: CircleAvatar(
           maxRadius: 30,
@@ -26,7 +26,7 @@ class _PeopleCardState extends State<PeopleCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
            children: [
              Text(widget.name),
-             Text("${widget.followers} followers", style: TextStyle(color: Colors.grey, fontSize: 12),)
+             Text("${widget.followers} followers", style: const TextStyle(color: Colors.grey, fontSize: 12),)
            ],
          ),
         

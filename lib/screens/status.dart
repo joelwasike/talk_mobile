@@ -8,6 +8,8 @@ import 'package:usersms/widgets/story/screens/story_screen.dart';
 
 class StatusScreen extends StatefulWidget {
   static const String id = "statusscreen";
+
+  const StatusScreen({super.key});
   @override
   _StatusScreenState createState() => _StatusScreenState();
 }
@@ -76,7 +78,7 @@ class _StatusScreenState extends State<StatusScreen> {
           SliverToBoxAdapter(
               child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: Container(
+                  child: SizedBox(
                     height: 800,
                     child: Column(
                       children: [
@@ -84,7 +86,7 @@ class _StatusScreenState extends State<StatusScreen> {
                         isclicked
                             ? FadeInDown(
                                 child: Padding(
-                                  padding: EdgeInsets.only(
+                                  padding: const EdgeInsets.only(
                                       top: 16, left: 16, right: 16),
                                   child: TextField(
                                     decoration: InputDecoration(
@@ -99,7 +101,7 @@ class _StatusScreenState extends State<StatusScreen> {
                                       ),
                                       filled: true,
                                       fillColor: LightColor.maincolor1,
-                                      contentPadding: EdgeInsets.all(8),
+                                      contentPadding: const EdgeInsets.all(8),
                                       enabledBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(20),
@@ -183,7 +185,7 @@ class _StatusScreenState extends State<StatusScreen> {
                         const SizedBox(
                           height: 10,
                         ),
-                        StatusTiles(),
+                        const StatusTiles(),
                         const SizedBox(
                           height: 30,
                         ),
@@ -197,6 +199,8 @@ class _StatusScreenState extends State<StatusScreen> {
 }
 
 class StatusTiles extends StatelessWidget {
+  const StatusTiles({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -213,7 +217,7 @@ class StatusTiles extends StatelessWidget {
                         enableDrag: true,
                         context: context,
                         builder: (context) => Container(
-                            padding: EdgeInsets.only(
+                            padding: const EdgeInsets.only(
                                 bottom:
                                     0),
                             decoration: const BoxDecoration(
@@ -221,7 +225,7 @@ class StatusTiles extends StatelessWidget {
                                 borderRadius: BorderRadius.only(
                                     topRight: Radius.circular(25),
                                     topLeft: Radius.circular(25))),
-                            child: StoryScreen(images: imageList)));
+                            child: const StoryScreen(images: imageList)));
                   },
                   title: Container(
                     child: Row(

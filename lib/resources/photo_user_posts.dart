@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
-import 'package:video_player/video_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'heartanimationwidget.dart';
 import 'image_data.dart';
@@ -124,7 +123,7 @@ class _UserPostState extends State<UserPost> {
               imageUrl: widget.image!,
               fit: BoxFit.cover,
               placeholder: (context, url) =>
-                  Text(""), // Placeholder while loading
+                  const Text(""), // Placeholder while loading
             ),
             Opacity(
               opacity: isHeartAnimating ? 1 : 0,
@@ -259,7 +258,7 @@ class _UserPostState extends State<UserPost> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: EdgeInsets.only(
+                                            padding: const EdgeInsets.only(
                                                 top: 16, left: 16, right: 16),
                                             child: TextField(
                                               decoration: InputDecoration(
@@ -277,7 +276,7 @@ class _UserPostState extends State<UserPost> {
                                                 fillColor:
                                                     LightColor.maincolor1,
                                                 contentPadding:
-                                                    EdgeInsets.all(8),
+                                                    const EdgeInsets.all(8),
                                                 enabledBorder:
                                                     OutlineInputBorder(
                                                         borderRadius:
@@ -289,7 +288,7 @@ class _UserPostState extends State<UserPost> {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(height: 20),
+                                          const SizedBox(height: 20),
                                           Expanded(
                                             child: ListView.builder(
                                               physics:
@@ -389,11 +388,11 @@ class _UserPostState extends State<UserPost> {
             padding: const EdgeInsets.only(left: 8),
             child: RichText(
                 text: TextSpan(children: [
-              TextSpan(
+              const TextSpan(
                   text: "Wiky_Akumu ",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
-                  text: widget.content, style: TextStyle(color: Colors.white)),
+                  text: widget.content, style: const TextStyle(color: Colors.white)),
             ])),
           ),
         )
@@ -446,7 +445,7 @@ class LongPressSelectableTile extends StatefulWidget {
   final String image;
   final String followers;
 
-  const LongPressSelectableTile({
+  const LongPressSelectableTile({super.key, 
     required this.onTap,
     required this.onLongPress,
     required this.isSelected,
@@ -470,18 +469,18 @@ class _LongPressSelectableTileState extends State<LongPressSelectableTile> {
         title: Text(widget.name),
         subtitle: Text(
           "Followers: ${widget.followers}",
-          style: TextStyle(color: Colors.grey, fontSize: 13),
+          style: const TextStyle(color: Colors.grey, fontSize: 13),
         ),
         leading: CircleAvatar(
           maxRadius: 30,
           backgroundImage: NetworkImage(widget.image),
         ),
         trailing: widget.isSelected
-            ? Icon(
+            ? const Icon(
                 Icons.check_circle,
                 color: LightColor.maincolor,
               )
-            : SizedBox(),
+            : const SizedBox(),
       ),
     );
   }

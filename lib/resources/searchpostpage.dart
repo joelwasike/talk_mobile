@@ -31,7 +31,7 @@ class _SearchPostPageState extends State<SearchPostPage> {
     "Fello"
   ];
 
-  ScrollController _scrollController = ScrollController(); // Add this line
+  final ScrollController _scrollController = ScrollController(); // Add this line
 
   @override
   void dispose() {

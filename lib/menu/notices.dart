@@ -127,7 +127,7 @@ class _NoticesState extends State<Notices> {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(30.0)),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.add_alert,
               color: Colors.white, // Adjust the color as needed
             ),

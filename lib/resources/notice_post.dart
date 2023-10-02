@@ -38,7 +38,7 @@ class _NoticePostState extends State<NoticePost> {
             children: [
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.notification_important,
                     color: LightColor.maincolor,
                   ),
@@ -207,10 +207,10 @@ class _NoticePostState extends State<NoticePost> {
                 ],
               ),
               Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: IconButton(
                       onPressed: () {},
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.download_rounded,
                         color: LightColor.background,
                       ))),

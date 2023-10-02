@@ -23,7 +23,7 @@ class Stat extends StatelessWidget {
         ),
         Text(
           NumberFormat.decimalPattern().format(value),
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold
           )
         ),

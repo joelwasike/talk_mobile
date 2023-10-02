@@ -157,7 +157,7 @@ class _ClubCredState extends State<ClubCred> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 30,
-        iconTheme: IconThemeData(color: LightColor.background),
+        iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
         backgroundColor: LightColor.maincolor1,
         title: Row(
@@ -188,7 +188,7 @@ class _ClubCredState extends State<ClubCred> {
                 );
               },
               backgroundColor: LightColor.maincolor,
-              child: Text(
+              child: const Text(
                 "create",
                 style: TextStyle(color: Colors.white),
               )),
@@ -265,7 +265,7 @@ class _ClubCredState extends State<ClubCred> {
                 contentPadding: const EdgeInsets.all(8),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: LightColor.maincolor)),
+                    borderSide: const BorderSide(color: LightColor.maincolor)),
               ),
             ),
           ),

@@ -17,7 +17,7 @@ class _ForumCardState extends State<ForumCard> {
   Widget build(BuildContext context) {
     return  Column(
       children: [
-        SizedBox(height: 5,),
+        const SizedBox(height: 5,),
         Container(
           height: MediaQuery.of(context).size.height/11,
           width: MediaQuery.of(context).size.width,
@@ -37,12 +37,12 @@ class _ForumCardState extends State<ForumCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
                    Text(widget.name),
-                   Text(widget.description, style: TextStyle(color: Colors.grey, fontSize: 11),)
+                   Text(widget.description, style: const TextStyle(color: Colors.grey, fontSize: 11),)
                  ],
                ),
                trailing: Container(
                 width: 10,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: LightColor.maincolor
                 ),

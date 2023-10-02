@@ -17,7 +17,7 @@ class _PeopleFCardState extends State<PeopleFCard> {
   Widget build(BuildContext context) {
     return  Column(
       children: [
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         ListTile(
          leading: CircleAvatar(
           maxRadius: 30,
@@ -30,7 +30,7 @@ class _PeopleFCardState extends State<PeopleFCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
                    Text(widget.name),
-                   Text("${widget.school}", style: TextStyle(color: Colors.grey, fontSize: 12),)
+                   Text(widget.school, style: const TextStyle(color: Colors.grey, fontSize: 12),)
                  ],
                ),
              ),
@@ -39,8 +39,8 @@ class _PeopleFCardState extends State<PeopleFCard> {
                 borderRadius: BorderRadius.circular(7),
                 color: LightColor.maincolor
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
+              child: const Padding(
+                padding: EdgeInsets.all(5.0),
                 child: Center(child: Text("Follow")),
               ),
              )

@@ -61,7 +61,7 @@ class _ContentScreenState extends State<ContentScreen> {
   }
 
   Future<void> _loadNextVideo() async {
-    final nextIndex = 1; // Change this to load the appropriate next video
+    const nextIndex = 1; // Change this to load the appropriate next video
     if (nextIndex < widget.videos.length) {
       final nextVideoSource = widget.videos[nextIndex].toString();
 

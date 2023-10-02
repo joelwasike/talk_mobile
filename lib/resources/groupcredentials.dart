@@ -156,7 +156,7 @@ class _GroupCredState extends State<GroupCred> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 30,
-        iconTheme: IconThemeData(color: LightColor.background),
+        iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
         backgroundColor: LightColor.maincolor1,
         title: Padding(
@@ -190,7 +190,7 @@ class _GroupCredState extends State<GroupCred> {
                 );
               },
               backgroundColor: LightColor.maincolor,
-              child: Text(
+              child: const Text(
                 "create",
                 style: TextStyle(color: Colors.white),
               )),
@@ -267,7 +267,7 @@ class _GroupCredState extends State<GroupCred> {
                 contentPadding: const EdgeInsets.all(8),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: LightColor.maincolor)),
+                    borderSide: const BorderSide(color: LightColor.maincolor)),
               ),
             ),
           ),

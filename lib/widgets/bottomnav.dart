@@ -21,9 +21,9 @@ class _BottomNavState extends State<BottomNav> {
 
   final List<Widget> pages = [
    const Homepage(),
-   StatusScreen(),
+   const StatusScreen(),
    const SearchScreen(),
-    AlbumPage(),
+    const AlbumPage(),
      Reels(),
    const ProfileScren()
   ];

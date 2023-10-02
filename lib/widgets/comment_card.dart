@@ -110,10 +110,10 @@ class _CommentCardState extends State<CommentCard> {
                                         ),
                                         Expanded(
                                           child: ListView.builder(
-                                            physics: BouncingScrollPhysics(),
+                                            physics: const BouncingScrollPhysics(),
                                             itemCount: people.length,
                                             itemBuilder: (context, index) {
-                                              return CommentofcommentCard();
+                                              return const CommentofcommentCard();
                                             },
                                           ),
                                         ),
@@ -171,10 +171,10 @@ class _CommentCardState extends State<CommentCard> {
                                           ),
                                           Expanded(
                                             child: ListView.builder(
-                                              physics: BouncingScrollPhysics(),
+                                              physics: const BouncingScrollPhysics(),
                                               itemCount: people.length,
                                               itemBuilder: (context, index) {
-                                                return CommentofcommentCard();
+                                                return const CommentofcommentCard();
                                               },
                                             ),
                                           ),

@@ -212,7 +212,7 @@ class _GroupchatState extends State<Groupchat> {
   Widget build(BuildContext context) => Scaffold(
         body: Chat(
           
-          theme: DarkChatTheme() ,
+          theme: const DarkChatTheme() ,
           messages: _messages,
           onAttachmentPressed: _handleAttachmentPressed,
           onMessageTap: _handleMessageTap,

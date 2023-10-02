@@ -28,7 +28,7 @@ class _FollowersState extends State<Followers> {
     return  Scaffold(
        appBar: AppBar(
         toolbarHeight: 30,
-        iconTheme: IconThemeData(color: LightColor.background),
+        iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
         backgroundColor: LightColor.maincolor1,
         title: Padding(
@@ -55,7 +55,7 @@ class _FollowersState extends State<Followers> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
             child: TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -68,14 +68,14 @@ class _FollowersState extends State<Followers> {
                 ),
                 filled: true,
                 fillColor: LightColor.maincolor1,
-                contentPadding: EdgeInsets.all(8),
+                contentPadding: const EdgeInsets.all(8),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide(color: Colors.grey.shade600)),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Expanded(

@@ -55,10 +55,10 @@ class _MyAppState extends State<MyApp> {
         '/auth': (_) => const Authpage(),
         '/change': (_) =>  const ForgotPassword(),
         '/home': (_) =>  const Homepage(),
-        '/post': (_) =>   AlbumPage(),
+        '/post': (_) =>   const AlbumPage(),
         '/search': (_) =>  const SearchScreen(),
-        '/story': (_) =>  StoryScreen( images: imageList),
-         '/camera': (_) =>  AddPostScreen()
+        '/story': (_) =>  const StoryScreen( images: imageList),
+         '/camera': (_) =>  const AddPostScreen()
 
       },
        

@@ -3,7 +3,7 @@ import 'package:usersms/utils/colors.dart';
 
 class ChatBubble extends StatelessWidget {
   final String message;
-  ChatBubble({super.key, required this.message});
+  const ChatBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {

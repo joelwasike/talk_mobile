@@ -8,7 +8,7 @@ import '../../../utils/colors.dart';
 
 class StoryScreen extends StatefulWidget {
   late final List<ImageData> images;
-  StoryScreen({required this.images, super.key});
+  const StoryScreen({required this.images, super.key});
 
   @override
   State<StoryScreen> createState() => _StoryScreenState();
@@ -136,7 +136,7 @@ class _StoryScreenState extends State<StoryScreen> {
               ),
             ),
              Padding(
-            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
             child: TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -149,7 +149,7 @@ class _StoryScreenState extends State<StoryScreen> {
                 ),
                 filled: true,
                 fillColor: LightColor.maincolor1,
-                contentPadding: EdgeInsets.all(8),
+                contentPadding: const EdgeInsets.all(8),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide(color: Colors.grey.shade600)),

@@ -17,7 +17,7 @@ class _MessageCardState extends State<MessageCard> {
   Widget build(BuildContext context) {
     return  Column(
       children: [
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         ListTile(
          leading: CircleAvatar(
           maxRadius: 30,
@@ -27,12 +27,12 @@ class _MessageCardState extends State<MessageCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
            children: [
              Text(widget.name),
-             Text(widget.description, style: TextStyle(color: Colors.grey, fontSize: 12),)
+             Text(widget.description, style: const TextStyle(color: Colors.grey, fontSize: 12),)
            ],
          ),
          trailing: Container(
           width: 10,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
             color: LightColor.maincolor
           ),

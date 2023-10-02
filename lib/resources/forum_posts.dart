@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:usersms/resources/photo_user_posts.dart';
 import 'package:usersms/utils/colors.dart';
 
-import 'image_data.dart';
 
 class ForumPosts extends StatefulWidget {
   final String title;
@@ -35,7 +34,7 @@ class _ForumPostsState extends State<ForumPosts> {
     "Wasike",
     "Fello"
   ];
-   ScrollController _scrollController = ScrollController(); // Add this line
+   final ScrollController _scrollController = ScrollController(); // Add this line
 
   @override
   void dispose() {
@@ -47,7 +46,7 @@ class _ForumPostsState extends State<ForumPosts> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: LightColor.background),      
+        iconTheme: const IconThemeData(color: LightColor.background),      
         toolbarHeight: 29,
         backgroundColor: const Color(0xFF121212),
         title: Row(

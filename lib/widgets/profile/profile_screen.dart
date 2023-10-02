@@ -213,7 +213,7 @@ class _ProfileScrenState extends State<ProfileScren> {
                                     height: 180.0,
                                     fit: BoxFit.cover,
                                   ),
-                                  Icon(Icons.add_a_photo,color: LightColor.background,size: 30,)
+                                  const Icon(Icons.add_a_photo,color: LightColor.background,size: 30,)
                           ])),
                     )
                   ],
@@ -229,11 +229,11 @@ class _ProfileScrenState extends State<ProfileScren> {
                 ),
                 const SizedBox(height: 80.0),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 50.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 50.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Stat(title: 'Posts', value: 35),
+                      const Stat(title: 'Posts', value: 35),
                       GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -242,7 +242,7 @@ class _ProfileScrenState extends State<ProfileScren> {
                                   builder: (context) => const Followers()),
                             );
                           },
-                          child: Stat(title: 'Followers', value: 1552)),
+                          child: const Stat(title: 'Followers', value: 1552)),
                       GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -251,7 +251,7 @@ class _ProfileScrenState extends State<ProfileScren> {
                                   builder: (context) => const Following()),
                             );
                           },
-                          child: Stat(title: 'Following', value: 128)),
+                          child: const Stat(title: 'Following', value: 128)),
                     ],
                   ),
                 ),

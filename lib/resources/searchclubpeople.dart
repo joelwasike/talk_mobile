@@ -34,7 +34,7 @@ class _GetClubPeopleState extends State<GetClubPeople> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 30,
-        iconTheme: IconThemeData(color: LightColor.background),
+        iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
         backgroundColor: LightColor.maincolor1,
         title: Padding(
@@ -83,7 +83,7 @@ class _GetClubPeopleState extends State<GetClubPeople> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
             child: TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -96,14 +96,14 @@ class _GetClubPeopleState extends State<GetClubPeople> {
                 ),
                 filled: true,
                 fillColor: LightColor.maincolor1,
-                contentPadding: EdgeInsets.all(8),
+                contentPadding: const EdgeInsets.all(8),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide(color: Colors.grey.shade600)),
               ),
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
               physics: const BouncingScrollPhysics(),
@@ -156,7 +156,7 @@ class LongPressSelectableTile extends StatelessWidget {
   final String image;
   final String followers;
 
-  const LongPressSelectableTile({
+  const LongPressSelectableTile({super.key, 
     required this.onTap,
     required this.onLongPress,
     required this.isSelected,
@@ -172,17 +172,17 @@ class LongPressSelectableTile extends StatelessWidget {
       onLongPress: onLongPress,
       child: ListTile(
         title: Text(name),
-        subtitle: Text("Followers: $followers",style: TextStyle(color: Colors.grey, fontSize: 13),),
+        subtitle: Text("Followers: $followers",style: const TextStyle(color: Colors.grey, fontSize: 13),),
         leading: CircleAvatar(
           maxRadius: 30,
           backgroundImage: NetworkImage(image),
         ),
         trailing: isSelected
-            ? Icon(
+            ? const Icon(
                 Icons.check_circle,
                 color: LightColor.maincolor,
               )
-            : SizedBox(),
+            : const SizedBox(),
       ),
     );
   }

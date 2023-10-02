@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:usersms/resources/club_post.dart';
 import 'package:usersms/widgets/club_card.dart';
-import 'package:usersms/widgets/forum_card.dart';
 import '../resources/image_data.dart';
 import '../resources/searchclubpeople.dart';
-import '../resources/searchforumfriends.dart';
 import '../screens/homepage.dart';
 import '../utils/colors.dart';
 
@@ -58,7 +56,7 @@ class _ClubsState extends State<Clubs> {
                           ),
                     );
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.add_box,
                     color: LightColor.background,
                   ))
@@ -81,7 +79,7 @@ class _ClubsState extends State<Clubs> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
            Padding(
-            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
             child: TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -94,20 +92,20 @@ class _ClubsState extends State<Clubs> {
                 ),
                 filled: true,
                 fillColor: LightColor.maincolor1,
-                contentPadding: EdgeInsets.all(8),
+                contentPadding: const EdgeInsets.all(8),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide(color: Colors.grey.shade600)),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
         
           Expanded(
             child: ListView.builder(
-              physics: BouncingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               itemCount: clubs.length,
               itemBuilder: (context, index) {
                 return GestureDetector(

@@ -44,7 +44,7 @@ class ViewerPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Container(
+              SizedBox(
                   height: 350,
                   child: medium.mediumType == MediumType.image
                       ? AspectRatio(
@@ -109,7 +109,7 @@ class ViewerPage extends StatelessWidget {
 class VideoProvider extends StatefulWidget {
   final String mediumId;
 
-  const VideoProvider({
+  const VideoProvider({super.key, 
     required this.mediumId,
   });
 

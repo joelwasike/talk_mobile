@@ -1,7 +1,4 @@
-import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
@@ -327,7 +324,7 @@ Future<String> generateVideoThumbnail(String videoUrl) async {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: EdgeInsets.only(
+                                            padding: const EdgeInsets.only(
                                                 top: 16, left: 16, right: 16),
                                             child: TextField(
                                               decoration: InputDecoration(
@@ -345,7 +342,7 @@ Future<String> generateVideoThumbnail(String videoUrl) async {
                                                 fillColor:
                                                     LightColor.maincolor1,
                                                 contentPadding:
-                                                    EdgeInsets.all(8),
+                                                    const EdgeInsets.all(8),
                                                 enabledBorder:
                                                     OutlineInputBorder(
                                                         borderRadius:
@@ -357,7 +354,7 @@ Future<String> generateVideoThumbnail(String videoUrl) async {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(height: 20),
+                                          const SizedBox(height: 20),
                                           Expanded(
                                             child: ListView.builder(
                                               physics:
@@ -516,7 +513,7 @@ class LongPressSelectableTile extends StatefulWidget {
   final String image;
   final String followers;
 
-  const LongPressSelectableTile({
+  const LongPressSelectableTile({super.key, 
     required this.onTap,
     required this.onLongPress,
     required this.isSelected,
@@ -540,18 +537,18 @@ class _LongPressSelectableTileState extends State<LongPressSelectableTile> {
         title: Text(widget.name),
         subtitle: Text(
           "Followers: ${widget.followers}",
-          style: TextStyle(color: Colors.grey, fontSize: 13),
+          style: const TextStyle(color: Colors.grey, fontSize: 13),
         ),
         leading: CircleAvatar(
           maxRadius: 30,
           backgroundImage: NetworkImage(widget.image),
         ),
         trailing: widget.isSelected
-            ? Icon(
+            ? const Icon(
                 Icons.check_circle,
                 color: LightColor.maincolor,
               )
-            : SizedBox(),
+            : const SizedBox(),
       ),
     );
   }

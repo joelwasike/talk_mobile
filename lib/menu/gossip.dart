@@ -18,7 +18,7 @@ class Gossip extends StatefulWidget {
 }
 
 class _GossipState extends State<Gossip> {
-  ScrollController _scrollController = ScrollController(); // Add this line
+  final ScrollController _scrollController = ScrollController(); // Add this line
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
   String? content;
@@ -114,7 +114,7 @@ class _GossipState extends State<Gossip> {
           ),
           InViewNotifierList(
             scrollDirection: Axis.vertical,
-            initialInViewIds: ['0'],
+            initialInViewIds: const ['0'],
             isInViewPortCondition: (double deltaTop, double deltaBottom,
                 double viewPortDimension) {
               return deltaTop < (0.5 * viewPortDimension) &&
@@ -169,7 +169,7 @@ class _GossipState extends State<Gossip> {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(30.0)),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.add_alert,
               color: Colors.white, // Adjust the color as needed
             ),

@@ -29,7 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
           toolbarHeight: 40,
           backgroundColor: LightColor.maincolor1,
           automaticallyImplyLeading: false,
-          title: TabBar(
+          title: const TabBar(
             unselectedLabelStyle: TextStyle(fontSize: 15),
             indicatorPadding: EdgeInsets.only(bottom: 10),
             labelColor: LightColor.background,
@@ -41,7 +41,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ],
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
             PinterestGrid(),
             FriendsTab(), // Create the FriendsTab widget
@@ -66,7 +66,7 @@ class _PinterestGridState extends State<PinterestGrid> {
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
             child: TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -79,7 +79,7 @@ class _PinterestGridState extends State<PinterestGrid> {
                 ),
                 filled: true,
                 fillColor: LightColor.maincolor1,
-                contentPadding: EdgeInsets.all(8),
+                contentPadding: const EdgeInsets.all(8),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide(color: Colors.grey.shade600)),
@@ -205,7 +205,7 @@ class _FriendsTabState extends State<FriendsTab> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+          padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
           child: TextField(
             decoration: InputDecoration(
               border: InputBorder.none,
@@ -218,14 +218,14 @@ class _FriendsTabState extends State<FriendsTab> {
               ),
               filled: true,
               fillColor: LightColor.maincolor1,
-              contentPadding: EdgeInsets.all(8),
+              contentPadding: const EdgeInsets.all(8),
               enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide(color: Colors.grey.shade600)),
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         Expanded(

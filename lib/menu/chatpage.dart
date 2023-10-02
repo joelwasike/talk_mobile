@@ -18,7 +18,7 @@ class _ChatpageState extends State<Chatpage> {
   final TextEditingController _messageController = TextEditingController();
   final Chatservice _chatservice = Chatservice();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
@@ -65,7 +65,7 @@ class _ChatpageState extends State<Chatpage> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _scrollController.animateTo(
             _scrollController.position.maxScrollExtent,
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
           );
         });
@@ -117,13 +117,13 @@ class _ChatpageState extends State<Chatpage> {
                   : CrossAxisAlignment.start,
           children: [
             ChatBubble(message: data["message"]),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Text(
               DateFormat('hh:mm a').format(
                 (data["timestamp"] as Timestamp)
                     .toDate(), // Convert to DateTime
               ),
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 10,
               ),

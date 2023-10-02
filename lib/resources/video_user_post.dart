@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:inview_notifier_list/inview_notifier_list.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'package:video_player/video_player.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 import 'heartanimationwidget.dart';
 import 'image_data.dart';
 
@@ -17,7 +15,7 @@ class VUserPost extends StatefulWidget {
   final bool play;
   final ScrollController scrollController;
 
-  const VUserPost({
+  const VUserPost({super.key, 
     required this.name,
     required this.scrollController,
     required this.content,
@@ -507,7 +505,7 @@ class LongPressSelectableTile extends StatefulWidget {
   final String image;
   final String followers;
 
-  const LongPressSelectableTile({
+  const LongPressSelectableTile({super.key, 
     required this.onTap,
     required this.onLongPress,
     required this.isSelected,

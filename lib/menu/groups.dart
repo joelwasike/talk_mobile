@@ -56,7 +56,7 @@ class _GroupsState extends State<Groups> {
                           ),
                     );
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.add_box,
                     color: LightColor.background,
                   ))
@@ -79,7 +79,7 @@ class _GroupsState extends State<Groups> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
            Padding(
-            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
             child: TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -92,19 +92,19 @@ class _GroupsState extends State<Groups> {
                 ),
                 filled: true,
                 fillColor: LightColor.maincolor1,
-                contentPadding: EdgeInsets.all(8),
+                contentPadding: const EdgeInsets.all(8),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide(color: Colors.grey.shade600)),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Expanded(
             child: ListView.builder(
-              physics: BouncingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               itemCount: groups.length,
               itemBuilder: (context, index) {
                 return GestureDetector(

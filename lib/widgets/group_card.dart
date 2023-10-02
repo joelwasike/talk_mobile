@@ -39,12 +39,12 @@ class _GroupcardState extends State<Groupcard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
                    Text(widget.name),
-                   Text(widget.description, style: TextStyle(color: Colors.grey, fontSize: 11),)
+                   Text(widget.description, style: const TextStyle(color: Colors.grey, fontSize: 11),)
                  ],
                ),
                trailing: Container(
                 width: 10,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: LightColor.maincolor
                 ),
@@ -52,7 +52,7 @@ class _GroupcardState extends State<Groupcard> {
               ),
           ),
         ),
-        SizedBox(height: 5,),
+        const SizedBox(height: 5,),
       ],
     );
   }

@@ -275,7 +275,7 @@ class _AddGossipState extends State<AddGossip> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 30,
-        iconTheme: IconThemeData(color: LightColor.background),
+        iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
         backgroundColor: LightColor.maincolor1,
         title: Padding(
@@ -306,7 +306,7 @@ class _AddGossipState extends State<AddGossip> {
                 uploadGossip();
               },
               backgroundColor: LightColor.maincolor,
-              child: isloading?CircularProgressIndicator(color: Colors.white,): Text(
+              child: isloading?const CircularProgressIndicator(color: Colors.white,): const Text(
                 "Post",
                 style: TextStyle(color: Colors.white),
               )),
@@ -337,7 +337,7 @@ class _AddGossipState extends State<AddGossip> {
                 contentPadding: const EdgeInsets.all(8),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: LightColor.maincolor)),
+                    borderSide: const BorderSide(color: LightColor.maincolor)),
               ),
             ),
           ),
@@ -371,10 +371,10 @@ class _AddGossipState extends State<AddGossip> {
                 ],
               ),
               child:  TextField(
-                style: TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 14),
                 controller: descriptionController,
                 maxLines: null,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   hintText: "Enter Gossip description here",
                   hintStyle: TextStyle(
@@ -413,7 +413,7 @@ class _AddGossipState extends State<AddGossip> {
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               color: LightColor.maincolor),
-                          child: Icon(
+                          child: const Icon(
                             Icons.add_a_photo,
                             color: LightColor.background,
                           ),
@@ -433,7 +433,7 @@ class _AddGossipState extends State<AddGossip> {
                   "     Select a photo",
                   style: TextStyle(color: Colors.grey.shade600),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Column(
@@ -448,7 +448,7 @@ class _AddGossipState extends State<AddGossip> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: LightColor.maincolor),
-                        child: Icon(
+                        child: const Icon(
                           Icons.video_file,
                           color: LightColor.background,
                         ),
@@ -482,7 +482,7 @@ class _AddGossipState extends State<AddGossip> {
                                 child: VideoPlayer(_videoController!),
                               ),
                             if (isVideoPlaying)
-                              Center(
+                              const Center(
                                 child: Icon(
                                   Icons.pause,
                                   size: 50,
@@ -490,7 +490,7 @@ class _AddGossipState extends State<AddGossip> {
                                 ),
                               ),
                             if (!isVideoPlaying)
-                              Center(
+                              const Center(
                                 child: Icon(
                                   Icons.play_circle_fill,
                                   size: 50,
