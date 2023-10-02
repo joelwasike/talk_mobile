@@ -15,11 +15,14 @@ class VUserPost extends StatefulWidget {
   final bool play;
   final ScrollController scrollController;
 
-  const VUserPost({super.key, 
+  const VUserPost({
+    super.key,
     required this.name,
     required this.scrollController,
     required this.content,
-    required this.likes,required this.url, required this.play,
+    required this.likes,
+    required this.url,
+    required this.play,
   });
 
   @override
@@ -31,11 +34,8 @@ class _UserPostState extends State<VUserPost> {
   bool isHeartAnimating = false;
   SampleItem? selectedMenu;
   final TextEditingController _messageController = TextEditingController();
-  VideoPlayerController? _videoPlayerController;
-   late VideoPlayerController _controller;
+  late VideoPlayerController _controller;
   late Future<void> _initializeVideoPlayerFuture;
-
-
 
   List people = [
     "Joel",
@@ -89,7 +89,6 @@ class _UserPostState extends State<VUserPost> {
     _controller.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -152,54 +151,52 @@ class _UserPostState extends State<VUserPost> {
           ),
         ),
         GestureDetector(
-          onDoubleTap: () {
-            setState(() {
-              isHeartAnimating = true;
-              isliked = true;
-            });
-          },
-          child: Stack(
-  alignment: Alignment.center,
-  children: [
-   AspectRatio(
-     aspectRatio: _videoPlayerController!.value.aspectRatio,
-     child: GestureDetector(
-       onTap: () {
-         print("object taped");
-       },
-       child: FutureBuilder(
-      future: _initializeVideoPlayerFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return VideoPlayer(_controller);
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
-    ),
-     ),
-   ),
-    Opacity(
-      opacity: isHeartAnimating ? 1 : 0,
-      child: HeartAnimationWidget(
-        isAnimating: isHeartAnimating,
-        duration: const Duration(milliseconds: 700),
-        onEnd: () => setState(() {
-          isHeartAnimating = false;
-        }),
-        child: const Icon(
-          Icons.favorite,
-          color: Colors.white,
-          size: 100,
-        ),
-      ),
-    ),
-  ],
-)
-
-        ),
+            onDoubleTap: () {
+              setState(() {
+                isHeartAnimating = true;
+                isliked = true;
+              });
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: GestureDetector(
+                    onTap: () {
+                      print("object taped");
+                    },
+                    child: FutureBuilder(
+                      future: _initializeVideoPlayerFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          return VideoPlayer(_controller);
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                Opacity(
+                  opacity: isHeartAnimating ? 1 : 0,
+                  child: HeartAnimationWidget(
+                    isAnimating: isHeartAnimating,
+                    duration: const Duration(milliseconds: 700),
+                    onEnd: () => setState(() {
+                      isHeartAnimating = false;
+                    }),
+                    child: const Icon(
+                      Icons.favorite,
+                      color: Colors.white,
+                      size: 100,
+                    ),
+                  ),
+                ),
+              ],
+            )),
         const SizedBox(
           height: 10,
         ),
@@ -431,7 +428,7 @@ class _UserPostState extends State<VUserPost> {
                 "${widget.name} ",
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-               Text(
+              Text(
                 widget.likes.toString(),
               ),
               const Text(
@@ -446,12 +443,12 @@ class _UserPostState extends State<VUserPost> {
           child: Padding(
             padding: const EdgeInsets.only(left: 8),
             child: RichText(
-                text:  TextSpan(children: [
+                text: TextSpan(children: [
               const TextSpan(
                   text: "Wiky_Akumu ",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
-                  text:widget.content,
+                  text: widget.content,
                   style: const TextStyle(color: Colors.white)),
             ])),
           ),
@@ -505,7 +502,8 @@ class LongPressSelectableTile extends StatefulWidget {
   final String image;
   final String followers;
 
-  const LongPressSelectableTile({super.key, 
+  const LongPressSelectableTile({
+    super.key,
     required this.onTap,
     required this.onLongPress,
     required this.isSelected,

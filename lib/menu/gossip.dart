@@ -18,7 +18,8 @@ class Gossip extends StatefulWidget {
 }
 
 class _GossipState extends State<Gossip> {
-  final ScrollController _scrollController = ScrollController(); // Add this line
+  final ScrollController _scrollController =
+      ScrollController(); // Add this line
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
   String? content;

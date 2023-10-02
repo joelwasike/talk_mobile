@@ -7,7 +7,7 @@ import '../../../utils/colors.dart';
 
 
 class StoryScreen extends StatefulWidget {
-  late final List<ImageData> images;
+  final List<ImageData> images;
   const StoryScreen({required this.images, super.key});
 
   @override
