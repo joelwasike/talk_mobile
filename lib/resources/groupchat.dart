@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:usersms/utils/colors.dart';
 import 'package:uuid/uuid.dart';
 
 
@@ -211,8 +212,14 @@ class _GroupchatState extends State<Groupchat> {
   @override
   Widget build(BuildContext context) => Scaffold(
         body: Chat(
-          
-          theme: const DarkChatTheme() ,
+          theme:  DarkChatTheme(
+            backgroundColor: LightColor.scaffold,
+            primaryColor: LightColor.maincolor,
+            inputBorderRadius: BorderRadius.only(topLeft: Radius.circular(6),topRight: Radius.circular(6)),
+            inputBackgroundColor: Colors.black,
+            secondaryColor: Colors.grey.shade900,
+            
+          ),
           messages: _messages,
           onAttachmentPressed: _handleAttachmentPressed,
           onMessageTap: _handleMessageTap,

@@ -7,8 +7,8 @@ import 'package:usersms/resources/followers.dart';
 import 'package:usersms/resources/following.dart';
 import 'package:usersms/utils/colors.dart';
 import 'dart:math' as math;
-import 'package:usersms/widgets/profile/widgets/profile_background.dart';
-import 'package:usersms/widgets/profile/widgets/stat.dart';
+import 'package:usersms/screens/profile/widgets/profile_background.dart';
+import 'package:usersms/screens/profile/widgets/stat.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import '../../resources/image_data.dart';
@@ -224,7 +224,7 @@ class _ProfileScrenState extends State<ProfileScren> {
                 ),
                 const SizedBox(height: 4.0),
                 Text(
-                  '@jolewasike',
+                  '@joelwasike',
                   style: TextStyle(color: Colors.grey.shade300),
                 ),
                 const SizedBox(height: 80.0),
@@ -259,8 +259,8 @@ class _ProfileScrenState extends State<ProfileScren> {
                 Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: StaggeredGrid.count(
-                    mainAxisSpacing: 3.0,
-                    crossAxisSpacing: 3.0,
+                    mainAxisSpacing: 2.0,
+                    crossAxisSpacing: 2.0,
                     crossAxisCount: 3,
                     children: List.generate(
                       imageList.length,
@@ -345,7 +345,7 @@ class ImageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isVideo = isVideoLink(imageData.imageUrl);
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16.0),
+      borderRadius: BorderRadius.circular(6.0),
       child: isVideo
           ? FutureBuilder<String>(
               future: generateVideoThumbnail(imageData.imageUrl),

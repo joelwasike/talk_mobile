@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'package:video_player/video_player.dart';
@@ -109,14 +110,15 @@ class _UserPostState extends State<VUserPost> {
                   ),
                   Text(
                     widget.name,
-                    style: const TextStyle(
+                    style: TextStyle(
+                      color: Colors.grey.shade300,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
               PopupMenuButton<SampleItem>(
-                color: LightColor.background,
+                color: Colors.grey.shade300,
                 initialValue: selectedMenu,
                 onSelected: (SampleItem item) {
                   setState(() {
@@ -172,8 +174,37 @@ class _UserPostState extends State<VUserPost> {
                         if (snapshot.connectionState == ConnectionState.done) {
                           return VideoPlayer(_controller);
                         } else {
-                          return const Center(
-                            child: CircularProgressIndicator(),
+                          return GFShimmer(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 300,
+                                  color: Colors.grey.shade800.withOpacity(0.4),
+                                ),
+                                const SizedBox(height: 12),
+                                Container(
+                                  width: double.infinity,
+                                  height: 8,
+                                  color: Colors.grey.shade800.withOpacity(0.4),
+                                ),
+                                const SizedBox(height: 6),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.5,
+                                  height: 8,
+                                  color: Colors.grey.shade800.withOpacity(0.4),
+                                ),
+                                const SizedBox(height: 6),
+                                Container(
+                                  width: MediaQuery.of(context).size.width *
+                                      0.25,
+                                  height: 8,
+                                  color: Colors.grey.shade800.withOpacity(0.4),
+                                )
+                              ],
+                            ),
                           );
                         }
                       },
@@ -188,9 +219,9 @@ class _UserPostState extends State<VUserPost> {
                     onEnd: () => setState(() {
                       isHeartAnimating = false;
                     }),
-                    child: const Icon(
+                    child: Icon(
                       Icons.favorite,
-                      color: Colors.white,
+                      color: Colors.grey.shade300,
                       size: 100,
                     ),
                   ),
@@ -213,7 +244,7 @@ class _UserPostState extends State<VUserPost> {
                     child: IconButton(
                       icon: Icon(
                         isliked ? Icons.favorite : Icons.favorite_outline,
-                        color: isliked ? Colors.red : Colors.white,
+                        color: isliked ? Colors.red : Colors.grey.shade300,
                         size: 28,
                       ),
                       onPressed: () {
@@ -245,11 +276,11 @@ class _UserPostState extends State<VUserPost> {
                                     const SizedBox(
                                       height: 10,
                                     ),
-                                    const Text(
+                                    Text(
                                       "Comments",
                                       style: TextStyle(
                                           fontSize: 16,
-                                          color: LightColor.background),
+                                          color: Colors.grey.shade300),
                                     ),
                                     Divider(
                                       color: Colors.grey.shade800,
@@ -271,9 +302,9 @@ class _UserPostState extends State<VUserPost> {
                                 ),
                               ));
                     },
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.chat_bubble_outline_outlined,
-                      color: Colors.white,
+                      color: Colors.grey.shade300,
                     ),
                   ),
                   IconButton(
@@ -296,11 +327,11 @@ class _UserPostState extends State<VUserPost> {
                                     const SizedBox(
                                       height: 10,
                                     ),
-                                    const Text(
+                                    Text(
                                       "Select friends to share",
                                       style: TextStyle(
                                           fontSize: 16,
-                                          color: LightColor.background),
+                                          color: Colors.grey.shade300),
                                     ),
                                     Divider(
                                       color: Colors.grey.shade800,
@@ -399,19 +430,19 @@ class _UserPostState extends State<VUserPost> {
                     },
                     icon: Transform(
                       transform: Matrix4.rotationZ(5.8),
-                      child: const Icon(
+                      child: Icon(
                         Icons.send,
-                        color: Colors.white,
+                        color: Colors.grey.shade300,
                       ),
                     ),
                   ),
                 ],
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Icon(
                   Icons.bookmark_add_outlined,
-                  color: Colors.white,
+                  color: Colors.grey.shade300,
                 ),
               ),
             ],
@@ -425,15 +456,11 @@ class _UserPostState extends State<VUserPost> {
                 "Liked by ",
               ),
               Text(
-                "${widget.name} ",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
                 widget.likes.toString(),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const Text(
-                "students",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                " students",
               )
             ],
           ),
@@ -444,12 +471,9 @@ class _UserPostState extends State<VUserPost> {
             padding: const EdgeInsets.only(left: 8),
             child: RichText(
                 text: TextSpan(children: [
-              const TextSpan(
-                  text: "Wiky_Akumu ",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
                   text: widget.content,
-                  style: const TextStyle(color: Colors.white)),
+                  style: TextStyle(color: Colors.grey.shade300, fontSize: 14)),
             ])),
           ),
         )

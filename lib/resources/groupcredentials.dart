@@ -158,7 +158,7 @@ class _GroupCredState extends State<GroupCred> {
         toolbarHeight: 30,
         iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
-        backgroundColor: LightColor.maincolor1,
+        backgroundColor: LightColor.scaffold,
         title: Padding(
           padding: const EdgeInsets.only(left: 56),
           child: Row(
@@ -175,32 +175,38 @@ class _GroupCredState extends State<GroupCred> {
                       ))),
             ],
           ),
-        ),
+        ), 
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 40, right: 10),
-        child: SizedBox(
-          height: 50,
-          width: 50,
-          child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  (context),
-                  MaterialPageRoute(builder: (context) => const GroupCred()),
-                );
-              },
-              backgroundColor: LightColor.maincolor,
-              child: const Text(
-                "create",
-                style: TextStyle(color: Colors.white),
-              )),
+       floatingActionButton: FloatingActionButton(
+        backgroundColor:
+            Colors.transparent, // Set the background color to transparent
+        mini: false,
+        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        onPressed: () {
+           Navigator.push(
+                      (context),
+                      MaterialPageRoute(builder: (context) => const GroupCred()
+                         
+                          ),
+                    );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: LightColor.maincolor, // Specify the border color here
+            ),
+          ),
+          child:  Center(
+            child: Icon(Icons.arrow_forward_ios,color: LightColor.maincolor,)
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       body: ListView(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 40),
             child: Column(
               children: [
                 GestureDetector(
@@ -254,7 +260,10 @@ class _GroupCredState extends State<GroupCred> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               decoration: InputDecoration(
-                border: InputBorder.none,
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: LightColor.maincolor),
+                ),
                 hintText: "eg. Hiking Group..",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 prefixIcon: Icon(

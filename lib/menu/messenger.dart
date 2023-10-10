@@ -30,9 +30,9 @@ class _MessengerState extends State<Messenger> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: FadeInLeft(child: const DrawerWidget()),
         toolbarHeight: 30,
-        automaticallyImplyLeading: false,
-        backgroundColor: LightColor.maincolor1,
+        backgroundColor: LightColor.scaffold,
         title: Padding(
           padding: const EdgeInsets.only(left: 56),
           child: Row(
@@ -47,43 +47,53 @@ class _MessengerState extends State<Messenger> {
                           fontWeight: FontWeight.w900,
                         ),
                       ))),
-              IconButton(
-                  onPressed: () {
-                      Navigator.push(
+              
+            ],
+          ),
+        ),
+      ),
+        floatingActionButton: FloatingActionButton(
+        backgroundColor:
+            Colors.transparent, // Set the background color to transparent
+        mini: false,
+        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        onPressed: () {
+           Navigator.push(
                       (context),
                       MaterialPageRoute(builder: (context) => const GetMessagingPerson()
                          
                           ),
                     );
-                  },
-                  icon: const Icon(
-                    Icons.add_comment,
-                    color: LightColor.background,
-                  ))
-            ],
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: LightColor.maincolor, // Specify the border color here
+            ),
+          ),
+          child:  Center(
+            child: Icon(Icons.message,color: LightColor.maincolor,)
           ),
         ),
       ),
-      floatingActionButton: SizedBox(
-        height: 40,
-        width: 40,
-        child: FloatingActionButton(
-            onPressed: () {},
-            backgroundColor: Colors.grey.shade900,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(30.0))),
-            child: const DrawerWidget()),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+     
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
             child: TextField(
               decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: "Search message...",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
+                hintText: "Search friends...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 prefixIcon: Icon(
                   Icons.search,
@@ -93,14 +103,11 @@ class _MessengerState extends State<Messenger> {
                 filled: true,
                 fillColor: LightColor.maincolor1,
                 contentPadding: const EdgeInsets.all(8),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(color: Colors.grey.shade600)),
               ),
             ),
           ),
           const SizedBox(
-            height: 20,
+            height: 10,
           ),
           Expanded(
             child: ListView.builder(

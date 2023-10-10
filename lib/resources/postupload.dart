@@ -14,27 +14,30 @@ class ViewerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: LightColor.maincolor1,
-        automaticallyImplyLeading: false,
-        actions: <Widget>[
-          FloatingActionButton(
-            backgroundColor: LightColor.secondaycolor,
-            mini: true,
-            shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(30.0), // Adjust the radius as needed
+      floatingActionButton: FloatingActionButton(
+        backgroundColor:
+            Colors.transparent, // Set the background color to transparent
+        mini: false,
+        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        onPressed: () {},
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: LightColor.maincolor, // Specify the border color here
             ),
-            onPressed: () {},
-            child: const Text(
+          ),
+          child: const Center(
+            child: Text(
               "Post",
               style: TextStyle(
-                  color: LightColor.maincolor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16.0),
+                color: LightColor.maincolor,
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
+              ),
             ),
-          )
-        ],
+          ),
+        ),
       ),
       body: ListView(
         children: <Widget>[
@@ -109,7 +112,8 @@ class ViewerPage extends StatelessWidget {
 class VideoProvider extends StatefulWidget {
   final String mediumId;
 
-  const VideoProvider({super.key, 
+  const VideoProvider({
+    super.key,
     required this.mediumId,
   });
 

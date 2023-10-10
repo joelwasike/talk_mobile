@@ -25,8 +25,8 @@ class _PeopleCardState extends State<PeopleCard> {
          title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
            children: [
-             Text(widget.name),
-             Text("${widget.followers} followers", style: const TextStyle(color: Colors.grey, fontSize: 12),)
+             Text(widget.name,style:  TextStyle(color: Colors.grey.shade200, fontSize: 15)),
+             Text("online", style: const TextStyle(color: Colors.grey, fontSize: 12),)
            ],
          ),
         

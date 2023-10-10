@@ -41,9 +41,10 @@ class _HomepageState extends State<Homepage> {
       mainScreen: currentScreen(),
       borderRadius: 30,
       showShadow: true,
-      angle: -13.0,
+      angle: 0.0,
       slideWidth: 200,
-      menuBackgroundColor: LightColor.maincolor1,
+      menuBackgroundColor: LightColor.scaffold,
+      
     );
   }
 
@@ -183,7 +184,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: LightColor.maincolor1,
+      backgroundColor: LightColor.scaffold,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,7 +237,9 @@ class _DrawerScreenState extends State<DrawerScreen> {
         widget.setIndex(index);
       },
       child: Container(
-        margin: const EdgeInsets.only(left: 20, bottom: 12),
+        height: 35,
+        width: MediaQuery.of(context).size.height,
+        margin: const EdgeInsets.only(left: 20, bottom: 0),
         child: Row(
           children: [
             Icon(
@@ -286,7 +289,11 @@ class Logout extends StatelessWidget {
         onTap: () async {
           await FirebaseAuth.instance.signOut();
         },
-        child: const GlassBox(
+        child:  Container(
+          decoration: BoxDecoration(
+            color: LightColor.maincolor,
+            borderRadius: BorderRadius.circular(6)
+          ),
             height: 40.0,
             width: 100.0,
             child: Center(

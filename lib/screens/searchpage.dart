@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -66,10 +68,17 @@ class _PinterestGridState extends State<PinterestGrid> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
             child: TextField(
               decoration: InputDecoration(
-                border: InputBorder.none,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
                 hintText: "Search friends...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 prefixIcon: Icon(
@@ -80,18 +89,15 @@ class _PinterestGridState extends State<PinterestGrid> {
                 filled: true,
                 fillColor: LightColor.maincolor1,
                 contentPadding: const EdgeInsets.all(8),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(color: Colors.grey.shade600)),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.only(top: 2),
             child: Container(
               child: StaggeredGrid.count(
-                mainAxisSpacing: 4.0,
-                crossAxisSpacing: 4.0,
+                mainAxisSpacing: 2.0,
+                crossAxisSpacing: 2.0,
                 crossAxisCount: 3,
                 children: List.generate(
                   imageList.length,
@@ -149,7 +155,7 @@ class ImageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isVideo = isVideoLink(imageData.imageUrl);
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16.0),
+      borderRadius: BorderRadius.circular(6.0),
       child: isVideo
           ? FutureBuilder<String>(
               future: generateVideoThumbnail(imageData.imageUrl),
@@ -175,8 +181,25 @@ class ImageCard extends StatelessWidget {
                   return Container(); // Show a loading indicator
                 }
               },
-            )
-          : Image.network(imageData.imageUrl, fit: BoxFit.cover),
+            ): CachedNetworkImage(
+                imageUrl: imageData.imageUrl, fit: BoxFit.cover,
+                
+                placeholder: (context, url) => GFShimmer(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: MediaQuery.of(context).size.height/4,
+                                  color: Colors.grey.shade800.withOpacity(0.4),
+                                ),
+                              
+                              ],
+                            ),
+                          ),
+                // Placeholder while loading
+              ),
+          // Image.network(imageData.imageUrl, fit: BoxFit.cover),
     );
   }
 }
@@ -204,27 +227,31 @@ class _FriendsTabState extends State<FriendsTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
-          child: TextField(
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: "Search friends...",
-              hintStyle: TextStyle(color: Colors.grey.shade600),
-              prefixIcon: Icon(
-                Icons.search,
-                color: Colors.grey.shade600,
-                size: 20,
+       Padding(
+            padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
+            child: TextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
+                hintText: "Search friends...",
+                hintStyle: TextStyle(color: Colors.grey.shade600),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Colors.grey.shade600,
+                  size: 20,
+                ),
+                filled: true,
+                fillColor: LightColor.maincolor1,
+                contentPadding: const EdgeInsets.all(8),
               ),
-              filled: true,
-              fillColor: LightColor.maincolor1,
-              contentPadding: const EdgeInsets.all(8),
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: Colors.grey.shade600)),
             ),
           ),
-        ),
         const SizedBox(
           height: 20,
         ),

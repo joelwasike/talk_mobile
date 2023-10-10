@@ -175,30 +175,35 @@ class _ForumCredState extends State<ForumCred> {
           ],
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 40, right: 10),
-        child: SizedBox(
-          height: 50,
-          width: 50,
-          child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  (context),
-                  MaterialPageRoute(builder: (context) => const GroupCred()),
-                );
-              },
-              backgroundColor: LightColor.maincolor,
-              child: const Text(
-                "create",
-                style: TextStyle(color: Colors.white),
-              )),
+        floatingActionButton: FloatingActionButton(
+        backgroundColor:
+            Colors.transparent, // Set the background color to transparent
+        mini: false,
+        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        onPressed: () {
+           Navigator.push(
+                      (context),
+                      MaterialPageRoute(builder: (context) => const ForumCred()
+                         
+                          ),
+                    );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: LightColor.maincolor, // Specify the border color here
+            ),
+          ),
+          child:  Center(
+            child: Icon(Icons.arrow_forward_ios,color: LightColor.maincolor,)
+          ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       body: ListView(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 40),
             child: Column(
               children: [
                 GestureDetector(

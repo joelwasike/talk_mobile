@@ -79,6 +79,9 @@ dependencies:
   getwidget: ^4.0.0
   carousel_slider: ^4.2.1
   inview_notifier_list: ^3.0.0
+  flutter_downloader: ^1.11.3
+  android_path_provider: ^0.3.0
+  device_info_plus: ^9.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

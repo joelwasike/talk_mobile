@@ -1,7 +1,9 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:usersms/resources/addnotice.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/notice_post.dart';
 import '../screens/homepage.dart';
 import '../utils/colors.dart';
@@ -16,7 +18,6 @@ class Notices extends StatefulWidget {
 }
 
 class _NoticesState extends State<Notices> {
-
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
   String? content;
@@ -32,8 +33,7 @@ class _NoticesState extends State<Notices> {
     setState(() {
       isloading = true;
     });
-    final url = Uri.parse(
-        'https://5335-197-232-22-252.ngrok-free.app/getnotices'); // Replace with your JSON URL
+    final url = Uri.parse('$baseUrl/getnotices'); // Replace with your JSON URL
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -74,7 +74,7 @@ class _NoticesState extends State<Notices> {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
-            leading:    FadeInLeft(child: const DrawerWidget()),
+            leading: FadeInLeft(child: const DrawerWidget()),
             backgroundColor: LightColor.scaffold,
             floating: true,
             pinned: false,
@@ -85,8 +85,8 @@ class _NoticesState extends State<Notices> {
                   FadeInRight(
                       child: Text('Campus Notice',
                           style: GoogleFonts.aguafinaScript(
-                            textStyle: const TextStyle(
-                              color: Colors.white,
+                            textStyle: TextStyle(
+                              color: Colors.grey.shade300,
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
                             ),
@@ -99,12 +99,65 @@ class _NoticesState extends State<Notices> {
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
                 final item = data[index];
-                return NoticePost(
-                  name: item['title'],
-                  image: item['media'],
-                  content: item['content'],
-                  likes: item['likes'],
-                );
+                return isloading
+                    ? ListView.builder(
+                        itemCount: 5,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              SizedBox(
+                                height: 10,
+                              ),
+                              GFShimmer(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 300,
+                                      color:
+                                          Colors.grey.shade800.withOpacity(0.4),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Container(
+                                      width: double.infinity,
+                                      height: 8,
+                                      color:
+                                          Colors.grey.shade800.withOpacity(0.4),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.5,
+                                      height: 8,
+                                      color:
+                                          Colors.grey.shade800.withOpacity(0.4),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.25,
+                                      height: 8,
+                                      color:
+                                          Colors.grey.shade800.withOpacity(0.4),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              )
+                            ],
+                          );
+                        },
+                      )
+                    : NoticePost(
+                        file: item['pdf'],
+                        name: item['title'],
+                        image: item['media'],
+                        content: item['content'],
+                        likes: item['likes'],
+                      );
               },
               childCount: data.length,
             ),
@@ -127,9 +180,9 @@ class _NoticesState extends State<Notices> {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(30.0)),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.add_alert,
-              color: Colors.white, // Adjust the color as needed
+              color: Colors.grey.shade300, // Adjust the color as needed
             ),
           ),
         ),

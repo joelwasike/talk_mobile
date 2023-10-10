@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'dart:io';
@@ -34,14 +36,15 @@ class AlbumPageState extends State<AlbumPage>
   Future<void> initAsync() async {
     if (await _promptPermissionSetting()) {
       List<Medium> mediaList = await fetchMediaItems();
-      setState(() {
+      if (mounted) {
+         setState(() {
         _media = mediaList;
         _loading = false;
       });
     }
-    setState(() {
-      _loading = false;
-    });
+    
+      }
+     
   }
 
   Future<List<Medium>> fetchMediaItems() async {
@@ -104,8 +107,13 @@ class AlbumPageState extends State<AlbumPage>
               ],
             )),
         body: _loading
-            ? const Center(
-                child: CircularProgressIndicator(),
+            ?  const Center(
+                child:  SpinKitThreeBounce(
+                          color: Colors.white,
+                          size: 25,
+                        )
+                // Placeholder while loading
+              
               )
             : TabBarView(
                 children: [
@@ -116,8 +124,8 @@ class AlbumPageState extends State<AlbumPage>
                       padding: const EdgeInsets.only(top: 2),
                       child: Container(
                         child: StaggeredGrid.count(
-                          mainAxisSpacing: 4.0,
-                          crossAxisSpacing: 4.0,
+                          mainAxisSpacing: 2.0,
+                          crossAxisSpacing: 2.0,
                           crossAxisCount: 3,
                           children: List.generate(
                             _media?.length ?? 0,
@@ -131,7 +139,7 @@ class AlbumPageState extends State<AlbumPage>
                                   ),
                                 ),
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16.0),
+                                  borderRadius: BorderRadius.circular(3.0),
                                   child: Stack(
                                     alignment: Alignment.center,
                                     children: [

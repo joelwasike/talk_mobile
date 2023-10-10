@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -33,30 +34,28 @@ class _AddGossipState extends State<AddGossip> {
   bool isVideoPlaying = false;
   bool isloading = false;
   File? videoFile;
+  PlatformFile? pickedFile;
+  String? path;
 
-//pick video
-  Future<void> _pickVideo() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.video,
-    );
-
-    if (result != null) {
-      setState(() {
-        videoFile = File(result.files.single.path!);
-      });
-
-      _videoThumbnail = await VideoThumbnail.thumbnailData(
-        video: videoFile!.path,
-        imageFormat: ImageFormat.JPEG,
-        maxHeight: 100, // Adjust the thumbnail size as needed
-        quality: 50, // Adjust the quality of the thumbnail
+  Future<void> _pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov'],
       );
 
-      _videoController = VideoPlayerController.file(videoFile!)
-        ..initialize().then((_) {
-          // Ensure the first frame is shown
-          setState(() {});
+      if (result != null) {
+        setState(() {
+          pickedFile = result.files.single;
+          path = pickedFile!.path;
         });
+      } else {
+        print("error occured");
+        // User canceled the file picking operation.
+      }
+    } catch (e) {
+      // Handle errors or exceptions.
+      print('Error picking file: $e');
     }
   }
 
@@ -79,8 +78,8 @@ class _AddGossipState extends State<AddGossip> {
       isloading = true;
     });
     try {
-      print("image selected is: ${imagefile!.path}");
-      print("video selected is: ${videoFile!.path}");
+      //print("image selected is: ${imagefile!.path}");
+      //print("video selected is: ${videoFile!.path}");
 
       Dio dio = Dio();
 
@@ -91,27 +90,17 @@ class _AddGossipState extends State<AddGossip> {
         MapEntry('content', descriptionController.text),
         const MapEntry('email', "daviswasike@gmail.com"),
       ]);
-      if (imagefile != null) {
-         formData.files.addAll([
-        MapEntry(
-          'photo',
-          await MultipartFile.fromFile(imagefile!.path),
-        ),
-      ]);
+      if (pickedFile != null) {
+        formData.files.addAll([
+          MapEntry(
+            'media',
+            await MultipartFile.fromFile(path!),
+          ),
+        ]);
       }
-
-       if (videoFile != null) {
-         formData.files.addAll([
-        MapEntry(
-          'video',
-          await MultipartFile.fromFile(videoFile!.path),
-        ),
-      ]);
-      }
-     
 
       final response = await dio.post(
-        'https://68ff-197-232-22-252.ngrok.io/uploadgossip',
+        '$baseUrl/uploadgossip',
         data: formData,
       );
       //print(jsonDecode(response.data));
@@ -127,12 +116,12 @@ class _AddGossipState extends State<AddGossip> {
         print('Gossip uploaded successfully');
       } else {
         // Handle error response
-        toast("Error uploading Notice");
-        print('Error uploading notice: ${response.statusMessage}');
+        toast("Error uploading Gossip");
+        print('Error uploading Gossip: ${response.statusMessage}');
       }
     } catch (e) {
       // Handle exceptions
-      toast("Error uploading Notice");
+      toast("Error uploading Gossip");
       print('Error: $e');
     } finally {
       setState(() {
@@ -306,10 +295,14 @@ class _AddGossipState extends State<AddGossip> {
                 uploadGossip();
               },
               backgroundColor: LightColor.maincolor,
-              child: isloading?const CircularProgressIndicator(color: Colors.white,): const Text(
-                "Post",
-                style: TextStyle(color: Colors.white),
-              )),
+              child: isloading
+                  ? const CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                  : const Text(
+                      "Post",
+                      style: TextStyle(color: Colors.white),
+                    )),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
@@ -370,7 +363,7 @@ class _AddGossipState extends State<AddGossip> {
                   ),
                 ],
               ),
-              child:  TextField(
+              child: TextField(
                 style: const TextStyle(fontSize: 14),
                 controller: descriptionController,
                 maxLines: null,
@@ -394,114 +387,98 @@ class _AddGossipState extends State<AddGossip> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
-                  onTap: () async {
-                    Map<Permission, PermissionStatus> statuses = await [
-                      Permission.storage,
-                      Permission.camera,
-                    ].request();
-                    if (statuses[Permission.storage]!.isDenied &&
-                        statuses[Permission.camera]!.isDenied) {
-                      print('no permission provided');
-                    } else {
-                      showImagePicker(context);
-                    }
-                  },
-                  child: imagefile == null
-                      ? Container(
-                          width: MediaQuery.of(context).size.width / 3,
-                          height: MediaQuery.of(context).size.height / 20,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: LightColor.maincolor),
-                          child: const Icon(
-                            Icons.add_a_photo,
-                            color: LightColor.background,
-                          ),
-                        )
-                      : SizedBox(
-                          width: 115,
-                          height: 115,
-                          child: Image.file(
-                            imagefile!,
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                ),
+                    onTap: () async {
+                      Map<Permission, PermissionStatus> statuses = await [
+                        Permission.storage,
+                        Permission.camera,
+                      ].request();
+                      if (statuses[Permission.storage]!.isDenied &&
+                          statuses[Permission.camera]!.isDenied) {
+                        print('no permission provided');
+                      } else {
+                        _pickFile();
+                      }
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width / 3,
+                      height: MediaQuery.of(context).size.height / 20,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: LightColor.maincolor),
+                      child: const Icon(
+                        Icons.add_a_photo,
+                        color: LightColor.background,
+                      ),
+                    )),
                 Text(
-                  "     Select a photo",
+                  "     Select a file",
                   style: TextStyle(color: Colors.grey.shade600),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
                 Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        _pickVideo();
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width / 3,
-                        height: MediaQuery.of(context).size.height / 20,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: LightColor.maincolor),
-                        child: const Icon(
-                          Icons.video_file,
-                          color: LightColor.background,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      "Select a video",
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
-                    if (_videoThumbnail != null)
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isVideoPlaying = !isVideoPlaying;
-                            if (isVideoPlaying) {
-                              _videoController?.play();
-                            } else {
-                              _videoController?.pause();
-                            }
-                          });
-                        },
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (_videoThumbnail != null && !isVideoPlaying)
-                              Image.memory(_videoThumbnail!),
-                            if (_videoThumbnail != null && isVideoPlaying)
-                              AspectRatio(
-                                aspectRatio:
-                                    _videoController!.value.aspectRatio,
-                                child: VideoPlayer(_videoController!),
-                              ),
-                            if (isVideoPlaying)
-                              const Center(
-                                child: Icon(
-                                  Icons.pause,
-                                  size: 50,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            if (!isVideoPlaying)
-                              const Center(
-                                child: Icon(
-                                  Icons.play_circle_fill,
-                                  size: 50,
-                                  color: Colors.white,
-                                ),
-                              ),
-                          ],
-                        ),
-                      )
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    if (pickedFile != null)
+                      pickedFile!.extension == 'mp4' ||
+                              pickedFile!.extension == 'mov'
+                          ?Text(pickedFile!.name)
+                          : Image.file(
+                              File(path!),
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                  
                   ],
-                )
+                ),
+                // Column(
+                //   children: [
+                //     if (_videoThumbnail != null)
+                //       GestureDetector(
+                //         onTap: () {
+                //           setState(() {
+                //             isVideoPlaying = !isVideoPlaying;
+                //             if (isVideoPlaying) {
+                //               _videoController?.play();
+                //             } else {
+                //               _videoController?.pause();
+                //             }
+                //           });
+                //         },
+                //         child: Stack(
+                //           alignment: Alignment.center,
+                //           children: [
+                //             if (_videoThumbnail != null && !isVideoPlaying)
+                //               Image.memory(_videoThumbnail!),
+                //             if (_videoThumbnail != null && isVideoPlaying)
+                //               AspectRatio(
+                //                 aspectRatio:
+                //                     _videoController!.value.aspectRatio,
+                //                 child: VideoPlayer(_videoController!),
+                //               ),
+                //             if (isVideoPlaying)
+                //               const Center(
+                //                 child: Icon(
+                //                   Icons.pause,
+                //                   size: 50,
+                //                   color: Colors.white,
+                //                 ),
+                //               ),
+                //             if (!isVideoPlaying)
+                //               const Center(
+                //                 child: Icon(
+                //                   Icons.play_circle_fill,
+                //                   size: 50,
+                //                   color: Colors.white,
+                //                 ),
+                //               ),
+                //           ],
+                //         ),
+                //       )
+                //   ],
+                // )
               ],
             ),
           ),

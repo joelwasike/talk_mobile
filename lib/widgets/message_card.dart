@@ -26,7 +26,7 @@ class _MessageCardState extends State<MessageCard> {
          title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
            children: [
-             Text(widget.name),
+             Text(widget.name, style:  TextStyle(color: Colors.grey.shade200, fontSize: 15)),
              Text(widget.description, style: const TextStyle(color: Colors.grey, fontSize: 12),)
            ],
          ),

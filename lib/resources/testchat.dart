@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:usersms/utils/colors.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatPagee extends StatefulWidget {
@@ -210,18 +211,18 @@ class _ChatPageeState extends State<ChatPagee> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xff1f1c38),
+        backgroundColor: LightColor.scaffold,
         appBar: AppBar(
           iconTheme: const IconThemeData(
             color: Colors.white, 
           ),
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20))),
+                  bottomLeft: Radius.circular(6),
+                  bottomRight: Radius.circular(6))),
           elevation: 0,
           automaticallyImplyLeading: true,
-          backgroundColor: const Color(0xff2b2250),
+          backgroundColor: Colors.black,
           flexibleSpace: SafeArea(
             child: Container(
               padding: const EdgeInsets.only(right: 16),
@@ -267,7 +268,14 @@ class _ChatPageeState extends State<ChatPagee> {
           ),
         ),
         body: Chat(
-          theme: const DarkChatTheme(),
+          theme:  DarkChatTheme(
+            backgroundColor: LightColor.scaffold,
+            primaryColor: LightColor.maincolor,
+            inputBorderRadius: BorderRadius.only(topLeft: Radius.circular(6),topRight: Radius.circular(6)),
+            inputBackgroundColor: Colors.black,
+            secondaryColor: Colors.grey.shade900,
+            
+          ),
           messages: _messages,
           onAttachmentPressed: _handleAttachmentPressed,
           onMessageTap: _handleMessageTap,

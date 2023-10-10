@@ -22,7 +22,7 @@ class _ForumCardState extends State<ForumCard> {
           height: MediaQuery.of(context).size.height/11,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(6),
             image: DecorationImage(image: NetworkImage(widget.image.imageUrl), fit: BoxFit.cover, opacity: 0.2),
           ),
           child:  Padding(
@@ -36,8 +36,8 @@ class _ForumCardState extends State<ForumCard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
-                   Text(widget.name),
-                   Text(widget.description, style: const TextStyle(color: Colors.grey, fontSize: 11),)
+                   Text(widget.name,style:  TextStyle(color: Colors.grey.shade200, fontSize: 15)),
+                   Text(widget.description, style: const TextStyle(color: Colors.grey, fontSize: 12),)
                  ],
                ),
                trailing: Container(

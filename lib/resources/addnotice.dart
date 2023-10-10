@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/utils/colors.dart';
 
 class Addnotice extends StatefulWidget {
@@ -80,7 +81,7 @@ class _AddnoticeState extends State<Addnotice> {
     
 
       final response = await dio.post(
-        'https://7290-197-232-22-252.ngrok-free.app/uploadnotice',
+        '$baseUrl/uploadnotice',
         data: formData,
       );
       //print(jsonDecode(response.data));

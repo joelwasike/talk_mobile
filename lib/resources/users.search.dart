@@ -62,7 +62,7 @@ class _UserrPostState extends State<UserrPost> {
 Future<String> generateVideoThumbnail(String videoUrl) async {
     final thumbnailPath = await VideoThumbnail.thumbnailFile(
       video: videoUrl,
-      quality: 75, // Adjust the quality (0 - 100)
+      quality: 100, // Adjust the quality (0 - 100)
       maxHeight: 128, // Maximum height of the thumbnail
     );
 

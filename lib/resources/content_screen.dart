@@ -4,7 +4,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:video_player/video_player.dart';
 
-import '../resources/heartanimationwidget.dart';
+import 'heartanimationwidget.dart';
 import '../utils/colors.dart';
 import '../widgets/comment_card.dart';
 
@@ -41,7 +41,9 @@ class _ContentScreenState extends State<ContentScreen> {
   Future initializePlayer() async {
     try {
       _videoPlayerController = VideoPlayerController.networkUrl(widget.src!);
-      await Future.wait([_videoPlayerController.initialize()]);
+      await Future.wait([_videoPlayerController.initialize().then((_) {
+      setState(() {});
+    })]);
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
@@ -69,7 +71,10 @@ class _ContentScreenState extends State<ContentScreen> {
       final file = await DefaultCacheManager().getSingleFile(nextVideoSource);
       
       _nextVideoController = VideoPlayerController.file(file);
-      await _nextVideoController!.initialize();
+      await _nextVideoController!.initialize().then((_) {
+      // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+      setState(() {});
+    });
       
       _nextChewieController = ChewieController(
         videoPlayerController: _nextVideoController!,
@@ -164,6 +169,7 @@ class _ContentScreenState extends State<ContentScreen> {
                       ],
                     ),
                     Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         HeartAnimationWidget(
                           alwaysAnimate: true,
@@ -182,7 +188,6 @@ class _ContentScreenState extends State<ContentScreen> {
                           ),
                         ),
                         const Text('601k'),
-                        const SizedBox(height: 10),
                         IconButton(
                           onPressed: () {
                             showModalBottomSheet(
@@ -230,7 +235,6 @@ class _ContentScreenState extends State<ContentScreen> {
                           ),
                         ),
                         const Text('1123'),
-                        const SizedBox(height: 10),
                         IconButton(
                           onPressed: () {
                             showModalBottomSheet(

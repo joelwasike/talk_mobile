@@ -12,6 +12,7 @@ import 'package:usersms/splashscreen.dart';
 import 'package:usersms/widgets/story/screens/story_screen.dart';
 import 'firebase_options.dart';
 import 'resources/image_data.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +22,11 @@ void main() async {
    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
+   await FlutterDownloader.initialize(
+    debug: true, 
+    ignoreSsl: true 
+  );
+
   runApp(const MyApp());
 }
 
@@ -44,9 +50,9 @@ class _MyAppState extends State<MyApp> {
       bodyColor: Colors.white, //<-- SEE HERE
       displayColor: Colors.white, //<-- SEE HERE
     ),
-        primarySwatch: Colors.deepPurple,
-        primaryColor: const Color(0xFF121212),
-        scaffoldBackgroundColor: const Color(0xFF121212),
+        primarySwatch: Colors.blue,
+        primaryColor: Colors.white,
+        scaffoldBackgroundColor: Color.fromARGB(255, 10, 10, 10),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
         useMaterial3: true,
       ),
