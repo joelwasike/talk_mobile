@@ -30,9 +30,10 @@ class _ClubsState extends State<Clubs> {
   Widget build(BuildContext context) {
     return  Scaffold(
        appBar: AppBar(
+  
+        leading: DrawerWidget(),
         toolbarHeight: 30,
-        automaticallyImplyLeading: false,
-        backgroundColor: LightColor.maincolor1,
+        backgroundColor: LightColor.scaffold,
         title: Padding(
           padding: const EdgeInsets.only(left: 56),
           child: Row(
@@ -47,42 +48,51 @@ class _ClubsState extends State<Clubs> {
                             fontWeight: FontWeight.w900,
                           ),
                         ))),
-             IconButton(
-                  onPressed: () {
-                     Navigator.push(
+           
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor:
+            Colors.transparent, // Set the background color to transparent
+        mini: false,
+        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        onPressed: () {
+           Navigator.push(
                       (context),
                       MaterialPageRoute(builder: (context) => const GetClubPeople()
                          
                           ),
                     );
-                  },
-                  icon: const Icon(
-                    Icons.add_box,
-                    color: LightColor.background,
-                  ))
-            ],
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: LightColor.maincolor, // Specify the border color here
+            ),
+          ),
+          child:  Center(
+            child: Icon(Icons.add_box,color: LightColor.maincolor,)
           ),
         ),
       ),
-      floatingActionButton: SizedBox(
-        height: 40,
-        width: 40,
-        child: FloatingActionButton(
-            onPressed: () {},
-            backgroundColor: Colors.grey.shade900,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(30.0))),
-            child: const DrawerWidget()),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+          Padding(
+            padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
             child: TextField(
               decoration: InputDecoration(
-                border: InputBorder.none,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
                 hintText: "Search clubs and societies...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 prefixIcon: Icon(
@@ -93,9 +103,6 @@ class _ClubsState extends State<Clubs> {
                 filled: true,
                 fillColor: LightColor.maincolor1,
                 contentPadding: const EdgeInsets.all(8),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(color: Colors.grey.shade600)),
               ),
             ),
           ),

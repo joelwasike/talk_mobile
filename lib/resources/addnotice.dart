@@ -194,7 +194,7 @@ class _AddnoticeState extends State<Addnotice> {
 
   _imgFromGallery() async {
     await picker
-        .pickImage(source: ImageSource.gallery, imageQuality: 50)
+        .pickImage(source: ImageSource.gallery, imageQuality: 30)
         .then((value) {
       if (value != null) {
         _cropImage(File(value.path));
@@ -204,7 +204,7 @@ class _AddnoticeState extends State<Addnotice> {
 
   _imgFromCamera() async {
     await picker
-        .pickImage(source: ImageSource.camera, imageQuality: 50)
+        .pickImage(source: ImageSource.camera, imageQuality: 30)
         .then((value) {
       if (value != null) {
         _cropImage(File(value.path));
