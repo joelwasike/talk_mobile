@@ -19,13 +19,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
-   await FlutterDownloader.initialize(
-    debug: true, 
-    ignoreSsl: true 
-  );
+  await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
 
   runApp(const MyApp());
 }
@@ -38,18 +35,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-   late final ImageData image;
+  late final ImageData image;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-         textTheme:
-        Theme.of(context).textTheme.apply(
-      bodyColor: Colors.white, //<-- SEE HERE
-      displayColor: Colors.white, //<-- SEE HERE
-    ),
+        fontFamily: 'joel',
+        textTheme: Theme.of(context).textTheme.apply(
+              bodyColor: Colors.white, //<-- SEE HERE
+              displayColor: Colors.white, //<-- SEE HERE
+            ),
         primarySwatch: Colors.blue,
         primaryColor: Colors.white,
         scaffoldBackgroundColor: Color.fromARGB(255, 10, 10, 10),
@@ -59,15 +56,13 @@ class _MyAppState extends State<MyApp> {
       home: const Home(),
       routes: <String, WidgetBuilder>{
         '/auth': (_) => const Authpage(),
-        '/change': (_) =>  const ForgotPassword(),
-        '/home': (_) =>  const Homepage(),
-        '/post': (_) =>   const AlbumPage(),
-        '/search': (_) =>  const SearchScreen(),
-        '/story': (_) =>  const StoryScreen( images: imageList),
-         '/camera': (_) =>  const AddPostScreen()
-
+        '/change': (_) => const ForgotPassword(),
+        '/home': (_) => const Homepage(),
+        '/post': (_) => const AlbumPage(),
+        '/search': (_) => const SearchScreen(),
+        '/story': (_) => const StoryScreen(images: imageList),
+        '/camera': (_) => const AddPostScreen()
       },
-       
     );
   }
 }

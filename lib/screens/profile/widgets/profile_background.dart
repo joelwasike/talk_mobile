@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:usersms/utils/colors.dart';
+
 class ProfileBackground extends StatelessWidget {
   const ProfileBackground({Key? key, required this.child}) : super(key: key);
 
@@ -22,7 +24,7 @@ class ProfileBackground extends StatelessWidget {
                 height: size.height * 0.60,
                 width: size.height * 0.60,
                 decoration: BoxDecoration(
-                  border: Border.all(width: 1.0, color: Colors.indigo),
+                  border: Border.all(width: 1.0, color: LightColor.maincolor),
                   borderRadius: BorderRadius.circular(152.0),
                 ),
               ),
@@ -36,7 +38,7 @@ class ProfileBackground extends StatelessWidget {
                 height: size.height * 0.60,
                 width: size.height * 0.60,
                 decoration: BoxDecoration(
-                  color: Colors.indigo,
+                  color: LightColor.maincolor,
                   borderRadius: BorderRadius.circular(152.0),
                 ),
               ),

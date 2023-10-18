@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
@@ -192,7 +193,7 @@ class _UserPostState extends State<UserPost> {
                     isAnimating: isliked,
                     child: IconButton(
                       icon: Icon(
-                        isliked ? Icons.favorite : Icons.favorite_outline,
+                        isliked ? Icons.favorite : FontAwesomeIcons.heart,
                         color: isliked ? Colors.red : Colors.grey.shade300,
                         size: 28,
                       ),
@@ -252,7 +253,7 @@ class _UserPostState extends State<UserPost> {
                               ));
                     },
                     icon: Icon(
-                      Icons.chat_bubble_outline_outlined,
+                      FontAwesomeIcons.message,
                       color: Colors.grey.shade300,
                     ),
                   ),

@@ -1,20 +1,17 @@
-import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'heartanimationwidget.dart';
-import 'package:android_path_provider/android_path_provider.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 
 class NoticePost extends StatefulWidget {
-  final String? file;
+  final String file;
   final String? name;
   final String? image;
   final String? content;
@@ -26,14 +23,15 @@ class NoticePost extends StatefulWidget {
       required this.image,
       this.content,
       required this.likes,
-      this.file});
+      required this.file});
 
   @override
   State<NoticePost> createState() => _NoticePostState();
 }
 
 class _NoticePostState extends State<NoticePost> {
-  late String _localPath;
+   double? _progress;
+  String _status = '';
   bool isliked = false;
   bool isHeartAnimating = false;
   SampleItem? selectedMenu;
@@ -254,17 +252,31 @@ class _NoticePostState extends State<NoticePost> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: IconButton(
                   onPressed: () async {
-                    final directory =
-                        await getExternalStorageDirectory(); // You need to import 'package:path_provider/path_provider.dart' for this
-                    final _localPath = directory!
-                        .path; // This is the path where the file will be saved
-
-                    await FlutterDownloader.enqueue(
-                      url: widget.file!,
-                      savedDir: _localPath,
-                      showNotification: true,
-                      openFileFromNotification: true,
-                    );
+                    FileDownloader.downloadFile(
+                      url: "https://research.nhm.org/pdfs/10840/10840-002.pdf",
+                      name: widget.name,
+                      downloadDestination:  DownloadDestinations.appFiles,
+                      notificationType: NotificationType.all,
+                      onProgress: (name, progress) {
+                        setState(() {
+                          _progress = progress;
+                          _status = 'Progress: $progress%';
+                        });
+                      },
+                      onDownloadCompleted: (path) {
+                        setState(() {
+                          _progress = null;
+                          _status = 'File downloaded to: $path';
+                        });
+                      },
+                      onDownloadError: (error) {
+                        setState(() {
+                          _progress = null;
+                          _status = 'Download error: $error';
+                        });
+                      }).then((file) {
+                    debugPrint('file path: ${file?.path}');
+                  });
                   },
                   icon: Icon(
                     Icons.download_rounded,

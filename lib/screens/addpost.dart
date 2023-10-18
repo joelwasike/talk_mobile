@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
@@ -82,7 +83,7 @@ class AlbumPageState extends State<AlbumPage>
       length: 2, // Number of tabs
       child: Scaffold(
         appBar: AppBar(
-            backgroundColor: LightColor.maincolor1,
+            backgroundColor: LightColor.scaffold,
             automaticallyImplyLeading: false,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -91,8 +92,8 @@ class AlbumPageState extends State<AlbumPage>
                   "Talk Gallery",
                   style: GoogleFonts.aguafinaScript(
                       textStyle: const TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
                           color: LightColor.background)),
                 ),
                 IconButton(
@@ -100,7 +101,7 @@ class AlbumPageState extends State<AlbumPage>
                       Navigator.pushNamed(context, '/camera');
                     },
                     icon: const Icon(
-                      Icons.camera,
+                      FontAwesomeIcons.camera,
                       size: 30,
                       color: LightColor.maincolor,
                     ))

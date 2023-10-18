@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:usersms/screens/addpost.dart';
 import 'package:usersms/screens/homepage.dart';
@@ -50,30 +51,34 @@ class _BottomNavState extends State<BottomNav> {
           color: Colors.grey.shade300,
           activeColor: Color.fromARGB(255, 22, 136, 230),
           gap: 8,
-          tabs: const [
+          tabs:  [
             GButton(
-              icon: Icons.home,
+              icon: FontAwesomeIcons.house,
               text: "Home",
+              iconColor: Colors.grey.shade400,
             ),
             // GButton(icon: Icons.video_call,
             // text: "Status",
             
             // ),
             GButton(
-              icon: Icons.search,
+              icon: FontAwesomeIcons.magnifyingGlass,iconColor: Colors.grey.shade400,
               text: "Search",
             ),
             GButton(
-              icon: Icons.add_a_photo,
+              icon: FontAwesomeIcons.camera,
               text: "Post",
+              iconColor: Colors.grey.shade400,
             ),
             GButton(
-              icon: Icons.videocam_sharp,
+              icon: FontAwesomeIcons.video,
               text: "Reels",
+              iconColor: Colors.grey.shade400,
             ),
             GButton(
-              icon: Icons.person,
+              icon: FontAwesomeIcons.userLarge,
               text: "Profile",
+              iconColor: Colors.grey.shade400,
             ),
           ],
           selectedIndex: selectedIndex,

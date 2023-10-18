@@ -164,30 +164,31 @@ class _NoticesState extends State<Notices> {
           ),
         ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SizedBox(
-          height: 40,
-          width: 40,
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Addnotice()),
-              );
-            },
-            backgroundColor: Colors.grey.shade800,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(30.0)),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor:
+            Colors.transparent, // Set the background color to transparent
+        mini: false,
+        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        onPressed: () {
+           Navigator.push(
+                      (context),
+                      MaterialPageRoute(builder: (context) => const Addnotice()
+                         
+                          ),
+                    );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: LightColor.maincolor, // Specify the border color here
             ),
-            child: Icon(
-              Icons.add_alert,
-              color: Colors.grey.shade300, // Adjust the color as needed
-            ),
+          ),
+          child:  Center(
+            child: Icon(Icons.add_box,color: LightColor.maincolor,)
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
   }
 }

@@ -29,14 +29,14 @@ class _SearchScreenState extends State<SearchScreen> {
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 40,
-          backgroundColor: LightColor.maincolor1,
+          backgroundColor: LightColor.scaffold,
           automaticallyImplyLeading: false,
           title: const TabBar(
             unselectedLabelStyle: TextStyle(fontSize: 15),
             indicatorPadding: EdgeInsets.only(bottom: 10),
             labelColor: LightColor.background,
             indicatorColor: LightColor.maincolor,
-            dividerColor: LightColor.maincolor1,
+            dividerColor: LightColor.scaffold,
             tabs: [
               Tab(text: 'Photos'),
               Tab(text: 'Friends'),
@@ -87,7 +87,7 @@ class _PinterestGridState extends State<PinterestGrid> {
                   size: 20,
                 ),
                 filled: true,
-                fillColor: LightColor.maincolor1,
+                fillColor: LightColor.scaffold,
                 contentPadding: const EdgeInsets.all(8),
               ),
             ),
@@ -247,7 +247,7 @@ class _FriendsTabState extends State<FriendsTab> {
                   size: 20,
                 ),
                 filled: true,
-                fillColor: LightColor.maincolor1,
+                fillColor: LightColor.scaffold,
                 contentPadding: const EdgeInsets.all(8),
               ),
             ),

@@ -24,7 +24,7 @@ class _UserProfileScrenState extends State<UserProfileScren> {
     return ProfileBackground(
       child: SafeArea(
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+          backgroundColor: LightColor.scaffold,
           body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -40,7 +40,7 @@ class _UserProfileScrenState extends State<UserProfileScren> {
                         height: 140.0,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          border: Border.all(width: 1.0, color: Colors.black),
+                          border: Border.all(width: 1.0, color: LightColor.scaffold),
                           borderRadius: BorderRadius.circular(35.0),
                         ),
                       ),
