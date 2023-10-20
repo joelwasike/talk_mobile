@@ -73,7 +73,10 @@ class _ContentScreenState extends State<ContentScreen> {
       _nextVideoController = VideoPlayerController.file(file);
       await _nextVideoController!.initialize().then((_) {
       // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
+      
     });
       
       _nextChewieController = ChewieController(

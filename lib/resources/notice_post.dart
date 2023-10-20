@@ -53,14 +53,14 @@ class _NoticePostState extends State<NoticePost> {
                 children: [
                   const Icon(
                     FontAwesomeIcons.bell,
-                    color: LightColor.maincolor,
+                    color: LightColor.background,
                   ),
                   const SizedBox(
                     width: 10,
                   ),
                   Text(
                     widget.name!,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold, color: LightColor.maincolor),
                   ),
                 ],
               ),

@@ -62,7 +62,7 @@ class _HomepageState extends State<Homepage> {
       case 2:
         return const Groups();
       case 3:
-        return const Forums();
+        return  Forums();
       case 4:
         return const Notices();
       case 5:
@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               FadeInRight(
-                  child: Text('Campus Talk',
+                  child: Text('Kibabii Campus Talk',
                       style: GoogleFonts.aguafinaScript(
                         textStyle: TextStyle(
                           color: Colors.grey.shade300,

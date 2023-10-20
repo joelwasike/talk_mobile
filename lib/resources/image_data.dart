@@ -20,7 +20,7 @@ const imageList = [
   ),
   ImageData(
     id: 'id-003',
-    imageUrl: 'https://letstalkon.impalapay.io/gossip/rBQjht24qRJywp7Wm78pWhatsApp Video 2023-09-26 at 11.03.08 PM.mp4',
+    imageUrl: 'https://picsum.photos/seed/image002/500/800',
   ),
   ImageData(
     id: 'id-004',
@@ -32,7 +32,7 @@ const imageList = [
   ),
   ImageData(
     id: 'id-006',
-    imageUrl: 'https://letstalkon.impalapay.io/gossip/rBQjht24qRJywp7Wm78pWhatsApp Video 2023-09-26 at 11.03.08 PM.mp4',
+    imageUrl: 'https://picsum.photos/seed/image002/500/800',
   ),
   ImageData(
     id: 'id-007',
@@ -53,7 +53,7 @@ const imageList = [
   ),
    ImageData(
     id: 'id-013',
-    imageUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+    imageUrl: 'https://picsum.photos/seed/image002/500/800',
   ),
   ImageData(
     id: 'id-011',
@@ -70,7 +70,7 @@ const imageList = [
    
     ImageData(
     id: 'id-013',
-    imageUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4',
+    imageUrl: 'https://picsum.photos/seed/image002/500/800',
   ),
   ImageData(
     id: 'id-014',
@@ -86,7 +86,7 @@ const imageList = [
   ),
   ImageData(
     id: 'id-017',
-    imageUrl: 'https://letstalkon.impalapay.io/gossip/rBQjht24qRJywp7Wm78pWhatsApp Video 2023-09-26 at 11.03.08 PM.mp4',
+    imageUrl: 'https://picsum.photos/seed/image002/500/800',
   ),
   ImageData(
     id: 'id-018',
