@@ -23,7 +23,7 @@ class VUserPost extends StatefulWidget {
     required this.content,
     required this.likes,
     required this.url,
-    required this.play,
+    required this.play, 
   });
 
   @override
@@ -181,27 +181,27 @@ class _UserPostState extends State<VUserPost> {
                                 Container(
                                   width: MediaQuery.of(context).size.width,
                                   height: 300,
-                                  color: Colors.grey.shade800.withOpacity(0.4),
+                                  color: Colors.grey.shade800.withOpacity(0.2),
                                 ),
                                 const SizedBox(height: 12),
                                 Container(
                                   width: double.infinity,
                                   height: 8,
-                                  color: Colors.grey.shade800.withOpacity(0.4),
+                                  color: Colors.grey.shade800.withOpacity(0.2),
                                 ),
                                 const SizedBox(height: 6),
                                 Container(
                                   width:
                                       MediaQuery.of(context).size.width * 0.5,
                                   height: 8,
-                                  color: Colors.grey.shade800.withOpacity(0.4),
+                                  color: Colors.grey.shade800.withOpacity(0.2),
                                 ),
                                 const SizedBox(height: 6),
                                 Container(
                                   width: MediaQuery.of(context).size.width *
                                       0.25,
                                   height: 8,
-                                  color: Colors.grey.shade800.withOpacity(0.4),
+                                  color: Colors.grey.shade800.withOpacity(0.2),
                                 )
                               ],
                             ),

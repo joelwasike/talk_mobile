@@ -122,42 +122,15 @@ class _UserPostState extends State<UserPost> {
           },
           child: Stack(alignment: Alignment.center, children: [
             ConstrainedBox(
+              
               constraints: BoxConstraints (maxHeight: MediaQuery.of(context).size.height/1.3, minWidth: MediaQuery.of(context).size.width),
               child: CachedNetworkImage(
                 imageUrl: widget.image!,
-                
+                fadeInCurve: Curves.easeIn,
                 fit: BoxFit.fitWidth,
-                placeholder: (context, url) => GFShimmer(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 300,
-                                  color: Colors.grey.shade800.withOpacity(0.4),
-                                ),
-                                const SizedBox(height: 12),
-                                Container(
-                                  width: double.infinity,
-                                  height: 8,
-                                  color: Colors.grey.shade800.withOpacity(0.4),
-                                ),
-                                const SizedBox(height: 6),
-                                Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  height: 8,
-                                  color: Colors.grey.shade800.withOpacity(0.4),
-                                ),
-                                const SizedBox(height: 6),
-                                Container(
-                                  width: MediaQuery.of(context).size.width *
-                                      0.25,
-                                  height: 8,
-                                  color: Colors.grey.shade800.withOpacity(0.4),
-                                )
-                              ],
-                            ),
+                placeholder: (context, url) => Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 300,
                           ),
                 // Placeholder while loading
               ),

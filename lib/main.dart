@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:usersms/auth/auth.dart';
 import 'package:usersms/auth/forgotpassword.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,7 +10,6 @@ import 'package:usersms/screens/addpost.dart';
 import 'package:usersms/screens/homepage.dart';
 import 'package:usersms/screens/searchpage.dart';
 import 'package:usersms/splashscreen.dart';
-import 'package:usersms/widgets/story/screens/story_screen.dart';
 import 'firebase_options.dart';
 import 'resources/image_data.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -23,6 +23,8 @@ void main() async {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
   await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
+   await Hive.initFlutter();
+    await Hive.openBox('Talk');
 
   runApp(const MyApp());
 }
@@ -60,7 +62,7 @@ class _MyAppState extends State<MyApp> {
         '/home': (_) => const Homepage(),
         '/post': (_) => const AlbumPage(),
         '/search': (_) => const SearchScreen(),
-        '/story': (_) => const StoryScreen(images: imageList),
+        //'/story': (_) => const StoryScreen(images: imageList),
         '/camera': (_) => const AddPostScreen()
       },
     );

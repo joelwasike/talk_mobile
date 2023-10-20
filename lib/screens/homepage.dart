@@ -21,7 +21,6 @@ import '../utils/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
 
@@ -31,7 +30,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   int currentIndex = 0;
- 
+
   @override
   Widget build(BuildContext context) {
     return ZoomDrawer(
@@ -51,7 +50,6 @@ class _HomepageState extends State<Homepage> {
       angle: 0.0,
       slideWidth: 200,
       menuBackgroundColor: LightColor.scaffold,
-      
     );
   }
 
@@ -73,8 +71,7 @@ class _HomepageState extends State<Homepage> {
         return const Clubs();
       case 7:
         return const Portal();
-      case 8:
-        return const Television();
+     
       default:
         return const HomeScreen();
     }
@@ -90,7 +87,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
- final ScrollController _scrollController =
+  final ScrollController _scrollController =
       ScrollController(); // Add this line
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
@@ -112,10 +109,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
-
-      setState(() {
-        data = jsonData.cast<Map<String, dynamic>>();
-      });
+      if (mounted) {
+        setState(() {
+          data = jsonData.cast<Map<String, dynamic>>();
+        });
+      }
 
       // Now you can access the data as needed.
       for (final item in data) {
@@ -220,7 +218,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 10,)
+                    SizedBox(
+                      height: 10,
+                    )
                   ],
                 );
               },
@@ -264,7 +264,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
-     
     );
   }
 }
@@ -317,10 +316,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
           drawerList(Icons.school, "School Portal", 7),
           const SizedBox(
             height: 10,
-          ),
-          drawerList(Icons.tv, "Campus TV", 8),
-          const SizedBox(
-            height: 20,
           ),
           const Logout()
         ],
@@ -386,11 +381,10 @@ class Logout extends StatelessWidget {
         onTap: () async {
           await FirebaseAuth.instance.signOut();
         },
-        child:  Container(
-          decoration: BoxDecoration(
-            color: LightColor.maincolor,
-            borderRadius: BorderRadius.circular(6)
-          ),
+        child: Container(
+            decoration: BoxDecoration(
+                color: LightColor.maincolor,
+                borderRadius: BorderRadius.circular(6)),
             height: 40.0,
             width: 100.0,
             child: Center(

@@ -30,7 +30,7 @@ class _AddnoticeState extends State<Addnotice> {
   TextEditingController descriptionController = TextEditingController();
 
   toast(String message) {
-    CherryToast.error(
+    CherryToast.success(
             title: const Text(""),
             backgroundColor: Colors.black,
             displayTitle: false,

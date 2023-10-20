@@ -175,20 +175,19 @@ class _GroupCredState extends State<GroupCred> {
                       ))),
             ],
           ),
-        ), 
+        ),
       ),
-       floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
         backgroundColor:
             Colors.transparent, // Set the background color to transparent
         mini: false,
-        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        shape:
+            const CircleBorder(), // Use CircleBorder to create a round button
         onPressed: () {
-           Navigator.push(
-                      (context),
-                      MaterialPageRoute(builder: (context) => const GroupCred()
-                         
-                          ),
-                    );
+          Navigator.push(
+            (context),
+            MaterialPageRoute(builder: (context) => const GroupCred()),
+          );
         },
         child: Container(
           decoration: BoxDecoration(
@@ -197,9 +196,11 @@ class _GroupCredState extends State<GroupCred> {
               color: LightColor.maincolor, // Specify the border color here
             ),
           ),
-          child:  Center(
-            child: Icon(Icons.arrow_forward_ios,color: LightColor.maincolor,)
-          ),
+          child: Center(
+              child: Icon(
+            Icons.arrow_forward_ios,
+            color: LightColor.maincolor,
+          )),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
@@ -210,19 +211,20 @@ class _GroupCredState extends State<GroupCred> {
             child: Column(
               children: [
                 GestureDetector(
-                   onTap: () async {
-                        Map<Permission, PermissionStatus> statuses = await [
-                          Permission.storage,
-                          Permission.camera,
-                        ].request();
-                        if (statuses[Permission.storage]!.isDenied &&
-                            statuses[Permission.camera]!.isDenied) {
-                          print('no permission provided');
-                        } else {
-                          showImagePicker(context);
-                        }
-                      },
+                  onTap: () async {
+                    Map<Permission, PermissionStatus> statuses = await [
+                      Permission.storage,
+                      Permission.camera,
+                    ].request();
+                    if (statuses[Permission.storage]!.isDenied &&
+                        statuses[Permission.camera]!.isDenied) {
+                      print('no permission provided');
+                    } else {
+                      showImagePicker(context);
+                    }
+                  },
                   child: CircleAvatar(
+                    backgroundColor: LightColor.maincolor,
                     maxRadius: 60,
                     child: ClipOval(
                       child: SizedBox(

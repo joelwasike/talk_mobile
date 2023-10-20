@@ -20,7 +20,7 @@ const imageList = [
   ),
   ImageData(
     id: 'id-003',
-    imageUrl: 'https://picsum.photos/seed/image003/500/300',
+    imageUrl: 'https://letstalkon.impalapay.io/gossip/rBQjht24qRJywp7Wm78pWhatsApp Video 2023-09-26 at 11.03.08 PM.mp4',
   ),
   ImageData(
     id: 'id-004',
@@ -32,7 +32,7 @@ const imageList = [
   ),
   ImageData(
     id: 'id-006',
-    imageUrl: 'https://picsum.photos/seed/image006/500/500',
+    imageUrl: 'https://letstalkon.impalapay.io/gossip/rBQjht24qRJywp7Wm78pWhatsApp Video 2023-09-26 at 11.03.08 PM.mp4',
   ),
   ImageData(
     id: 'id-007',
@@ -86,7 +86,7 @@ const imageList = [
   ),
   ImageData(
     id: 'id-017',
-    imageUrl: 'https://picsum.photos/seed/image017/500/600',
+    imageUrl: 'https://letstalkon.impalapay.io/gossip/rBQjht24qRJywp7Wm78pWhatsApp Video 2023-09-26 at 11.03.08 PM.mp4',
   ),
   ImageData(
     id: 'id-018',

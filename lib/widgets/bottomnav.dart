@@ -54,6 +54,7 @@ class _BottomNavState extends State<BottomNav> {
           tabs:  [
             GButton(
               icon: FontAwesomeIcons.house,
+              iconSize: 20,
               text: "Home",
               iconColor: Colors.grey.shade400,
             ),
@@ -62,23 +63,27 @@ class _BottomNavState extends State<BottomNav> {
             
             // ),
             GButton(
-              icon: FontAwesomeIcons.magnifyingGlass,iconColor: Colors.grey.shade400,
+              icon: FontAwesomeIcons.magnifyingGlass,iconColor: Colors.grey.shade300,
               text: "Search",
+              iconSize: 20,
             ),
             GButton(
               icon: FontAwesomeIcons.camera,
+              iconSize: 20,
               text: "Post",
-              iconColor: Colors.grey.shade400,
+              iconColor: Colors.grey.shade300,
             ),
             GButton(
               icon: FontAwesomeIcons.video,
+              iconSize: 20,
               text: "Reels",
-              iconColor: Colors.grey.shade400,
+              iconColor: Colors.grey.shade300,
             ),
             GButton(
               icon: FontAwesomeIcons.userLarge,
+              iconSize: 20,
               text: "Profile",
-              iconColor: Colors.grey.shade400,
+              iconColor: Colors.grey.shade300,
             ),
           ],
           selectedIndex: selectedIndex,

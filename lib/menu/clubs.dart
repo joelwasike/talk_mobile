@@ -39,6 +39,7 @@ class _ClubsState extends State<Clubs> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Spacer(),
               FadeInRight(
                     child: Text('Clubs & Societies',
                         style: GoogleFonts.aguafinaScript(
@@ -120,17 +121,16 @@ class _ClubsState extends State<Clubs> {
                      Navigator.push(
                     (context),
                     MaterialPageRoute(builder: (context) =>  Clubpost(title: clubs[index],)
-                        // SingleChildScrollView(
-                        //   child:
-                        //    Chatpage(email: data["email"], uid: data["uid"]),
-                        // ),
+                       
                         ),
                   );
                   },
-                  child: ClubCard(
-                    name: clubs[index],
-                    image: imageList[index],
-                    description: "This is the best message ever seen in this world and its known as joel wasike",
+                  child: FadeInRight(
+                    child: ClubCard(
+                      name: clubs[index],
+                      image: imageList[index],
+                      description: "This is the best message ever seen in this world and its known as joel wasike",
+                    ),
                   ),
                 );
               },

@@ -59,19 +59,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     ),
                   ),
                 ),
-                FadeInUp(
-                    child: Text('Talk',
-                        style: GoogleFonts.aguafinaScript(
-                          textStyle: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 45,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ))),
+                
                
-                const SizedBox(
-                  height: 100,
-                ),
+               
               ]),
             ),
           ),

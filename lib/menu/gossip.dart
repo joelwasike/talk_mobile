@@ -127,25 +127,25 @@ class _GossipState extends State<Gossip> {
                           Container(
                             width: MediaQuery.of(context).size.width,
                             height: 300,
-                            color: Colors.grey.shade800.withOpacity(0.4),
+                            color: Colors.grey.shade800.withOpacity(0.2),
                           ),
                           const SizedBox(height: 12),
                           Container(
                             width: double.infinity,
                             height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.4),
+                            color: Colors.grey.shade800.withOpacity(0.2),
                           ),
                           const SizedBox(height: 6),
                           Container(
                             width: MediaQuery.of(context).size.width * 0.5,
                             height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.4),
+                            color: Colors.grey.shade800.withOpacity(0.2),
                           ),
                           const SizedBox(height: 6),
                           Container(
                             width: MediaQuery.of(context).size.width * 0.25,
                             height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.4),
+                            color: Colors.grey.shade800.withOpacity(0.2),
                           )
                         ],
                       ),
@@ -156,6 +156,7 @@ class _GossipState extends State<Gossip> {
               },
             )
           : InViewNotifierList(
+            physics: BouncingScrollPhysics(),
               scrollDirection: Axis.vertical,
               initialInViewIds: const ['0'],
               isInViewPortCondition: (double deltaTop, double deltaBottom,
@@ -168,26 +169,31 @@ class _GossipState extends State<Gossip> {
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                     return InViewNotifierWidget(
+                      
                       id: '$index',
                       builder:
                           (BuildContext context, bool isInView, Widget? child) {
                         final item = data[index];
                         return isVideoLink(item["media"])
-                            ? VUserPost(
-                                scrollController: _scrollController,
-                                play: isInView,
-                                name: item['title'],
-                                url: item['media'],
-                                content: item['content'],
-                                likes: item['likes'],
-                              )
-                            : UserPost(
-                                scrollController: _scrollController,
-                                name: item['title'],
-                                image: item['media'],
-                                content: item['content'],
-                                likes: item['likes'],
-                              );
+                            ? FadeInRight(
+                              child: VUserPost(
+                                  scrollController: _scrollController,
+                                  play: isInView,
+                                  name: item['title'],
+                                  url: item['media'],
+                                  content: item['content'],
+                                  likes: item['likes'],
+                                ),
+                            )
+                            : FadeInRight(
+                              child: UserPost(
+                                  scrollController: _scrollController,
+                                  name: item['title'],
+                                  image: item['media'],
+                                  content: item['content'],
+                                  likes: item['likes'],
+                                ),
+                            );
                       },
                     );
                   },

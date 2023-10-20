@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'heartanimationwidget.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 
@@ -30,7 +32,7 @@ class NoticePost extends StatefulWidget {
 }
 
 class _NoticePostState extends State<NoticePost> {
-   double? _progress;
+  double? _progress;
   String _status = '';
   bool isliked = false;
   bool isHeartAnimating = false;
@@ -50,7 +52,7 @@ class _NoticePostState extends State<NoticePost> {
               Row(
                 children: [
                   const Icon(
-                    Icons.notification_important,
+                    FontAwesomeIcons.bell,
                     color: LightColor.maincolor,
                   ),
                   const SizedBox(
@@ -78,41 +80,15 @@ class _NoticePostState extends State<NoticePost> {
                   maxHeight: MediaQuery.of(context).size.height / 1.3,
                   minWidth: MediaQuery.of(context).size.width),
               child: CachedNetworkImage(
-                imageUrl: widget.image!,
-
-                fit: BoxFit.fitWidth,
-                placeholder: (context, url) => GFShimmer(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 300,
-                        color: Colors.grey.shade800.withOpacity(0.4),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        height: 8,
-                        color: Colors.grey.shade800.withOpacity(0.4),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        height: 8,
-                        color: Colors.grey.shade800.withOpacity(0.4),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.25,
-                        height: 8,
-                        color: Colors.grey.shade800.withOpacity(0.4),
-                      )
-                    ],
+                fadeInCurve: Curves.easeIn,
+                  imageUrl: widget.image!,
+                  fit: BoxFit.fitWidth,
+                  placeholder: (context, url) => Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 300,
+                          ),
+                  // Placeholder while loading
                   ),
-                ),
-                // Placeholder while loading
-              ),
             ),
             Opacity(
               opacity: isHeartAnimating ? 1 : 0,
@@ -250,39 +226,45 @@ class _NoticePostState extends State<NoticePost> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: IconButton(
-                  onPressed: () async {
-                    FileDownloader.downloadFile(
-                      url: "https://research.nhm.org/pdfs/10840/10840-002.pdf",
-                      name: widget.name,
-                      downloadDestination:  DownloadDestinations.appFiles,
-                      notificationType: NotificationType.all,
-                      onProgress: (name, progress) {
-                        setState(() {
-                          _progress = progress;
-                          _status = 'Progress: $progress%';
-                        });
-                      },
-                      onDownloadCompleted: (path) {
-                        setState(() {
-                          _progress = null;
-                          _status = 'File downloaded to: $path';
-                        });
-                      },
-                      onDownloadError: (error) {
-                        setState(() {
-                          _progress = null;
-                          _status = 'Download error: $error';
-                        });
-                      }).then((file) {
-                    debugPrint('file path: ${file?.path}');
-                  });
-                  },
-                  icon: Icon(
-                    Icons.download_rounded,
-                    color: Colors.grey.shade300,
-                  ),
-                ),
+                child: _progress != null
+                    ? SpinKitThreeBounce(
+                          color: Colors.white,
+                          size: 25,
+                        )
+                    : IconButton(
+                        onPressed: () async {
+                          FileDownloader.downloadFile(
+                              url: widget.file.trim(),
+                              onProgress: (name, progress) {
+                                setState(() {
+                                  _progress = progress;
+                                });
+                              },
+                              onDownloadCompleted: (value) {
+                                print('path  $value ');
+                                setState(() {
+                                  _progress = null;
+                                });
+                                CherryToast.success(
+                                        title: const Text(""),
+                                        backgroundColor: Colors.black.withOpacity(0.9),
+                                        displayTitle: false,
+                                        description: Text(
+                                          "Download complete",
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        animationDuration:
+                                            const Duration(milliseconds: 500),
+                                        autoDismiss: true)
+                                    .show(context);
+                              });
+                        },
+                        icon: Icon(
+                          Icons.download_rounded,
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
               ),
             ],
           ),

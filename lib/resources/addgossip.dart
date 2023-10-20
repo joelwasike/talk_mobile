@@ -1,19 +1,14 @@
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/utils/colors.dart';
-import 'package:video_player/video_player.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 class AddGossip extends StatefulWidget {
   const AddGossip({super.key});
@@ -29,8 +24,6 @@ class _AddGossipState extends State<AddGossip> {
   var picker = ImagePicker();
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  Uint8List? _videoThumbnail;
-  VideoPlayerController? _videoController;
   bool isVideoPlaying = false;
   bool isloading = false;
   File? videoFile;
@@ -60,7 +53,7 @@ class _AddGossipState extends State<AddGossip> {
   }
 
   toast(String message) {
-    CherryToast.error(
+    CherryToast.success(
             title: const Text(""),
             backgroundColor: Colors.black,
             displayTitle: false,
@@ -130,134 +123,7 @@ class _AddGossipState extends State<AddGossip> {
     }
   }
 
-  void showImagePicker(BuildContext context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (builder) {
-          return Container(
-            height: MediaQuery.of(context).size.height / 10.2,
-            decoration: const BoxDecoration(
-                color: LightColor.maincolor1,
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(25),
-                    topLeft: Radius.circular(25))),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                    child: InkWell(
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.image,
-                        size: 30.0,
-                        color: LightColor.maincolor,
-                      ),
-                      Text(
-                        "Gallery",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16, color: LightColor.maincolor),
-                      )
-                    ],
-                  ),
-                  onTap: () {
-                    _imgFromGallery();
-                    Navigator.pop(context);
-                  },
-                )),
-                Expanded(
-                    child: InkWell(
-                  child: const SizedBox(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.camera_alt,
-                          size: 30.0,
-                          color: LightColor.maincolor,
-                        ),
-                        Text(
-                          "Camera",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 16, color: LightColor.maincolor),
-                        )
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    _imgFromCamera();
-                    Navigator.pop(context);
-                  },
-                ))
-              ],
-            ),
-          );
-        });
-  }
-
-  _imgFromGallery() async {
-    await picker
-        .pickImage(source: ImageSource.gallery, imageQuality: 50)
-        .then((value) {
-      if (value != null) {
-        _cropImage(File(value.path));
-      }
-    });
-  }
-
-  _imgFromCamera() async {
-    await picker
-        .pickImage(source: ImageSource.camera, imageQuality: 50)
-        .then((value) {
-      if (value != null) {
-        _cropImage(File(value.path));
-      }
-    });
-  }
-
-  _cropImage(File imgFile) async {
-    final croppedFile = await ImageCropper().cropImage(
-        sourcePath: imgFile.path,
-        aspectRatioPresets: Platform.isAndroid
-            ? [
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio16x9
-              ]
-            : [
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio5x3,
-                CropAspectRatioPreset.ratio5x4,
-                CropAspectRatioPreset.ratio7x5,
-                CropAspectRatioPreset.ratio16x9
-              ],
-        uiSettings: [
-          AndroidUiSettings(
-              toolbarTitle: "Crop",
-              toolbarColor: LightColor.maincolor1,
-              toolbarWidgetColor: Colors.white,
-              initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
-          IOSUiSettings(
-            title: "Crop",
-          )
-        ]);
-    if (croppedFile != null) {
-      imageCache.clear();
-      setState(() {
-        imagefile = File(croppedFile.path);
-      });
-      // reload();
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -433,52 +299,7 @@ class _AddGossipState extends State<AddGossip> {
                   
                   ],
                 ),
-                // Column(
-                //   children: [
-                //     if (_videoThumbnail != null)
-                //       GestureDetector(
-                //         onTap: () {
-                //           setState(() {
-                //             isVideoPlaying = !isVideoPlaying;
-                //             if (isVideoPlaying) {
-                //               _videoController?.play();
-                //             } else {
-                //               _videoController?.pause();
-                //             }
-                //           });
-                //         },
-                //         child: Stack(
-                //           alignment: Alignment.center,
-                //           children: [
-                //             if (_videoThumbnail != null && !isVideoPlaying)
-                //               Image.memory(_videoThumbnail!),
-                //             if (_videoThumbnail != null && isVideoPlaying)
-                //               AspectRatio(
-                //                 aspectRatio:
-                //                     _videoController!.value.aspectRatio,
-                //                 child: VideoPlayer(_videoController!),
-                //               ),
-                //             if (isVideoPlaying)
-                //               const Center(
-                //                 child: Icon(
-                //                   Icons.pause,
-                //                   size: 50,
-                //                   color: Colors.white,
-                //                 ),
-                //               ),
-                //             if (!isVideoPlaying)
-                //               const Center(
-                //                 child: Icon(
-                //                   Icons.play_circle_fill,
-                //                   size: 50,
-                //                   color: Colors.white,
-                //                 ),
-                //               ),
-                //           ],
-                //         ),
-                //       )
-                //   ],
-                // )
+               
               ],
             ),
           ),

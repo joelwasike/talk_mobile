@@ -36,14 +36,14 @@ class _GetClubPeopleState extends State<GetClubPeople> {
         toolbarHeight: 30,
         iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
-        backgroundColor: LightColor.maincolor1,
+        backgroundColor: LightColor.scaffold,
         title: Padding(
           padding: const EdgeInsets.only(left: 56),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               FadeInRight(
-                  child: Text('Select Club Members',
+                  child: Text('Choose friends',
                       style: GoogleFonts.aguafinaScript(
                         textStyle: const TextStyle(
                           color: Colors.white,
@@ -57,36 +57,47 @@ class _GetClubPeopleState extends State<GetClubPeople> {
         ),
 
       ),
-       floatingActionButton: Padding(
-         padding: const EdgeInsets.only(bottom: 40, right: 10),
-         child: SizedBox(
-          height: 50,
-          width: 50,
-          child: FloatingActionButton(
-              onPressed: () {
-                  Navigator.push(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor:
+            Colors.transparent, // Set the background color to transparent
+        mini: false,
+        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        onPressed: () {
+          Navigator.push(
                       (context),
                       MaterialPageRoute(builder: (context) => const  ClubCred()
                          
                           ),
                     );
-              },
-              backgroundColor: LightColor.maincolor,
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(30.0))),
-              child: const Icon(Icons.arrow_forward,color: LightColor.background,)),
-             ),
-       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: LightColor.maincolor, // Specify the border color here
+            ),
+          ),
+          child:  Center(
+            child: Icon(Icons.arrow_forward_ios,color: LightColor.maincolor,)
+          ),
+        ),
+      ),
 
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+         Padding(
+            padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
             child: TextField(
               decoration: InputDecoration(
-                border: InputBorder.none,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
                 hintText: "Search friends...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 prefixIcon: Icon(
@@ -97,9 +108,6 @@ class _GetClubPeopleState extends State<GetClubPeople> {
                 filled: true,
                 fillColor: LightColor.maincolor1,
                 contentPadding: const EdgeInsets.all(8),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(color: Colors.grey.shade600)),
               ),
             ),
           ),
@@ -171,7 +179,7 @@ class LongPressSelectableTile extends StatelessWidget {
       onTap: onTap,
       onLongPress: onLongPress,
       child: ListTile(
-        title: Text(name),
+        title: Text(name,style:  TextStyle(color: Colors.grey.shade200, fontSize: 13)),
         subtitle: Text("Followers: $followers",style: const TextStyle(color: Colors.grey, fontSize: 13),),
         leading: CircleAvatar(
           maxRadius: 30,

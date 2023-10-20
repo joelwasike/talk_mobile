@@ -159,10 +159,11 @@ class _ClubCredState extends State<ClubCred> {
         toolbarHeight: 30,
         iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
-        backgroundColor: LightColor.maincolor1,
+        backgroundColor: LightColor.scaffold,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Spacer(),
             FadeInRight(
                 child: Text('Create Club/Society',
                     style: GoogleFonts.aguafinaScript(
@@ -198,24 +199,25 @@ class _ClubCredState extends State<ClubCred> {
       body: ListView(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 40),
             child: Column(
               children: [
                 GestureDetector(
-                   onTap: () async {
-                        Map<Permission, PermissionStatus> statuses = await [
-                          Permission.storage,
-                          Permission.camera,
-                        ].request();
-                        if (statuses[Permission.storage]!.isDenied &&
-                            statuses[Permission.camera]!.isDenied) {
-                          print('no permission provided');
-                        } else {
-                          showImagePicker(context);
-                        }
-                      },
+                  onTap: () async {
+                    Map<Permission, PermissionStatus> statuses = await [
+                      Permission.storage,
+                      Permission.camera,
+                    ].request();
+                    if (statuses[Permission.storage]!.isDenied &&
+                        statuses[Permission.camera]!.isDenied) {
+                      print('no permission provided');
+                    } else {
+                      showImagePicker(context);
+                    }
+                  },
                   child: CircleAvatar(
                     maxRadius: 60,
+                    backgroundColor: LightColor.maincolor,
                     child: ClipOval(
                       child: SizedBox(
                         width: 115,
