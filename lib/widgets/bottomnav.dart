@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:usersms/screens/addpost.dart';
 import 'package:usersms/screens/homepage.dart';
 import 'package:usersms/screens/reels.dart';
 import 'package:usersms/screens/searchpage.dart';
-import 'package:usersms/screens/status.dart';
 import 'package:usersms/screens/profile/profile_screen.dart';
 
-import '../utils/colors.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});
@@ -80,6 +77,7 @@ class _BottomNavState extends State<BottomNav> {
               iconColor: Colors.grey.shade300,
             ),
             GButton(
+
               icon: FontAwesomeIcons.userLarge,
               iconSize: 20,
               text: "Profile",

@@ -35,7 +35,7 @@ class _CommentCardState extends State<CommentCard> {
             backgroundImage: AssetImage(
               "assets/airtime.jpg",
             ),
-            radius: 18,
+            radius: 30,
           ),
           Expanded(
             child: Padding(
@@ -51,12 +51,19 @@ class _CommentCardState extends State<CommentCard> {
                             text: "Joel:  ",
                             // text: snap.data()['name'],
                             style: TextStyle(
+                              color: LightColor.maincolor,
                               fontWeight: FontWeight.bold,
+                              fontSize: 16
                             )),
                         TextSpan(
                           text:
                               "joel wasike is a good boy ajdgfoua DADSBCIUaugsdui sbhdugsdfhias idsahgiudhgfdsaf uagfsagfuasb",
                           // text: ' ${snap.data()['text']}',
+                           style: TextStyle(
+                            color: LightColor.background,
+                              fontWeight: FontWeight.normal,
+                            )
+                          
                         ),
                       ],
                     ),
@@ -74,65 +81,7 @@ class _CommentCardState extends State<CommentCard> {
                               color: Colors.grey),
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                              useSafeArea: true,
-                              isScrollControlled: true,
-                              enableDrag: true,
-                              context: context,
-                              builder: (context) => Container(
-                                  padding: EdgeInsets.only(
-                                    bottom: MediaQuery.of(context)
-                                        .viewInsets
-                                        .bottom),
-                                    decoration: const BoxDecoration(
-                                        color: LightColor.maincolor1,
-                                        borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(25),
-                                            topLeft: Radius.circular(25))),
-                                    child: Column(
-                                      children: [
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        const Text(
-                                          "Comments",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              color: LightColor.background),
-                                        ),
-                                        Divider(
-                                          color: Colors.grey.shade800,
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Expanded(
-                                          child: ListView.builder(
-                                            physics: const BouncingScrollPhysics(),
-                                            itemCount: people.length,
-                                            itemBuilder: (context, index) {
-                                              return const CommentofcommentCard();
-                                            },
-                                          ),
-                                        ),
-                                        _buildMessageInput()
-                                      ],
-                                    ),
-                                  ));
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.only(top: 4),
-                          child: Text(
-                            "Reply",
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.grey),
-                          ),
-                        ),
-                      ),
+                      
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: GestureDetector(
@@ -158,7 +107,7 @@ class _CommentCardState extends State<CommentCard> {
                                             height: 10,
                                           ),
                                           const Text(
-                                            "Comments",
+                                            "Joel's Comment",
                                             style: TextStyle(
                                                 fontSize: 16,
                                                 color: LightColor.background),
@@ -184,7 +133,7 @@ class _CommentCardState extends State<CommentCard> {
                                     ));
                           },
                           child: const Text(
-                            "-View Replies",
+                            "- Make a comment",
                             style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w300,
@@ -210,12 +159,12 @@ class _CommentCardState extends State<CommentCard> {
                   ? const Icon(
                       Icons.favorite_border_outlined,
                       color: Colors.white,
-                      size: 16,
+                      size: 20,
                     )
                   : const Icon(
                       Icons.favorite,
                       color: Colors.red,
-                      size: 16,
+                      size: 20,
                     ),
             ),
           )

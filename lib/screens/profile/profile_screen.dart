@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:usersms/resources/followers.dart';
@@ -372,7 +374,24 @@ class ImageCard extends StatelessWidget {
                 }
               },
             )
-          : Image.network(imageData.imageUrl, fit: BoxFit.cover),
+          : CachedNetworkImage(
+                imageUrl: imageData.imageUrl, fit: BoxFit.cover,
+                
+                placeholder: (context, url) => GFShimmer(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: MediaQuery.of(context).size.height/4,
+                                  color: Colors.grey.shade800.withOpacity(0.4),
+                                ),
+                              
+                              ],
+                            ),
+                          ),
+                // Placeholder while loading
+              ),
     );
   }
 }

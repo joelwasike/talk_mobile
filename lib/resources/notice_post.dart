@@ -5,10 +5,13 @@ import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'heartanimationwidget.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 
@@ -33,12 +36,36 @@ class NoticePost extends StatefulWidget {
 
 class _NoticePostState extends State<NoticePost> {
   double? _progress;
-  String _status = '';
   bool isliked = false;
   bool isHeartAnimating = false;
   SampleItem? selectedMenu;
   final TextEditingController _messageController = TextEditingController();
   bool permissionReady = false;
+
+ //like a notice
+  Future<void> like() async {
+    final String apiUrl = '$baseUrl/noticelikes';
+    final Map<String, dynamic> data = {
+      'postid': 'value1',
+      'userid': 'value2',
+    };
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(data), // Convert the data to JSON
+    );
+
+    if (response.statusCode == 200) {
+      // Request was successful
+      print('Response data: ${response.body}');
+    } else {
+      // Request failed
+      print('Error: ${response.statusCode}');
+      print('Error body: ${response.body}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +87,9 @@ class _NoticePostState extends State<NoticePost> {
                   ),
                   Text(
                     widget.name!,
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: LightColor.maincolor),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: LightColor.maincolor),
                   ),
                 ],
               ),
@@ -81,14 +110,14 @@ class _NoticePostState extends State<NoticePost> {
                   minWidth: MediaQuery.of(context).size.width),
               child: CachedNetworkImage(
                 fadeInCurve: Curves.easeIn,
-                  imageUrl: widget.image!,
-                  fit: BoxFit.fitWidth,
-                  placeholder: (context, url) => Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 300,
-                          ),
-                  // Placeholder while loading
-                  ),
+                imageUrl: widget.image!,
+                fit: BoxFit.fitWidth,
+                placeholder: (context, url) => Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 300,
+                ),
+                // Placeholder while loading
+              ),
             ),
             Opacity(
               opacity: isHeartAnimating ? 1 : 0,
@@ -228,9 +257,9 @@ class _NoticePostState extends State<NoticePost> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: _progress != null
                     ? SpinKitThreeBounce(
-                          color: Colors.white,
-                          size: 25,
-                        )
+                        color: Colors.white,
+                        size: 25,
+                      )
                     : IconButton(
                         onPressed: () async {
                           FileDownloader.downloadFile(
@@ -247,7 +276,8 @@ class _NoticePostState extends State<NoticePost> {
                                 });
                                 CherryToast.success(
                                         title: const Text(""),
-                                        backgroundColor: Colors.black.withOpacity(0.9),
+                                        backgroundColor:
+                                            Colors.black.withOpacity(0.9),
                                         displayTitle: false,
                                         description: Text(
                                           "Download complete",

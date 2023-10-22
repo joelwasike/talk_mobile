@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
@@ -59,7 +58,7 @@ class _UserrPostState extends State<UserrPost> {
     return false;
   }
 
-Future<String> generateVideoThumbnail(String videoUrl) async {
+  Future<String> generateVideoThumbnail(String videoUrl) async {
     final thumbnailPath = await VideoThumbnail.thumbnailFile(
       video: videoUrl,
       quality: 100, // Adjust the quality (0 - 100)
@@ -325,10 +324,24 @@ Future<String> generateVideoThumbnail(String videoUrl) async {
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                top: 16, left: 16, right: 16),
+                                                top: 2, left: 6, right: 2),
                                             child: TextField(
                                               decoration: InputDecoration(
-                                                border: InputBorder.none,
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade600),
+                                                ),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  borderSide: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade600),
+                                                ),
                                                 hintText: "Search friends...",
                                                 hintStyle: TextStyle(
                                                     color:
@@ -343,14 +356,6 @@ Future<String> generateVideoThumbnail(String videoUrl) async {
                                                     LightColor.maincolor1,
                                                 contentPadding:
                                                     const EdgeInsets.all(8),
-                                                enabledBorder:
-                                                    OutlineInputBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20),
-                                                        borderSide: BorderSide(
-                                                            color: Colors.grey
-                                                                .shade600)),
                                               ),
                                             ),
                                           ),
@@ -513,7 +518,8 @@ class LongPressSelectableTile extends StatefulWidget {
   final String image;
   final String followers;
 
-  const LongPressSelectableTile({super.key, 
+  const LongPressSelectableTile({
+    super.key,
     required this.onTap,
     required this.onLongPress,
     required this.isSelected,
