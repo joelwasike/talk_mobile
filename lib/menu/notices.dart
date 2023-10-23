@@ -142,6 +142,7 @@ class _NoticesState extends State<Notices> {
                       final item = data[index];
                       return FadeInRight(
                         child: NoticePost(
+                          id: item['id'],
                           file: item['pdf'],
                           name: item['title'],
                           image: item['media'],

@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:usersms/auth/google_auth.dart';
 import 'package:usersms/glassbox.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:http/http.dart' as http;
+import 'package:usersms/resources/apiconstatnts.dart';
 
 class Login extends StatefulWidget {
   final VoidCallback showregisterPage;
@@ -20,38 +25,56 @@ class _LoginState extends State<Login> {
   var emailconroller = TextEditingController();
   var passwordcontroller = TextEditingController();
   bool isloading = false;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> fetchData() async {
+    setState(() {
+      isloading = true;
+    });
+    Map body = {"email": "joelwasike97@gmail.com"};
+    final url =
+        Uri.parse('$baseUrl/getuserdetails'); // Replace with your JSON URL
+    final response = await http.post(url, body: jsonEncode(body));
+
+    if (response.statusCode == 200) {
+      var jsonData = jsonDecode(response.body);
+      var box = Hive.box("Talk");
+      box.put("id", jsonData[0]["ID"]);
+      box.put("username", jsonData[0]["username"]);
+      box.put("email", jsonData[0]["email"]);
+      box.put("profile_picture", jsonData[0]["profile_picture"]);
+    } else {
+      print('HTTP Request Error: ${response.statusCode}');
+    }
+  }
 
   Future login() async {
     try {
       setState(() {
         isloading = true;
       });
+      await fetchData();
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailconroller.text.trim(),
           password: passwordcontroller.text.trim());
-
-          //add user to document if not added
-           _firestore.collection("users").doc(FirebaseAuth.instance.currentUser!.uid).set({
-              "uid": FirebaseAuth.instance.currentUser!.uid,
-              "email": FirebaseAuth.instance.currentUser!.email
-            }, SetOptions(merge: true));
     } on FirebaseAuthException catch (e) {
       CherryToast.error(
               title: const Text(""),
               backgroundColor: Colors.black45,
               displayTitle: false,
-              description: Text(e.message.toString(), style: const TextStyle(color: Colors.white),),
+              description: Text(
+                e.message.toString(),
+                style: const TextStyle(color: Colors.white),
+              ),
               animationDuration: const Duration(milliseconds: 500),
               autoDismiss: true)
           .show(context);
-    }finally{
+    } finally {
       if (mounted) {
         setState(() {
-        isloading = false;
-      });
+          isloading = false;
+        });
       }
-      
     }
   }
 
@@ -173,16 +196,21 @@ class _LoginState extends State<Login> {
                     decoration: BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(9)),
-                    child:  Center(
-                        child:isloading? const SpinKitThreeBounce(
-                          color: Colors.white,
-                          size: 25,
-                        ):const Text("Login", style: TextStyle(color: Colors.white),))),
+                    child: Center(
+                        child: isloading
+                            ? const SpinKitThreeBounce(
+                                color: Colors.white,
+                                size: 25,
+                              )
+                            : const Text(
+                                "Login",
+                                style: TextStyle(color: Colors.white),
+                              ))),
               ),
               const SizedBox(
                 height: 50,
               ),
-               Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   GestureDetector(

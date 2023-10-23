@@ -5,10 +5,14 @@ import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'heartanimationwidget.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 
@@ -17,15 +21,17 @@ class NoticePost extends StatefulWidget {
   final String? name;
   final String? image;
   final String? content;
-  final int? likes;
+  int likes;
+  final int? id;
 
-  const NoticePost(
+  NoticePost(
       {super.key,
       required this.name,
       required this.image,
       this.content,
       required this.likes,
-      required this.file});
+      required this.file,
+      this.id});
 
   @override
   State<NoticePost> createState() => _NoticePostState();
@@ -39,6 +45,23 @@ class _NoticePostState extends State<NoticePost> {
   SampleItem? selectedMenu;
   final TextEditingController _messageController = TextEditingController();
   bool permissionReady = false;
+
+  Future<void> like() async {
+    var box = Hive.box("Talk");
+    var userid = box.get("id");
+
+    Map body = {"userid": userid, "postid": widget.id};
+    final url = Uri.parse('$baseUrl/noticelikes'); // Replace with your JSON URL
+    final response = await http.post(url, body: jsonEncode(body));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        widget.likes = (widget.likes + 1);
+      });
+    } else {
+      print('HTTP Request Error: ${response.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +104,14 @@ class _NoticePostState extends State<NoticePost> {
                   minWidth: MediaQuery.of(context).size.width),
               child: CachedNetworkImage(
                 fadeInCurve: Curves.easeIn,
-                  imageUrl: widget.image!,
-                  fit: BoxFit.fitWidth,
-                  placeholder: (context, url) => Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 300,
-                          ),
-                  // Placeholder while loading
-                  ),
+                imageUrl: widget.image!,
+                fit: BoxFit.fitWidth,
+                placeholder: (context, url) => Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 300,
+                ),
+                // Placeholder while loading
+              ),
             ),
             Opacity(
               opacity: isHeartAnimating ? 1 : 0,
@@ -129,6 +152,17 @@ class _NoticePostState extends State<NoticePost> {
                         setState(() {
                           isliked = !isliked;
                         });
+                        if (isliked) {
+                          setState(() {
+                            widget.likes + 1;
+                          });
+                          like();
+                        }
+                         if (!isliked) {
+                          setState(() {
+                            widget.likes - 1;
+                          });
+                        }
                       },
                     ),
                   ),
@@ -228,9 +262,9 @@ class _NoticePostState extends State<NoticePost> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: _progress != null
                     ? SpinKitThreeBounce(
-                          color: Colors.white,
-                          size: 25,
-                        )
+                        color: Colors.white,
+                        size: 25,
+                      )
                     : IconButton(
                         onPressed: () async {
                           FileDownloader.downloadFile(
@@ -247,7 +281,8 @@ class _NoticePostState extends State<NoticePost> {
                                 });
                                 CherryToast.success(
                                         title: const Text(""),
-                                        backgroundColor: Colors.black.withOpacity(0.9),
+                                        backgroundColor:
+                                            Colors.black.withOpacity(0.9),
                                         displayTitle: false,
                                         description: Text(
                                           "Download complete",
