@@ -106,7 +106,8 @@ class _NoticesState extends State<Notices> {
                         width: MediaQuery.of(context).size.width * 0.25,
                         height: 8,
                         color: Colors.grey.shade800.withOpacity(0.2),
-                      )
+                      ),
+                      const SizedBox(height: 6),
                     ],
                   ),
                 );

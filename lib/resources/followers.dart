@@ -30,7 +30,7 @@ class _FollowersState extends State<Followers> {
         toolbarHeight: 30,
         iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
-        backgroundColor: LightColor.maincolor1,
+        backgroundColor: LightColor.scaffold,
         title: Padding(
           padding: const EdgeInsets.only(left: 56),
           child: Row(
@@ -55,11 +55,18 @@ class _FollowersState extends State<Followers> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
             child: TextField(
               decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: "Search...",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
+                ),
+                hintText: "Search clubs and societies...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 prefixIcon: Icon(
                   Icons.search,
@@ -69,9 +76,6 @@ class _FollowersState extends State<Followers> {
                 filled: true,
                 fillColor: LightColor.maincolor1,
                 contentPadding: const EdgeInsets.all(8),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(color: Colors.grey.shade600)),
               ),
             ),
           ),

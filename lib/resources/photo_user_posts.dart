@@ -174,6 +174,7 @@ class _UserPostState extends State<UserPost> {
                         setState(() {
                           isliked = !isliked;
                         });
+                        
                       },
                     ),
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:usersms/utils/colors.dart';
 
 
 class CommentofcommentCard extends StatefulWidget {
@@ -20,7 +21,7 @@ class _CommentofcommentCardState extends State<CommentofcommentCard> {
             backgroundImage: AssetImage(
               "assets/airtime.jpg",
             ),
-            radius: 18,
+            radius: 30,
           ),
           Expanded(
             child: Padding(
@@ -36,12 +37,18 @@ class _CommentofcommentCardState extends State<CommentofcommentCard> {
                             text: "Joel:  ",
                             // text: snap.data()['name'],
                             style: TextStyle(
+                              fontSize: 16,
+                              color: LightColor.maincolor,
                               fontWeight: FontWeight.bold,
                             )),
                         TextSpan(
                           text:
                               "joel wasike is a good boy ajdgfoua DADSBCIUaugsdui sbhdugsdfhias idsahgiudhgfdsaf uagfsagfuasb",
                           // text: ' ${snap.data()['text']}',
+                          style: TextStyle(
+                              color: LightColor.background,
+                              fontWeight: FontWeight.normal,
+                            )
                         ),
                       ],
                     ),
@@ -77,12 +84,12 @@ class _CommentofcommentCardState extends State<CommentofcommentCard> {
                   ? const Icon(
                       Icons.favorite_border_outlined,
                       color: Colors.white,
-                      size: 16,
+                      size: 20,
                     )
                   : const Icon(
                       Icons.favorite,
                       color: Colors.red,
-                      size: 16,
+                      size: 20,
                     ),
             ),
           )

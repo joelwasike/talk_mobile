@@ -1,10 +1,12 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:usersms/resources/club_post.dart';
 import 'package:usersms/resources/forum_posts.dart';
-import 'package:usersms/widgets/forum_card.dart';
+import 'package:usersms/resources/searchforumfriends.dart';
+import 'package:usersms/widgets/club_card.dart';
 import '../resources/image_data.dart';
-import '../resources/searchforumfriends.dart';
+import '../resources/searchclubpeople.dart';
 import '../screens/homepage.dart';
 import '../utils/colors.dart';
 
@@ -16,8 +18,8 @@ class Forums extends StatefulWidget {
 }
 
 class _ForumsState extends State<Forums> {
-    List forums = [
-    "Computer ",
+  List clubs = [
+    "Computer Science",
     "Literature",
     "Art",
     "Kiswahili",
@@ -28,8 +30,8 @@ class _ForumsState extends State<Forums> {
   ];
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-       appBar: AppBar(
+    return Scaffold(
+      appBar: AppBar(
         leading: DrawerWidget(),
         toolbarHeight: 30,
         backgroundColor: LightColor.scaffold,
@@ -38,32 +40,31 @@ class _ForumsState extends State<Forums> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Spacer(),
               FadeInRight(
-                    child: Text('Forums',
-                        style: GoogleFonts.aguafinaScript(
-                          textStyle: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ))),
-             
+                  child: Text('Campus Forums',
+                      style: GoogleFonts.aguafinaScript(
+                        textStyle: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ))),
             ],
           ),
         ),
       ),
-    floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
         backgroundColor:
             Colors.transparent, // Set the background color to transparent
         mini: false,
-        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        shape:
+            const CircleBorder(), // Use CircleBorder to create a round button
         onPressed: () {
-           Navigator.push(
-                      (context),
-                      MaterialPageRoute(builder: (context) => const GetForumPeople()
-                         
-                          ),
-                    );
+          Navigator.push(
+            (context),
+            MaterialPageRoute(builder: (context) => const GetForumPeople()),
+          );
         },
         child: Container(
           decoration: BoxDecoration(
@@ -72,15 +73,17 @@ class _ForumsState extends State<Forums> {
               color: LightColor.maincolor, // Specify the border color here
             ),
           ),
-          child:  Center(
-            child: Icon(Icons.add_box,color: LightColor.maincolor,)
-          ),
+          child: Center(
+              child: Icon(
+            Icons.add_box,
+            color: LightColor.maincolor,
+          )),
         ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Padding(
+          Padding(
             padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
             child: TextField(
               decoration: InputDecoration(
@@ -92,7 +95,7 @@ class _ForumsState extends State<Forums> {
                   borderRadius: BorderRadius.circular(6),
                   borderSide: BorderSide(color: Colors.grey.shade600),
                 ),
-                hintText: "Search forum...",
+                hintText: "Search clubs and societies...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 prefixIcon: Icon(
                   Icons.search,
@@ -108,25 +111,28 @@ class _ForumsState extends State<Forums> {
           const SizedBox(
             height: 5,
           ),
-        
           Expanded(
             child: ListView.builder(
               physics: const BouncingScrollPhysics(),
-              itemCount: forums.length,
+              itemCount: clubs.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                     Navigator.push(
-                    (context),
-                    MaterialPageRoute(builder: (context) =>  ForumPosts(title: forums[index],)
-                     
-                        ),
-                  );
+                    Navigator.push(
+                      (context),
+                      MaterialPageRoute(
+                          builder: (context) => ForumPosts(
+                                title: clubs[index],
+                              )),
+                    );
                   },
-                  child: ForumCard(
-                    name: forums[index],
-                    image: imageList[index],
-                    description: "This is the best message ever seen in this world and its known as joel wasike",
+                  child: FadeInRight(
+                    child: ClubCard(
+                      name: clubs[index],
+                      image: imageList[index],
+                      description:
+                          "This is the best message ever seen in this world and its known as joel wasike",
+                    ),
                   ),
                 );
               },

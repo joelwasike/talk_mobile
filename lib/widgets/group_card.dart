@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:usersms/resources/image_data.dart';
 import 'package:usersms/utils/colors.dart';
@@ -30,10 +31,27 @@ class _GroupcardState extends State<Groupcard> {
           child:  Padding(
             padding: const EdgeInsets.only(bottom: 15),
             child: ListTile(
-               leading: CircleAvatar(
-                maxRadius: 30,
-                backgroundImage: NetworkImage(widget.image.imageUrl),
-               ),
+               leading: CachedNetworkImage(
+                imageUrl: widget.image.imageUrl,
+                imageBuilder: (context, imageProvider) => CircleAvatar(
+                  maxRadius: 30,
+                  backgroundImage: imageProvider,
+                ),
+                placeholder: (context, url) => CircleAvatar(
+                  maxRadius: 30,
+                  backgroundColor: Colors
+                      .grey, // You can customize the placeholder background color
+                ),
+                errorWidget: (context, url, error) => CircleAvatar(
+                  maxRadius: 30,
+                  backgroundColor: Colors
+                      .grey, // You can customize the error background color
+                  child: Icon(
+                    Icons.error,
+                    color: Colors.red, // You can customize the error icon color
+                  ),
+                ),
+              ),
                title: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -162,6 +162,7 @@ class _NoticePostState extends State<NoticePost> {
                           setState(() {
                             widget.likes - 1;
                           });
+                          like();
                         }
                       },
                     ),

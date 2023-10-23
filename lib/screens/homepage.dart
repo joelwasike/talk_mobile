@@ -62,7 +62,7 @@ class _HomepageState extends State<Homepage> {
       case 2:
         return const Groups();
       case 3:
-        return const Forums();
+        return  Forums();
       case 4:
         return const Notices();
       case 5:
@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               FadeInRight(
-                  child: Text('Campus Talk',
+                  child: Text('Kibabii Campus Talk',
                       style: GoogleFonts.aguafinaScript(
                         textStyle: TextStyle(
                           color: Colors.grey.shade300,
@@ -281,44 +281,71 @@ class _DrawerScreenState extends State<DrawerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: LightColor.scaffold,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          drawerList(Icons.home, "Home", 0),
-          const SizedBox(
-            height: 10,
-          ),
-          drawerList(Icons.message, "Messenger", 1),
-          const SizedBox(
-            height: 10,
-          ),
-          drawerList(Icons.group, "Groups", 2),
-          const SizedBox(
-            height: 10,
-          ),
-          drawerList(Icons.forum, "Forums", 3),
-          const SizedBox(
-            height: 10,
-          ),
-          drawerList(Icons.notification_add, "Notices", 4),
-          const SizedBox(
-            height: 10,
-          ),
-          drawerList(Icons.people_alt, " Gossip", 5),
-          const SizedBox(
-            height: 10,
-          ),
-          drawerList(Icons.speaker, "Clubs", 6),
-          const SizedBox(
-            height: 10,
-          ),
-          drawerList(Icons.school, "School Portal", 7),
-          const SizedBox(
-            height: 10,
-          ),
-          const Logout()
-        ],
+      body: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+                  height: MediaQuery.of(context).size.height/6,
+                  child: DrawerHeader(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width/3,
+                          height: 70,
+                          padding: EdgeInsets.only(
+                            bottom: 10, ),
+                          child: DecoratedBox(
+                            decoration: ShapeDecoration(
+                                shape: CircleBorder(),
+                                image: DecorationImage(
+                                  fit: BoxFit.contain,
+                                  image: AssetImage("assets/talklogo.v1.cropped-modified.png"),
+                                )),
+                          ),
+                        ),
+                       
+                      ],
+                    ),
+                  ),
+                ),
+            drawerList(Icons.home, "Home", 0),
+            const SizedBox(
+              height: 10,
+            ),
+            drawerList(Icons.message, "Messenger", 1),
+            const SizedBox(
+              height: 10,
+            ),
+            drawerList(Icons.group, "Groups", 2),
+            const SizedBox(
+              height: 10,
+            ),
+            drawerList(Icons.forum, "Forums", 3),
+            const SizedBox(
+              height: 10,
+            ),
+            drawerList(Icons.notification_add, "Notices", 4),
+            const SizedBox(
+              height: 10,
+            ),
+            drawerList(Icons.people_alt, " Gossip", 5),
+            const SizedBox(
+              height: 10,
+            ),
+            drawerList(Icons.speaker, "Clubs", 6),
+            const SizedBox(
+              height: 10,
+            ),
+            drawerList(Icons.school, "School Portal", 7),
+            const SizedBox(
+              height: 10,
+            ),
+            const Logout()
+          ],
+        ),
       ),
     );
   }
