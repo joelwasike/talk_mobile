@@ -31,14 +31,14 @@ class _ClubpostState extends State<Clubpost> {
   int? likes;
   String? media;
   String? pdf;
-  String? title;
+  int? title;
 
   //get notices
   Future<void> fetchData() async {
     setState(() {
       isloading = true;
     });
-    final url = Uri.parse('$baseUrl/getgossips'); // Replace with your JSON URL
+    final url = Uri.parse('$baseUrl/getclubposts/1'); // Replace with your JSON URL
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -55,7 +55,7 @@ class _ClubpostState extends State<Clubpost> {
         id = item['id'];
         likes = item['likes'];
         media = item['media'];
-        title = item['title'];
+        title = item['userID'];
 
         setState(() {
           isloading = false;
@@ -182,7 +182,7 @@ class _ClubpostState extends State<Clubpost> {
                               child: VUserPost(
                                   scrollController: _scrollController,
                                   play: isInView,
-                                  name: item['title'],
+                                  name: 'Club',
                                   url: item['media'],
                                   content: item['content'],
                                   likes: item['likes'],
@@ -191,7 +191,7 @@ class _ClubpostState extends State<Clubpost> {
                             : FadeInRight(
                               child: UserPost(
                                   scrollController: _scrollController,
-                                  name: item['title'],
+                                  name: "Club",
                                   image: item['media'],
                                   content: item['content'],
                                   likes: item['likes'],
