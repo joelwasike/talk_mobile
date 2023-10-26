@@ -4,7 +4,7 @@ import 'package:usersms/resources/image_data.dart';
 import 'package:usersms/utils/colors.dart';
 
 class ClubCard extends StatefulWidget {
-  final ImageData image;
+  final String image;
   final String name;
   final String description;
   const ClubCard(
@@ -26,12 +26,12 @@ class _ClubCardState extends State<ClubCard> {
           height: 5,
         ),
         Container(
-          height: MediaQuery.of(context).size.height / 7,
+          height: MediaQuery.of(context).size.height / 9,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(6),
             image: DecorationImage(
-                image: NetworkImage(widget.image.imageUrl),
+                image: NetworkImage(widget.image),
                 fit: BoxFit.cover,
                 opacity: 0.2),
           ),
@@ -39,7 +39,7 @@ class _ClubCardState extends State<ClubCard> {
             padding: const EdgeInsets.only(bottom: 15),
             child: ListTile(
               leading: CachedNetworkImage(
-                imageUrl: widget.image.imageUrl,
+                imageUrl: widget.image,
                 imageBuilder: (context, imageProvider) => CircleAvatar(
                   maxRadius: 30,
                   backgroundImage: imageProvider,

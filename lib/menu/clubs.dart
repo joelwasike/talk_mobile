@@ -1,12 +1,17 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/club_post.dart';
+import 'package:usersms/resources/clubcred.dart';
+import 'package:usersms/resources/isloadong.dart';
 import 'package:usersms/widgets/club_card.dart';
 import '../resources/image_data.dart';
 import '../resources/searchclubpeople.dart';
 import '../screens/homepage.dart';
 import '../utils/colors.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Clubs extends StatefulWidget {
   const Clubs({super.key});
@@ -16,16 +21,39 @@ class Clubs extends StatefulWidget {
 }
 
 class _ClubsState extends State<Clubs> {
-    List clubs = [
-    "Computer Science",
-    "Literature",
-    "Art",
-    "Kiswahili",
-    "Impala",
-    "Nairobi Gossip",
-    "Kilimani",
-    "Kibabii University"
-  ];
+   
+   List<Map<String, dynamic>> data = [];
+  bool isloading = false;
+ 
+
+  Future<void> fetchData() async {
+    setState(() {
+      isloading = true;
+    });
+    final url = Uri.parse('$baseUrl/getclubs'); // Replace with your JSON URL
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+
+      setState(() {
+        data = jsonData.cast<Map<String, dynamic>>();
+      });
+      setState(() {
+        isloading = false;
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+    
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchData();
+  }
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
@@ -62,7 +90,7 @@ class _ClubsState extends State<Clubs> {
         onPressed: () {
            Navigator.push(
                       (context),
-                      MaterialPageRoute(builder: (context) => const GetClubPeople()
+                      MaterialPageRoute(builder: (context) => const ClubCred()
                          
                           ),
                     );
@@ -79,7 +107,7 @@ class _ClubsState extends State<Clubs> {
           ),
         ),
       ),
-      body: Column(
+      body:isloading? Isloading(): Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -114,22 +142,24 @@ class _ClubsState extends State<Clubs> {
           Expanded(
             child: ListView.builder(
               physics: const BouncingScrollPhysics(),
-              itemCount: clubs.length,
+              itemCount: data.length,
+              
               itemBuilder: (context, index) {
+                final club = data[index];
                 return GestureDetector(
                   onTap: () {
                      Navigator.push(
                     (context),
-                    MaterialPageRoute(builder: (context) =>  Clubpost(title: clubs[index],)
+                    MaterialPageRoute(builder: (context) =>  Clubpost(title: club['name'] ,)
                        
                         ),
                   );
                   },
                   child: FadeInRight(
                     child: ClubCard(
-                      name: clubs[index],
-                      image: imageList[index],
-                      description: "This is the best message ever seen in this world and its known as joel wasike",
+                      name: club['name'],
+                      image: club['profilepicture'],
+                      description: club['description'],
                     ),
                   ),
                 );

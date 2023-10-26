@@ -1,11 +1,15 @@
 import 'dart:io';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 
 import '../utils/colors.dart';
 import 'groupcredentials.dart';
@@ -19,6 +23,79 @@ class ClubCred extends StatefulWidget {
 
 class _ClubCredState extends State<ClubCred> {
   File? imagefile;
+  bool isloading = false;
+    TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
+   toast(String message) {
+    CherryToast.success(
+            title: const Text(""),
+            backgroundColor: Colors.black,
+            displayTitle: false,
+            description: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+            animationDuration: const Duration(milliseconds: 500),
+            autoDismiss: true)
+        .show(context);
+  }
+
+  Future<void> createclub() async {
+    setState(() {
+      isloading = true;
+    });
+    try {
+      if (imagefile == null) {
+        toast("The files should not be empty");
+        return;
+      }
+
+      Dio dio = Dio();
+
+      var formData = FormData();
+
+      formData.fields.addAll([
+        MapEntry('name', titleController.text),
+        MapEntry('description', descriptionController.text),
+         MapEntry('ownerid', "1"),
+      ]);
+      formData.files.addAll([
+        MapEntry(
+          'photo',
+          await MultipartFile.fromFile(imagefile!.path),
+        ),
+      ]);
+
+
+    
+
+      final response = await dio.post(
+        '$baseUrl/createclub',
+        data: formData,
+      );
+      //print(jsonDecode(response.data));
+      if (response.statusCode == 200) {
+        // Handle successful response
+        titleController.clear();
+        descriptionController.clear();
+        setState(() {
+          imagefile = null;
+        });
+        toast('Club created successfully');
+      } else {
+        // Handle error response
+        toast("Error creating club");
+      }
+    } catch (e) {
+      // Handle exceptions
+      print('Error: $e');
+    } finally {
+      setState(() {
+        isloading = false;
+      });
+    }
+  }
 
 //imagepicker
   final picker = ImagePicker();
@@ -183,13 +260,13 @@ class _ClubCredState extends State<ClubCred> {
           width: 50,
           child: FloatingActionButton(
               onPressed: () {
-                Navigator.push(
-                  (context),
-                  MaterialPageRoute(builder: (context) => const GroupCred()),
-                );
+               createclub();
               },
               backgroundColor: LightColor.maincolor,
-              child: const Text(
+              child:isloading? const SpinKitThreeBounce(
+                          color: Colors.white,
+                          size: 20,
+                        ): const Text(
                 "create",
                 style: TextStyle(color: Colors.white),
               )),
@@ -215,28 +292,33 @@ class _ClubCredState extends State<ClubCred> {
                       showImagePicker(context);
                     }
                   },
-                  child: CircleAvatar(
-                    maxRadius: 60,
-                    backgroundColor: LightColor.maincolor,
-                    child: ClipOval(
-                      child: SizedBox(
-                        width: 115,
-                        height: 115,
-                        child: imagefile == null
-                            ? Image.asset(
-                                'assets/airtime.jpg',
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              )
-                            : Image.file(
-                                imagefile!,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children:[ CircleAvatar(
+                      maxRadius: 60,
+                      backgroundColor: LightColor.maincolor,
+                      child: ClipOval(
+                        child: SizedBox(
+                          width: 115,
+                          height: 115,
+                          child: imagefile == null
+                              ? Image.asset(
+                                  'assets/airtime.jpg',
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.file(
+                                  imagefile!,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
                       ),
                     ),
+                    Icon(Icons.add_a_photo, color: Colors.white,size: 30,)
+                    ]
                   ),
                 ),
                 Text(
@@ -253,6 +335,7 @@ class _ClubCredState extends State<ClubCred> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              controller: titleController ,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: "eg. Salsa Dance Club..",
@@ -300,7 +383,8 @@ class _ClubCredState extends State<ClubCred> {
                   ),
                 ],
               ),
-              child: const TextField(
+              child:  TextField(
+                controller: descriptionController,
                 style: TextStyle(fontSize: 14),
                 //controller: desc,
                 maxLines: null,

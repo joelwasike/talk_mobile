@@ -127,12 +127,14 @@ class _ForumsState extends State<Forums> {
                     );
                   },
                   child: FadeInRight(
-                    child: ClubCard(
-                      name: clubs[index],
-                      image: imageList[index],
-                      description:
-                          "This is the best message ever seen in this world and its known as joel wasike",
-                    ),
+                    child: 
+                    Container()
+                    // ClubCard(
+                    //   name: clubs[index],
+                    //   image: imageList[index],
+                    //   description:
+                    //       "This is the best message ever seen in this world and its known as joel wasike",
+                    // ),
                   ),
                 );
               },
