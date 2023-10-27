@@ -150,7 +150,7 @@ class _ClubsState extends State<Clubs> {
                   onTap: () {
                      Navigator.push(
                     (context),
-                    MaterialPageRoute(builder: (context) =>  Clubpost(title: club['name'] ,)
+                    MaterialPageRoute(builder: (context) =>  Clubpost(title: club['name'], clubid: club["id"] ,)
                        
                         ),
                   );

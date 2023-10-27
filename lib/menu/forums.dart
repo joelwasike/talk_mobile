@@ -1,14 +1,20 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/club_post.dart';
+import 'package:usersms/resources/clubcred.dart';
 import 'package:usersms/resources/forum_posts.dart';
-import 'package:usersms/resources/searchforumfriends.dart';
+import 'package:usersms/resources/forumcred.dart';
+import 'package:usersms/resources/isloadong.dart';
 import 'package:usersms/widgets/club_card.dart';
+import 'package:usersms/widgets/forum_card.dart';
 import '../resources/image_data.dart';
 import '../resources/searchclubpeople.dart';
 import '../screens/homepage.dart';
 import '../utils/colors.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Forums extends StatefulWidget {
   const Forums({super.key});
@@ -18,20 +24,44 @@ class Forums extends StatefulWidget {
 }
 
 class _ForumsState extends State<Forums> {
-  List clubs = [
-    "Computer Science",
-    "Literature",
-    "Art",
-    "Kiswahili",
-    "Impala",
-    "Nairobi Gossip",
-    "Kilimani",
-    "Kibabii University"
-  ];
+   
+   List<Map<String, dynamic>> data = [];
+  bool isloading = false;
+ 
+
+  Future<void> fetchData() async {
+    setState(() {
+      isloading = true;
+    });
+    final url = Uri.parse('$baseUrl/getforums'); // Replace with your JSON URL
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+
+      setState(() {
+        data = jsonData.cast<Map<String, dynamic>>();
+      });
+      setState(() {
+        isloading = false;
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+    
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchData();
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return  Scaffold(
+       appBar: AppBar(
+  
         leading: DrawerWidget(),
         toolbarHeight: 30,
         backgroundColor: LightColor.scaffold,
@@ -42,14 +72,15 @@ class _ForumsState extends State<Forums> {
             children: [
               Spacer(),
               FadeInRight(
-                  child: Text('Campus Forums',
-                      style: GoogleFonts.aguafinaScript(
-                        textStyle: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ))),
+                    child: Text('Campus Forums',
+                        style: GoogleFonts.aguafinaScript(
+                          textStyle: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ))),
+           
             ],
           ),
         ),
@@ -58,13 +89,14 @@ class _ForumsState extends State<Forums> {
         backgroundColor:
             Colors.transparent, // Set the background color to transparent
         mini: false,
-        shape:
-            const CircleBorder(), // Use CircleBorder to create a round button
+        shape: const CircleBorder(), // Use CircleBorder to create a round button
         onPressed: () {
-          Navigator.push(
-            (context),
-            MaterialPageRoute(builder: (context) => const GetForumPeople()),
-          );
+           Navigator.push(
+                      (context),
+                      MaterialPageRoute(builder: (context) =>  ForumCred()
+                         
+                          ),
+                    );
         },
         child: Container(
           decoration: BoxDecoration(
@@ -73,14 +105,12 @@ class _ForumsState extends State<Forums> {
               color: LightColor.maincolor, // Specify the border color here
             ),
           ),
-          child: Center(
-              child: Icon(
-            Icons.add_box,
-            color: LightColor.maincolor,
-          )),
+          child:  Center(
+            child: Icon(Icons.add_box,color: LightColor.maincolor,)
+          ),
         ),
       ),
-      body: Column(
+      body:isloading? Isloading(): Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -95,7 +125,7 @@ class _ForumsState extends State<Forums> {
                   borderRadius: BorderRadius.circular(6),
                   borderSide: BorderSide(color: Colors.grey.shade600),
                 ),
-                hintText: "Search clubs and societies...",
+                hintText: "Search forums...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 prefixIcon: Icon(
                   Icons.search,
@@ -111,30 +141,29 @@ class _ForumsState extends State<Forums> {
           const SizedBox(
             height: 5,
           ),
+        
           Expanded(
             child: ListView.builder(
               physics: const BouncingScrollPhysics(),
-              itemCount: clubs.length,
+              itemCount: data.length,
+              
               itemBuilder: (context, index) {
+                final club = data[index];
                 return GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      (context),
-                      MaterialPageRoute(
-                          builder: (context) => ForumPosts(
-                                title: clubs[index],
-                              )),
-                    );
+                     Navigator.push(
+                    (context),
+                    MaterialPageRoute(builder: (context) =>  ForumPosts(title: club['title'], clubid: club["id"] ,)
+                       
+                        ),
+                  );
                   },
                   child: FadeInRight(
-                    child: 
-                    Container()
-                    // ClubCard(
-                    //   name: clubs[index],
-                    //   image: imageList[index],
-                    //   description:
-                    //       "This is the best message ever seen in this world and its known as joel wasike",
-                    // ),
+                    child: ForumCard(
+                      name: club['title'],
+                      image: club['photo'],
+                      description: club['description'],
+                    ),
                   ),
                 );
               },

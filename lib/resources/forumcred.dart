@@ -1,11 +1,15 @@
 import 'dart:io';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 
 import '../utils/colors.dart';
 import 'groupcredentials.dart';
@@ -19,6 +23,79 @@ class ForumCred extends StatefulWidget {
 
 class _ForumCredState extends State<ForumCred> {
   File? imagefile;
+  bool isloading = false;
+   TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
+   toast(String message) {
+    CherryToast.info(
+            title: const Text(""),
+            backgroundColor: Colors.black,
+            displayTitle: false,
+            description: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+            animationDuration: const Duration(milliseconds: 500),
+            autoDismiss: true)
+        .show(context);
+  }
+
+  Future<void> createclub() async {
+    setState(() {
+      isloading = true;
+    });
+    try {
+      if (imagefile == null) {
+        toast("The files should not be empty");
+        return;
+      }
+
+      Dio dio = Dio();
+
+      var formData = FormData();
+
+      formData.fields.addAll([
+        MapEntry('name', titleController.text),
+        MapEntry('description', descriptionController.text),
+         MapEntry('ownerid', "1"),
+      ]);
+      formData.files.addAll([
+        MapEntry(
+          'photo',
+          await MultipartFile.fromFile(imagefile!.path),
+        ),
+      ]);
+
+
+    
+
+      final response = await dio.post(
+        '$baseUrl/createclub',
+        data: formData,
+      );
+      //print(jsonDecode(response.data));
+      if (response.statusCode == 200) {
+        // Handle successful response
+        titleController.clear();
+        descriptionController.clear();
+        setState(() {
+          imagefile = null;
+        });
+        toast('Club created successfully');
+      } else {
+        // Handle error response
+        toast("Error creating club");
+      }
+    } catch (e) {
+      // Handle exceptions
+      print('Error: $e');
+    } finally {
+      setState(() {
+        isloading = false;
+      });
+    }
+  }
 
 //imagepicker
   final picker = ImagePicker();
@@ -159,10 +236,11 @@ class _ForumCredState extends State<ForumCred> {
         toolbarHeight: 30,
         iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
-        backgroundColor: LightColor.maincolor1,
+        backgroundColor: LightColor.scaffold,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Spacer(),
             FadeInRight(
                 child: Text('Create Forum',
                     style: GoogleFonts.aguafinaScript(
@@ -175,29 +253,23 @@ class _ForumCredState extends State<ForumCred> {
           ],
         ),
       ),
-        floatingActionButton: FloatingActionButton(
-        backgroundColor:
-            Colors.transparent, // Set the background color to transparent
-        mini: false,
-        shape: const CircleBorder(), // Use CircleBorder to create a round button
-        onPressed: () {
-           Navigator.push(
-                      (context),
-                      MaterialPageRoute(builder: (context) => const ForumCred()
-                         
-                          ),
-                    );
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: LightColor.maincolor, // Specify the border color here
-            ),
-          ),
-          child:  Center(
-            child: Icon(Icons.arrow_forward_ios,color: LightColor.maincolor,)
-          ),
+        floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 40, right: 10),
+        child: SizedBox(
+          height: 50,
+          width: 50,
+          child: FloatingActionButton(
+              onPressed: () {
+              // createclub();
+              },
+              backgroundColor: LightColor.maincolor,
+              child:isloading? const SpinKitThreeBounce(
+                          color: Colors.white,
+                          size: 20,
+                        ): const Text(
+                "create",
+                style: TextStyle(color: Colors.white),
+              )),
         ),
       ),
       body: ListView(
@@ -219,27 +291,33 @@ class _ForumCredState extends State<ForumCred> {
                           showImagePicker(context);
                         }
                       },
-                  child: CircleAvatar(
-                    maxRadius: 60,
-                    child: ClipOval(
-                      child: SizedBox(
-                        width: 115,
-                        height: 115,
-                        child: imagefile == null
-                            ? Image.asset(
-                                'assets/airtime.jpg',
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              )
-                            : Image.file(
-                                imagefile!,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children:[ CircleAvatar(
+                      maxRadius: 60,
+                      backgroundColor: LightColor.maincolor,
+                      child: ClipOval(
+                        child: SizedBox(
+                          width: 115,
+                          height: 115,
+                          child: imagefile == null
+                              ? Image.asset(
+                                  'assets/airtime.jpg',
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.file(
+                                  imagefile!,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
                       ),
                     ),
+                    Icon(Icons.add_a_photo, color: Colors.white,size: 30,)
+                    ]
                   ),
                 ),
                 Text(

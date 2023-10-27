@@ -100,36 +100,40 @@ class _HomeScreenState extends State<HomeScreen> {
   String? title;
 
   //get notices
-  Future<void> fetchData() async {
-    setState(() {
-      isloading = true;
-    });
-    final url = Uri.parse('$baseUrl/getgossips'); // Replace with your JSON URL
-    final response = await http.get(url);
+Future<void> fetchData() async {
+    try {
+      setState(() {
+        isloading = true;
+      });
+      final url = Uri.parse(
+          '$baseUrl/getposts'); // Replace with your JSON URL
+      final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      if (mounted) {
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+
         setState(() {
           data = jsonData.cast<Map<String, dynamic>>();
         });
-      }
 
-      // Now you can access the data as needed.
-      for (final item in data) {
-        content = item['content'];
-        email = item['email'];
-        id = item['id'];
-        likes = item['likes'];
-        media = item['media'];
-        title = item['title'];
-
-        setState(() {
-          isloading = false;
-        });
+        // Now you can access the data as needed.
+        for (final item in data) {
+          content = item['content'];
+          email = item['email'];
+          id = item['id'];
+          likes = item['likes'];
+          media = item['media'];
+          title = item['userID'];
+        }
+      } else {
+        throw Exception('Failed to load data');
       }
-    } else {
-      throw Exception('Failed to load data');
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isloading = false;
+      });
     }
   }
 
