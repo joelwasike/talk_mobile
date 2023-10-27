@@ -1,42 +1,134 @@
 import 'dart:io';
 
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:photo_gallery/photo_gallery.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:video_player/video_player.dart';
 
 import '../utils/colors.dart';
 
-class ViewerPage extends StatelessWidget {
-  final Medium medium;
+class ViewerPage extends StatefulWidget {
+  final File medium;
 
   const ViewerPage(this.medium, {super.key});
 
   @override
+  State<ViewerPage> createState() => _ViewerPageState();
+}
+
+class _ViewerPageState extends State<ViewerPage> {
+  TextEditingController caption = TextEditingController();
+  bool isloading = false;
+
+  toast(String message) {
+    CherryToast.success(
+            title: const Text(""),
+            backgroundColor: Colors.black,
+            displayTitle: false,
+            description: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+            animationDuration: const Duration(milliseconds: 500),
+            autoDismiss: true)
+        .show(context);
+  }
+
+  Future<void> uploadPost() async {
+    // _file = await PhotoGallery.getFile(mediumId: widget.medium.id);
+    setState(() {
+      isloading = true;
+    });
+    print(widget.medium.path);
+    try {
+      //print("image selected is: ${imagefile!.path}");
+      //print("video selected is: ${videoFile!.path}");
+
+      Dio dio = Dio();
+
+      var formData = FormData();
+
+      formData.fields.addAll([
+        MapEntry('userid', "1"),
+        MapEntry('content', caption.text),
+        const MapEntry('username', "davis"),
+      ]);
+
+      formData.files.addAll([
+        MapEntry(
+          'media',
+          await MultipartFile.fromFile(widget.medium.path),
+        ),
+      ]);
+
+      final response = await dio.post(
+        '$baseUrl/createpost',
+        data: formData,
+      );
+      //print(jsonDecode(response.data));
+      if (response.statusCode == 200) {
+        // Handle successful response
+        // titleController.clear();
+        // descriptionController.clear();
+        // setState(() {
+        //   imagefile = null;
+        // });
+        toast('Post uploaded successfully');
+      } else {
+        // Handle error response
+        toast("Error uploading Post");
+        print('Error uploading Post: ${response.statusMessage}');
+      }
+    } catch (e) {
+      // Handle exceptions
+      toast("Error uploading Post");
+      print('Error: $e');
+    } finally {
+      setState(() {
+        isloading = false;
+      });
+    }
+  }
+
+  bool isVideoFilePath(String filePath) {
+    final videoExtensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv'];
+    final lowerCaseFilePath = filePath.toLowerCase();
+
+    for (final extension in videoExtensions) {
+      if (lowerCaseFilePath.endsWith(extension)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor:
-            Colors.transparent, // Set the background color to transparent
-        mini: false,
-        shape: const CircleBorder(), // Use CircleBorder to create a round button
-        onPressed: () {},
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: LightColor.maincolor, // Specify the border color here
-            ),
-          ),
-          child: const Center(
-            child: Text(
-              "Post",
-              style: TextStyle(
-                color: LightColor.maincolor,
-                fontWeight: FontWeight.bold,
-                fontSize: 16.0,
-              ),
-            ),
-          ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 40, right: 10),
+        child: SizedBox(
+          height: 50,
+          width: 50,
+          child: FloatingActionButton(
+              onPressed: () {
+                uploadPost();
+              },
+              backgroundColor: LightColor.maincolor,
+              child: isloading
+                  ? const SpinKitThreeBounce(
+                      color: Colors.white,
+                      size: 20,
+                    )
+                  : const Text(
+                      "Post",
+                      style: TextStyle(color: Colors.white),
+                    )),
         ),
       ),
       body: ListView(
@@ -49,22 +141,24 @@ class ViewerPage extends StatelessWidget {
             children: <Widget>[
               SizedBox(
                   height: 350,
-                  child: medium.mediumType == MediumType.image
+                  child: !isVideoFilePath(widget.medium.path)
                       ? AspectRatio(
                           aspectRatio: 487 / 451,
                           child: Container(
                             decoration: BoxDecoration(
-                                image: DecorationImage(
-                              fit: BoxFit.contain,
-                              alignment: FractionalOffset.topCenter,
-                              image: PhotoProvider(mediumId: medium.id),
-                            )),
+                              image: DecorationImage(
+                                fit: BoxFit.contain,
+                                alignment: FractionalOffset.topCenter,
+                                image: FileImage(File(widget.medium
+                                    .path)), // Use FileImage with the file path.
+                              ),
+                            ),
                           ),
                         )
                       : SizedBox(
                           width: 200,
                           child: VideoProvider(
-                            mediumId: medium.id,
+                            mediumId: widget.medium,
                           ),
                         )),
               Padding(
@@ -86,9 +180,9 @@ class ViewerPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const TextField(
+                  child: TextField(
+                    controller: caption,
                     style: TextStyle(fontSize: 14),
-                    //controller: desc,
                     maxLines: null,
                     decoration: InputDecoration(
                       border: InputBorder.none,
@@ -110,7 +204,7 @@ class ViewerPage extends StatelessWidget {
 }
 
 class VideoProvider extends StatefulWidget {
-  final String mediumId;
+  final File mediumId;
 
   const VideoProvider({
     super.key,
@@ -135,7 +229,7 @@ class _VideoProviderState extends State<VideoProvider> {
 
   Future<void> initAsync() async {
     try {
-      _file = await PhotoGallery.getFile(mediumId: widget.mediumId);
+      _file = widget.mediumId;
       _controller = VideoPlayerController.file(_file!);
       _controller?.initialize().then((_) {
         setState(() {});

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'dart:io';
@@ -21,8 +20,7 @@ class AlbumPage extends StatefulWidget {
   State<StatefulWidget> createState() => AlbumPageState();
 }
 
-class AlbumPageState extends State<AlbumPage>
-    with SingleTickerProviderStateMixin {
+class AlbumPageState extends State<AlbumPage>with SingleTickerProviderStateMixin {
   List<Medium>? _media;
   bool _loading = false;
   File? imagefile;
@@ -38,14 +36,12 @@ class AlbumPageState extends State<AlbumPage>
     if (await _promptPermissionSetting()) {
       List<Medium> mediaList = await fetchMediaItems();
       if (mounted) {
-         setState(() {
-        _media = mediaList;
-        _loading = false;
-      });
-    }
-    
+        setState(() {
+          _media = mediaList;
+          _loading = false;
+        });
       }
-     
+    }
   }
 
   Future<List<Medium>> fetchMediaItems() async {
@@ -108,14 +104,14 @@ class AlbumPageState extends State<AlbumPage>
               ],
             )),
         body: _loading
-            ?  const Center(
-                child:  SpinKitThreeBounce(
-                          color: Colors.white,
-                          size: 25,
-                        )
-                // Placeholder while loading
-              
+            ? const Center(
+                child: SpinKitThreeBounce(
+                color: Colors.white,
+                size: 25,
               )
+                // Placeholder while loading
+
+                )
             : TabBarView(
                 children: [
                   // First Tab: Gallery
@@ -133,12 +129,15 @@ class AlbumPageState extends State<AlbumPage>
                             (index) => StaggeredGridTile.fit(
                               crossAxisCellCount: 1,
                               child: GestureDetector(
-                                onTap: () => Navigator.of(context).push(
+                                onTap: ()async{ 
+                                  File file = await PhotoGallery.getFile(mediumId: _media![index].id);
+                                  Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        ViewerPage(_media![index]),
+                                        ViewerPage(file),
                                   ),
-                                ),
+                                );
+                                },
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(3.0),
                                   child: Stack(
@@ -179,7 +178,6 @@ class AlbumPageState extends State<AlbumPage>
     );
   }
 }
-
 
 class Post extends StatefulWidget {
   const Post({super.key});

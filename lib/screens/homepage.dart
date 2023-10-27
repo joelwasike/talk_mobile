@@ -123,7 +123,7 @@ Future<void> fetchData() async {
           id = item['id'];
           likes = item['likes'];
           media = item['media'];
-          title = item['userID'];
+          title = item['username'];
         }
       } else {
         throw Exception('Failed to load data');
@@ -250,14 +250,14 @@ Future<void> fetchData() async {
                             ? VUserPost(
                                 scrollController: _scrollController,
                                 play: isInView,
-                                name: item['title'],
+                                name: item['username'],
                                 url: item['media'],
                                 content: item['content'],
                                 likes: item['likes'],
                               )
                             : UserPost(
                                 scrollController: _scrollController,
-                                name: item['title'],
+                                name: item['username'],
                                 image: item['media'],
                                 content: item['content'],
                                 likes: item['likes'],
@@ -291,8 +291,9 @@ class _DrawerScreenState extends State<DrawerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-                  height: MediaQuery.of(context).size.height/6,
+                  height: MediaQuery.of(context).size.height/5,
                   child: DrawerHeader(
+                    
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -300,7 +301,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                           width: MediaQuery.of(context).size.width/3,
                           height: 70,
                           padding: EdgeInsets.only(
-                            bottom: 10, ),
+                            bottom: 30, ),
                           child: DecoratedBox(
                             decoration: ShapeDecoration(
                                 shape: CircleBorder(),
