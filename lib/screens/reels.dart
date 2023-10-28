@@ -2,14 +2,15 @@ import 'package:animate_do/animate_do.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:usersms/shortstest/shortsmain.dart';
 
 import '../resources/content_screen.dart';
 
 
 class Reels extends StatelessWidget {
-  final List<Uri> videos = [
-  Uri.parse('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
-  Uri.parse('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4')
+  final List<String> videos = [
+  'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4'
 ];
 
    Reels({super.key});
@@ -22,10 +23,12 @@ class Reels extends StatelessWidget {
             children: [
               Swiper(
                 itemBuilder: (BuildContext context, int index) {
-                  return ContentScreen(
-                    videos: videos,
-                    src: videos[index],
-                  );
+                  return ShortsMainScreen(url: videos, startIndex: index);
+                  
+                  // ContentScreen(
+                  //   videos: videos,
+                  //   src: videos[index],
+                  // );
                 },
                 itemCount: videos.length,
                 scrollDirection: Axis.vertical,
