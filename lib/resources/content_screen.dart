@@ -1,6 +1,5 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:video_player/video_player.dart';
 
@@ -36,58 +35,59 @@ class _ContentScreenState extends State<ContentScreen> {
 
   @override
   void initState() {
-  initializePlayer(currentIndex);
+    initializePlayer(currentIndex);
     super.initState();
   }
 
   Future initializePlayer(int currentIndex) async {
-  try {
-    _videoPlayerController = VideoPlayerController.networkUrl(widget.src!);
-    await Future.wait([
-      _videoPlayerController.initialize().then((_) {
-        setState(() {});
-      })
-    ]);
+    try {
+      _videoPlayerController = VideoPlayerController.networkUrl(widget.src!);
+      await Future.wait([
+        _videoPlayerController.initialize().then((_) {
+          setState(() {});
+        })
+      ]);
 
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
-      autoPlay: true,
-      showControls: false,
-      looping: true,
-      allowFullScreen: true,
-    );
+      _chewieController = ChewieController(
+        videoPlayerController: _videoPlayerController,
+        autoPlay: true,
+        showControls: false,
+        looping: true,
+        allowFullScreen: true,
+      );
 
-    // Preload the next video
-    _loadNextVideo(currentIndex);
+      // Preload the next video
+      _loadNextVideo(currentIndex);
 
-    setState(() {});
-  } catch (e) {
-    print(e);
+      setState(() {});
+    } catch (e) {
+      print(e);
+    }
   }
-}
 
   Future<void> _loadNextVideo(int currentIndex) async {
-  final nextIndex = currentIndex + 1;
-  if (nextIndex < widget.videos.length) {
-    final nextVideoSource = widget.videos[nextIndex].toString();
+    final nextIndex = currentIndex + 1;
+    if (nextIndex < widget.videos.length) {
+      final nextVideoSource = widget.videos[nextIndex].toString();
 
-    _nextVideoController = VideoPlayerController.networkUrl(Uri.parse(nextVideoSource) );
-    await _nextVideoController!.initialize().then((_) {
-      // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-      if (mounted) {
-        setState(() {});
-      }
-    });
+      _nextVideoController =
+          VideoPlayerController.networkUrl(Uri.parse(nextVideoSource));
+      await _nextVideoController!.initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        if (mounted) {
+          setState(() {});
+        }
+      });
 
-    _nextChewieController = ChewieController(
-      videoPlayerController: _nextVideoController!,
-      autoPlay: false,
-      showControls: false,
-      looping: true,
-      allowFullScreen: true,
-    );
+      _nextChewieController = ChewieController(
+        videoPlayerController: _nextVideoController!,
+        autoPlay: false,
+        showControls: false,
+        looping: true,
+        allowFullScreen: true,
+      );
+    }
   }
-}
 
   @override
   void dispose() {
@@ -226,7 +226,7 @@ class _ContentScreenState extends State<ContentScreen> {
                                           const Expanded(
                                               child: Column(
                                             children: [
-                                              CommentCard(),
+                                              // CommentCard(),
                                             ],
                                           )),
                                           _buildMessageInput()

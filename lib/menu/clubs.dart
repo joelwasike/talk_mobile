@@ -6,8 +6,6 @@ import 'package:usersms/resources/club_post.dart';
 import 'package:usersms/resources/clubcred.dart';
 import 'package:usersms/resources/isloadong.dart';
 import 'package:usersms/widgets/club_card.dart';
-import '../resources/image_data.dart';
-import '../resources/searchclubpeople.dart';
 import '../screens/homepage.dart';
 import '../utils/colors.dart';
 import 'dart:convert';

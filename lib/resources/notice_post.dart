@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
+import 'package:usersms/resources/comments.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'heartanimationwidget.dart';
-import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 
+// ignore: must_be_immutable
 class NoticePost extends StatefulWidget {
   final String file;
   final String? name;
@@ -38,29 +38,62 @@ class NoticePost extends StatefulWidget {
 }
 
 class _NoticePostState extends State<NoticePost> {
+  bool boom = false;
+  int likes = 1;
+  var userid;
   double? _progress;
-  String _status = '';
   bool isliked = false;
   bool isHeartAnimating = false;
   SampleItem? selectedMenu;
   final TextEditingController _messageController = TextEditingController();
   bool permissionReady = false;
 
-  Future<void> like() async {
-    var box = Hive.box("Talk");
-    var userid = box.get("id");
-
+  Future likepost() async {
     Map body = {"userid": userid, "postid": widget.id};
-    final url = Uri.parse('$baseUrl/noticelikes'); // Replace with your JSON URL
+    final url = Uri.parse('$baseUrl/noticelikes');
     final response = await http.post(url, body: jsonEncode(body));
+    print(response.body);
 
     if (response.statusCode == 200) {
-      setState(() {
-        widget.likes = (widget.likes + 1);
-      });
+      print("liked succesfully");
     } else {
       print('HTTP Request Error: ${response.statusCode}');
     }
+  }
+
+  Future minuslikepost() async {
+    Map body = {"userid": userid, "postid": widget.id};
+    final url = Uri.parse('$baseUrl/minusnoticelikes');
+    final response = await http.post(url, body: jsonEncode(body));
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      print("liked succesfully");
+    } else {
+      print('HTTP Request Error: ${response.statusCode}');
+    }
+  }
+
+  void func() {
+    setState(() {
+      likes = widget.likes;
+    });
+  }
+
+  void id() {
+    var box = Hive.box("Talk");
+    setState(() {
+      userid = box.get("id");
+      print(userid);
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    func();
+    id();
   }
 
   @override
@@ -95,6 +128,21 @@ class _NoticePostState extends State<NoticePost> {
             setState(() {
               isHeartAnimating = true;
               isliked = true;
+              if (!boom) {
+                if (isliked) {
+                  setState(() {
+                    likes++;
+                  });
+                  likepost();
+                }
+                if (!isliked) {
+                  setState(() {
+                    likes--;
+                  });
+                  minuslikepost();
+                }
+              }
+              boom = true;
             });
           },
           child: Stack(alignment: Alignment.center, children: [
@@ -151,19 +199,19 @@ class _NoticePostState extends State<NoticePost> {
                       onPressed: () {
                         setState(() {
                           isliked = !isliked;
+                          if (isliked) {
+                            setState(() {
+                              likes++;
+                            });
+                            likepost();
+                          }
+                          if (!isliked) {
+                            setState(() {
+                              likes--;
+                            });
+                            minuslikepost();
+                          }
                         });
-                        if (isliked) {
-                          setState(() {
-                            widget.likes + 1;
-                          });
-                          like();
-                        }
-                         if (!isliked) {
-                          setState(() {
-                            widget.likes - 1;
-                          });
-                          like();
-                        }
                       },
                     ),
                   ),
@@ -175,38 +223,19 @@ class _NoticePostState extends State<NoticePost> {
                           enableDrag: true,
                           context: context,
                           builder: (context) => Container(
-                                decoration: const BoxDecoration(
-                                    color: LightColor.maincolor1,
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(25),
-                                        topLeft: Radius.circular(25))),
-                                child: Column(
-                                  children: [
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      "Comments",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey.shade300),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey.shade800,
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const Expanded(
-                                        child: Column(
-                                      children: [
-                                        CommentCard(),
-                                      ],
-                                    )),
-                                    _buildMessageInput()
-                                  ],
-                                ),
-                              ));
+                              padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom),
+                              decoration: const BoxDecoration(
+                                  color: LightColor.maincolor1,
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(25),
+                                      topLeft: Radius.circular(25))),
+                              child: Comments(
+                                getcommenturl: "getnoticecomments",
+                                postcommenturl: "noticecomments",
+                                postid: widget.id!,
+                              )));
                     },
                     icon: Icon(
                       Icons.chat_bubble_outline_outlined,

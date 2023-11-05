@@ -150,13 +150,15 @@ class _GossipState extends State<Gossip> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 10,)
+                    SizedBox(
+                      height: 10,
+                    )
                   ],
                 );
               },
             )
           : InViewNotifierList(
-            physics: BouncingScrollPhysics(),
+              physics: BouncingScrollPhysics(),
               scrollDirection: Axis.vertical,
               initialInViewIds: const ['0'],
               isInViewPortCondition: (double deltaTop, double deltaBottom,
@@ -169,31 +171,40 @@ class _GossipState extends State<Gossip> {
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                     return InViewNotifierWidget(
-                      
                       id: '$index',
                       builder:
                           (BuildContext context, bool isInView, Widget? child) {
                         final item = data[index];
                         return isVideoLink(item["media"])
                             ? FadeInRight(
-                              child: VUserPost(
+                                child: VUserPost(
                                   scrollController: _scrollController,
+                                  addlikelink: "postlikes",
+                                  minuslikelink: "postlikesminus",
+                                  id: item["id"],
                                   play: isInView,
                                   name: item['title'],
                                   url: item['media'],
                                   content: item['content'],
                                   likes: item['likes'],
+                                  getcommenturl: 'getgossipcomments',
+                                  postcommenturl: 'gossipcomments',
                                 ),
-                            )
+                              )
                             : FadeInRight(
-                              child: UserPost(
+                                child: UserPost(
                                   scrollController: _scrollController,
+                                  addlikelink: "gossiplikes",
+                                  minuslikelink: "minusgossiplikes",
+                                  id: item["id"],
                                   name: item['title'],
                                   image: item['media'],
                                   content: item['content'],
                                   likes: item['likes'],
+                                  getcommenturl: 'getgossipcomments',
+                                  postcommenturl: 'gossipcomments',
                                 ),
-                            );
+                              );
                       },
                     );
                   },
@@ -204,14 +215,13 @@ class _GossipState extends State<Gossip> {
         backgroundColor:
             Colors.transparent, // Set the background color to transparent
         mini: false,
-        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        shape:
+            const CircleBorder(), // Use CircleBorder to create a round button
         onPressed: () {
-           Navigator.push(
-                      (context),
-                      MaterialPageRoute(builder: (context) => const AddGossip()
-                         
-                          ),
-                    );
+          Navigator.push(
+            (context),
+            MaterialPageRoute(builder: (context) => const AddGossip()),
+          );
         },
         child: Container(
           decoration: BoxDecoration(
@@ -220,9 +230,11 @@ class _GossipState extends State<Gossip> {
               color: LightColor.maincolor, // Specify the border color here
             ),
           ),
-          child:  Center(
-            child: Icon(Icons.add_box,color: LightColor.maincolor,)
-          ),
+          child: Center(
+              child: Icon(
+            Icons.add_box,
+            color: LightColor.maincolor,
+          )),
         ),
       ),
     );

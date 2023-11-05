@@ -1,38 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:getwidget/components/shimmer/gf_shimmer.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
+import 'package:usersms/resources/comments.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'heartanimationwidget.dart';
 import 'image_data.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 
 class UserPost extends StatefulWidget {
+  final String getcommenturl;
+  final String postcommenturl;
+  final String addlikelink;
+  final String minuslikelink;
+  final int id;
   final String name;
   final String content;
   final int likes;
   final String? image;
   final ScrollController scrollController; // Add this line
 
-  const UserPost(
-      {super.key,
-      required this.name,
-      required this.image,
-      required this.scrollController,
-      required this.content,
-      required this.likes});
+  const UserPost({
+    super.key,
+    required this.name,
+    required this.image,
+    required this.scrollController,
+    required this.content,
+    required this.likes,
+    required this.id,
+    required this.addlikelink,
+    required this.minuslikelink,
+    required this.getcommenturl,
+    required this.postcommenturl,
+  });
 
   @override
   State<UserPost> createState() => _UserPostState();
 }
 
 class _UserPostState extends State<UserPost> {
+  bool boom = false;
+  int likes = 1;
   bool isliked = false;
   bool isHeartAnimating = false;
   SampleItem? selectedMenu;
   final TextEditingController _messageController = TextEditingController();
+  var userid;
+
+  Future likepost() async {
+    Map body = {"userid": userid, "postid": widget.id};
+    final url = Uri.parse('$baseUrl/${widget.addlikelink}');
+    final response = await http.post(url, body: jsonEncode(body));
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      print("liked succesfully");
+    } else {
+      print('HTTP Request Error: ${response.statusCode}');
+    }
+  }
+
+  Future minuslikepost() async {
+    Map body = {"userid": userid, "postid": widget.id};
+    final url = Uri.parse('$baseUrl/${widget.addlikelink}');
+    final response = await http.post(url, body: jsonEncode(body));
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      print("liked succesfully");
+    } else {
+      print('HTTP Request Error: ${response.statusCode}');
+    }
+  }
+
+  void func() {
+    setState(() {
+      likes = widget.likes;
+    });
+  }
+
+  void id() {
+    var box = Hive.box("Talk");
+    setState(() {
+      userid = box.get("id");
+      print(userid);
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    func();
+    id();
+  }
 
   List people = [
     "Joel",
@@ -72,7 +138,8 @@ class _UserPostState extends State<UserPost> {
                   ),
                   Text(
                     widget.name,
-                    style:  TextStyle(color: Colors.grey.shade300,
+                    style: TextStyle(
+                      color: Colors.grey.shade300,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -118,20 +185,36 @@ class _UserPostState extends State<UserPost> {
             setState(() {
               isHeartAnimating = true;
               isliked = true;
+              if (!boom) {
+                if (isliked) {
+                  setState(() {
+                    likes++;
+                  });
+                  likepost();
+                }
+                if (!isliked) {
+                  setState(() {
+                    likes--;
+                  });
+                  minuslikepost();
+                }
+              }
+              boom = true;
             });
           },
           child: Stack(alignment: Alignment.center, children: [
             ConstrainedBox(
-              
-              constraints: BoxConstraints (maxHeight: MediaQuery.of(context).size.height/1.3, minWidth: MediaQuery.of(context).size.width),
+              constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height / 1.3,
+                  minWidth: MediaQuery.of(context).size.width),
               child: CachedNetworkImage(
                 imageUrl: widget.image!,
                 fadeInCurve: Curves.easeIn,
                 fit: BoxFit.fitWidth,
                 placeholder: (context, url) => Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 300,
-                          ),
+                  width: MediaQuery.of(context).size.width,
+                  height: 300,
+                ),
                 // Placeholder while loading
               ),
             ),
@@ -173,8 +256,19 @@ class _UserPostState extends State<UserPost> {
                       onPressed: () {
                         setState(() {
                           isliked = !isliked;
+                          if (isliked) {
+                            setState(() {
+                              likes++;
+                            });
+                            likepost();
+                          }
+                          if (!isliked) {
+                            setState(() {
+                              likes--;
+                            });
+                            minuslikepost();
+                          }
                         });
-                        
                       },
                     ),
                   ),
@@ -186,45 +280,19 @@ class _UserPostState extends State<UserPost> {
                           enableDrag: true,
                           context: context,
                           builder: (context) => Container(
-                                padding: EdgeInsets.only(
-                                    bottom: MediaQuery.of(context)
-                                        .viewInsets
-                                        .bottom),
-                                decoration: const BoxDecoration(
-                                    color: LightColor.maincolor1,
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(25),
-                                        topLeft: Radius.circular(25))),
-                                child: Column(
-                                  children: [
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const Text(
-                                      "Comments",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: LightColor.background),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey.shade800,
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Expanded(
-                                      child: ListView.builder(
-                                        physics: const BouncingScrollPhysics(),
-                                        itemCount: people.length,
-                                        itemBuilder: (context, index) {
-                                          return const CommentCard();
-                                        },
-                                      ),
-                                    ),
-                                    _buildMessageInput()
-                                  ],
-                                ),
-                              ));
+                              padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom),
+                              decoration: const BoxDecoration(
+                                  color: LightColor.maincolor1,
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(25),
+                                      topLeft: Radius.circular(25))),
+                              child: Comments(
+                                getcommenturl: widget.getcommenturl,
+                                postcommenturl: widget.postcommenturl,
+                                postid: widget.id,
+                              )));
                     },
                     icon: Icon(
                       FontAwesomeIcons.message,
@@ -380,7 +448,7 @@ class _UserPostState extends State<UserPost> {
                 "Liked by ",
               ),
               Text(
-                widget.likes.toString(),
+                "$likes",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const Text(
@@ -402,42 +470,6 @@ class _UserPostState extends State<UserPost> {
           ),
         )
       ],
-    );
-  }
-
-  Widget _buildMessageInput() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade700),
-        ),
-      ),
-      child: Row(
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: CircleAvatar(
-              backgroundImage: AssetImage("assets/airtime.jpg"),
-            ),
-          ),
-          Expanded(
-            child: TextField(
-              controller: _messageController,
-              decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                  border: InputBorder.none,
-                  hintText: "    Write Comment",
-                  hintStyle: TextStyle(color: Colors.grey.shade400)),
-            ),
-          ),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.send,
-                color: LightColor.maincolor,
-              ))
-        ],
-      ),
     );
   }
 }

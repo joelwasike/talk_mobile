@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:usersms/resources/heartanimationwidget.dart';
 import 'package:usersms/shortstest/shortsplayerwidget.dart';
 import 'package:usersms/utils/colors.dart';
 
@@ -16,8 +15,6 @@ class ShortsMainScreen extends StatefulWidget {
 }
 
 class _ShortsMainScreenState extends State<ShortsMainScreen> {
-
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -26,19 +23,23 @@ class _ShortsMainScreenState extends State<ShortsMainScreen> {
               body: PageView.builder(
                 //to make the whole page scrollable
                 itemCount: widget.url.length,
-                controller: PageController(
-                    initialPage: widget.startIndex, viewportFraction: 1),
+                controller: PageController(viewportFraction: 1),
                 scrollDirection: Axis.vertical,
                 itemBuilder: (context, index) {
                   return Stack(
                     //to put all other elements on top of the video
                     children: [
                       ShortsPlayer(
-                        shortsUrl: widget.url[index],
+                        profilepic: widget.url[index]["profile_pictire"],
+                        username: widget.url[index]["username"],
+                        userid: widget.url[index]["userid"],
+                        likes: widget.url[index]["likes"],
+                        id: widget.url[index]["id"],
+                        content: widget.url[index]["content"],
+                        shortsUrl: widget.url[index]["media"],
                       ),
-              
+
                       //all stacked options
-                     
                     ],
                   );
                 },

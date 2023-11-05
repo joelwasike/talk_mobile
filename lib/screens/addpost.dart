@@ -20,7 +20,8 @@ class AlbumPage extends StatefulWidget {
   State<StatefulWidget> createState() => AlbumPageState();
 }
 
-class AlbumPageState extends State<AlbumPage>with SingleTickerProviderStateMixin {
+class AlbumPageState extends State<AlbumPage>
+    with SingleTickerProviderStateMixin {
   List<Medium>? _media;
   bool _loading = false;
   File? imagefile;
@@ -92,15 +93,15 @@ class AlbumPageState extends State<AlbumPage>with SingleTickerProviderStateMixin
                           fontWeight: FontWeight.w600,
                           color: LightColor.background)),
                 ),
-                IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/camera');
-                    },
-                    icon: const Icon(
-                      FontAwesomeIcons.camera,
-                      size: 30,
-                      color: LightColor.maincolor,
-                    ))
+                // IconButton(
+                //     onPressed: () {
+                //       Navigator.pushNamed(context, '/camera');
+                //     },
+                //     icon: const Icon(
+                //       FontAwesomeIcons.camera,
+                //       size: 30,
+                //       color: LightColor.maincolor,
+                //     ))
               ],
             )),
         body: _loading
@@ -129,14 +130,14 @@ class AlbumPageState extends State<AlbumPage>with SingleTickerProviderStateMixin
                             (index) => StaggeredGridTile.fit(
                               crossAxisCellCount: 1,
                               child: GestureDetector(
-                                onTap: ()async{ 
-                                  File file = await PhotoGallery.getFile(mediumId: _media![index].id);
+                                onTap: () async {
+                                  File file = await PhotoGallery.getFile(
+                                      mediumId: _media![index].id);
                                   Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        ViewerPage(file),
-                                  ),
-                                );
+                                    MaterialPageRoute(
+                                      builder: (context) => ViewerPage(file),
+                                    ),
+                                  );
                                 },
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(3.0),
@@ -174,61 +175,6 @@ class AlbumPageState extends State<AlbumPage>with SingleTickerProviderStateMixin
                   Container()
                 ],
               ),
-      ),
-    );
-  }
-}
-
-class Post extends StatefulWidget {
-  const Post({super.key});
-
-  @override
-  State<Post> createState() => _PostState();
-}
-
-class _PostState extends State<Post> {
-  Uint8List? _file;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          const Padding(padding: EdgeInsets.only(top: 0.0)),
-          const Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const CircleAvatar(
-                backgroundImage: AssetImage("assets/airtime.jpg"),
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.3,
-                child: const TextField(
-                  decoration: InputDecoration(
-                      hintText: "Write a caption...", border: InputBorder.none),
-                  maxLines: 8,
-                ),
-              ),
-              SizedBox(
-                height: 45.0,
-                width: 45.0,
-                child: AspectRatio(
-                  aspectRatio: 487 / 451,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                      fit: BoxFit.fill,
-                      alignment: FractionalOffset.topCenter,
-                      image: MemoryImage(_file!),
-                    )),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const Divider(),
-        ],
       ),
     );
   }

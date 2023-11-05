@@ -2,12 +2,10 @@ import 'dart:convert';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cherry_toast/cherry_toast.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:usersms/auth/google_auth.dart';
 import 'package:usersms/glassbox.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
@@ -25,19 +23,18 @@ class _LoginState extends State<Login> {
   var emailconroller = TextEditingController();
   var passwordcontroller = TextEditingController();
   bool isloading = false;
-  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> fetchData() async {
     setState(() {
       isloading = true;
     });
-    Map body = {"email": "joelwasike97@gmail.com"};
-    final url =
-        Uri.parse('$baseUrl/getuserdetails'); // Replace with your JSON URL
+    Map body = {"email": emailconroller.text};
+    final url = Uri.parse('$baseUrl/getuserdetails');
     final response = await http.post(url, body: jsonEncode(body));
-
+    print(response.body);
     if (response.statusCode == 200) {
       var jsonData = jsonDecode(response.body);
+      print(jsonData);
       var box = Hive.box("Talk");
       box.put("id", jsonData[0]["ID"]);
       box.put("username", jsonData[0]["username"]);
@@ -50,9 +47,6 @@ class _LoginState extends State<Login> {
 
   Future login() async {
     try {
-      setState(() {
-        isloading = true;
-      });
       await fetchData();
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailconroller.text.trim(),
@@ -210,36 +204,36 @@ class _LoginState extends State<Login> {
               const SizedBox(
                 height: 50,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  GestureDetector(
-                    onTap: () => AuthService().signInWithGoogle(),
-                    child: const GlassBox(
-                        height: 70.0,
-                        width: 70.0,
-                        child: Center(
-                          child: Image(
-                            height: 40,
-                            width: 40,
-                            image: AssetImage("assets/google.png"),
-                            fit: BoxFit.contain,
-                          ),
-                        )),
-                  ),
-                  const GlassBox(
-                      height: 70.0,
-                      width: 70.0,
-                      child: Center(
-                        child: Image(
-                          height: 50,
-                          width: 50,
-                          image: AssetImage("assets/facebook.png"),
-                          fit: BoxFit.contain,
-                        ),
-                      ))
-                ],
-              )
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   children: [
+              //     GestureDetector(
+              //       onTap: () => AuthService().signInWithGoogle(),
+              //       child: const GlassBox(
+              //           height: 70.0,
+              //           width: 70.0,
+              //           child: Center(
+              //             child: Image(
+              //               height: 40,
+              //               width: 40,
+              //               image: AssetImage("assets/google.png"),
+              //               fit: BoxFit.contain,
+              //             ),
+              //           )),
+              //     ),
+              //     const GlassBox(
+              //         height: 70.0,
+              //         width: 70.0,
+              //         child: Center(
+              //           child: Image(
+              //             height: 50,
+              //             width: 50,
+              //             image: AssetImage("assets/facebook.png"),
+              //             fit: BoxFit.contain,
+              //           ),
+              //         ))
+              //   ],
+              // )
             ],
           ),
         ));

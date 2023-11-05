@@ -4,12 +4,9 @@ import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
 import 'package:usersms/resources/addclubpost.dart';
-import 'package:usersms/resources/addgossip.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
-import 'package:usersms/resources/clubcred.dart';
 import 'package:usersms/resources/video_user_post.dart';
 import '../resources/photo_user_posts.dart';
-import '../screens/homepage.dart';
 import '../utils/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -220,20 +217,30 @@ class _ClubpostState extends State<Clubpost> {
                             ? FadeInRight(
                                 child: VUserPost(
                                   scrollController: _scrollController,
+                                  addlikelink: "postlikes",
+                                  minuslikelink: "postlikesminus",
+                                  id: item["id"],
                                   play: isInView,
                                   name: 'Club',
                                   url: item['media'],
                                   content: item['content'],
                                   likes: item['likes'],
+                                  getcommenturl: 'getclubcomments',
+                                  postcommenturl: 'clubcomments',
                                 ),
                               )
                             : FadeInRight(
                                 child: UserPost(
                                   scrollController: _scrollController,
+                                  addlikelink: "clublikes",
+                                  minuslikelink: "minusclublikes",
+                                  id: item["id"],
                                   name: "thejoel",
                                   image: item['media'],
                                   content: item['content'],
                                   likes: item['likes'],
+                                  getcommenturl: 'getclubcomments',
+                                  postcommenturl: 'clubcomments',
                                 ),
                               );
                       },
