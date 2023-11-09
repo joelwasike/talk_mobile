@@ -35,7 +35,7 @@ class _FollowersState extends State<Followers> {
       setState(() {
         isloading = true;
       });
-      final url = Uri.parse('$baseUrl/getfollowings/$idd');
+      final url = Uri.parse('$baseUrl/getfollowers/$idd');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -161,6 +161,7 @@ class _FollowersState extends State<Followers> {
               itemCount: data.length,
               itemBuilder: (context, index) {
                 return PeopleFCard(
+                  isfollowing: data[index]["following"],
                   id: data[index]["ID"],
                   email: data[index]["email"],
                   name: data[index]["username"],

@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchData() async {
     try {
       setState(() {
-        isloading = true;
+        // isloading = true;
       });
       final url = Uri.parse('$baseUrl/getposts'); // Replace with your JSON URL
       final response = await http.get(url);
@@ -130,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print(e);
     } finally {
       setState(() {
-        isloading = false;
+        //isloading = false;
       });
     }
   }
@@ -246,54 +246,65 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             )
-          : InViewNotifierList(
-              scrollDirection: Axis.vertical,
-              initialInViewIds: const ['0'],
-              isInViewPortCondition: (double deltaTop, double deltaBottom,
-                  double viewPortDimension) {
-                return deltaTop < (0.5 * viewPortDimension) &&
-                    deltaBottom > (0.5 * viewPortDimension);
+          : RefreshIndicator(
+              onRefresh: () async {
+                fetchData();
               },
-              itemCount: data.length,
-              builder: (BuildContext context, int index) {
-                return LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    return InViewNotifierWidget(
-                      id: '$index',
-                      builder:
-                          (BuildContext context, bool isInView, Widget? child) {
-                        final item = data[index];
-                        return isVideoLink(item["media"])
-                            ? VUserPost(
-                                scrollController: _scrollController,
-                                addlikelink: "postlikes",
-                                minuslikelink: "postlikesminus",
-                                id: item['id'],
-                                play: isInView,
-                                name: item['username'],
-                                url: item['media'],
-                                content: item['content'],
-                                likes: item['likes'],
-                                getcommenturl: 'getpostcomments',
-                                postcommenturl: 'comments',
-                              )
-                            : UserPost(
-                                addlikelink: "postlikes",
-                                minuslikelink: "postlikesminus",
-                                scrollController: _scrollController,
-                                id: item["id"],
-                                name: item['username'],
-                                image: item['media'],
-                                content: item['content'],
-                                likes: item['likes'],
-                                getcommenturl: 'getpostcomments',
-                                postcommenturl: 'comments',
-                              );
-                      },
-                    );
-                  },
-                );
-              },
+              backgroundColor: LightColor.scaffold,
+              color: LightColor.maincolor,
+              child: InViewNotifierList(
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                initialInViewIds: const ['0'],
+                isInViewPortCondition: (double deltaTop, double deltaBottom,
+                    double viewPortDimension) {
+                  return deltaTop < (0.5 * viewPortDimension) &&
+                      deltaBottom > (0.5 * viewPortDimension);
+                },
+                itemCount: data.length,
+                builder: (BuildContext context, int index) {
+                  return LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return InViewNotifierWidget(
+                        id: '$index',
+                        builder: (BuildContext context, bool isInView,
+                            Widget? child) {
+                          final item = data[index];
+                          return isVideoLink(item["media"])
+                              ? VUserPost(
+                                  scrollController: _scrollController,
+                                  profilepic: item['profilepicture'],
+                                  addlikelink: "postlikes",
+                                  minuslikelink: "postlikesminus",
+                                  id: item['id'],
+                                  play: isInView,
+                                  name: item['username'],
+                                  url: item['media'],
+                                  content: item['content'],
+                                  likes: item['likes'],
+                                  getcommenturl: 'getpostcomments',
+                                  postcommenturl: 'comments',
+                                )
+                              : UserPost(
+                                  profilepic: item['profilepicture'],
+                                  addlikelink: "postlikes",
+                                  minuslikelink: "postlikesminus",
+                                  scrollController: _scrollController,
+                                  id: item["id"],
+                                  name: item['username'],
+                                  image: item['media'],
+                                  content: item['content'],
+                                  likes: item['likes'],
+                                  getcommenturl: 'getpostcomments',
+                                  postcommenturl: 'comments',
+                                );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
     );
   }

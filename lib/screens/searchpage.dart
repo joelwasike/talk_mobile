@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -214,6 +215,7 @@ class _PinterestGridState extends State<PinterestGrid> {
                     crossAxisCellCount: 1,
                     child: GestureDetector(
                         onTap: () {
+                          print(data[index]["id"]);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -337,7 +339,10 @@ class _FriendsTabState extends State<FriendsTab> {
       setState(() {
         isloading = true;
       });
-      final url = Uri.parse('$baseUrl/getusers'); // Replace with your JSON URL
+      var box = Hive.box("Talk");
+      var id = box.get("id");
+      final url =
+          Uri.parse('$baseUrl/getusers/$id'); // Replace with your JSON URL
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -380,7 +385,7 @@ class _FriendsTabState extends State<FriendsTab> {
       });
 
       final url = Uri.parse(
-          '$baseUrl/searchusers'); // Modify the URL to your search endpoint
+          '$baseUrl/searchusers/$id'); // Modify the URL to your search endpoint
       final response = await http.post(
         url,
         body: jsonEncode({
@@ -413,6 +418,13 @@ class _FriendsTabState extends State<FriendsTab> {
   void clearGrid() {
     setState(() {
       data.clear();
+    });
+  }
+
+  void getid() {
+    var box = Hive.box("Talk");
+    setState(() {
+      id = box.get("id");
     });
   }
 
@@ -465,22 +477,21 @@ class _FriendsTabState extends State<FriendsTab> {
             itemCount: data.length,
             itemBuilder: (context, index) {
               return GestureDetector(
-                onTap: () {
-                  // Navigator.push(
-                  //   (context),
-                  //   MaterialPageRoute(builder: (context) =>  ChatPagee(name: people[index])
+                  onTap: () {
+                    // Navigator.push(
+                    //   (context),
+                    //   MaterialPageRoute(builder: (context) =>  ChatPagee(name: people[index])
 
-                  //       ),
-                  // );
-                },
-                child: PeopleFCard(
-                  id: data[index]["ID"],
-                  email: data[index]["email"],
-                  name: data[index]["username"],
-                  image: data[index]["profile_picture"],
-                  school: data[index]["campus"],
-                ),
-              );
+                    //       ),
+                    // );
+                  },
+                  child: PeopleFCard(
+                      image: data[index]["profile_picture"],
+                      name: data[index]["username"],
+                      school: data[index]["campus"],
+                      id: data[index]["ID"],
+                      email: data[index]["email"],
+                      isfollowing: data[index]["following"]));
             },
           ),
         ),

@@ -1,4 +1,7 @@
+import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
@@ -14,6 +17,7 @@ import 'package:http/http.dart' as http;
 enum SampleItem { itemOne, itemTwo, itemThree }
 
 class UserPost extends StatefulWidget {
+  final String profilepic;
   final String getcommenturl;
   final String postcommenturl;
   final String addlikelink;
@@ -37,6 +41,7 @@ class UserPost extends StatefulWidget {
     required this.minuslikelink,
     required this.getcommenturl,
     required this.postcommenturl,
+    required this.profilepic,
   });
 
   @override
@@ -100,6 +105,8 @@ class _UserPostState extends State<UserPost> {
     id();
   }
 
+  double? _progress;
+
   List people = [
     "Joel",
     "Delan",
@@ -130,8 +137,8 @@ class _UserPostState extends State<UserPost> {
             children: [
               Row(
                 children: [
-                  const CircleAvatar(
-                    backgroundImage: AssetImage('assets/airtime.jpg'),
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(widget.profilepic),
                   ),
                   const SizedBox(
                     width: 10,
@@ -162,16 +169,6 @@ class _UserPostState extends State<UserPost> {
                       children: [
                         Text('Follow'),
                         Icon(Icons.person),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem<SampleItem>(
-                    value: SampleItem.itemTwo,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Download'),
-                        Icon(Icons.download),
                       ],
                     ),
                   ),
@@ -432,10 +429,46 @@ class _UserPostState extends State<UserPost> {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Icon(
-                  Icons.bookmark_add_outlined,
-                  color: Colors.grey.shade300,
-                ),
+                child: _progress != null
+                    ? SpinKitThreeBounce(
+                        color: Colors.white,
+                        size: 25,
+                      )
+                    : IconButton(
+                        onPressed: () async {
+                          FileDownloader.downloadFile(
+                              url: widget.image!.trim(),
+                              onProgress: (name, progress) {
+                                setState(() {
+                                  _progress = progress;
+                                });
+                              },
+                              onDownloadCompleted: (value) {
+                                print('path  $value ');
+                                setState(() {
+                                  _progress = null;
+                                });
+                                CherryToast.success(
+                                        title: const Text(""),
+                                        backgroundColor:
+                                            Colors.black.withOpacity(0.9),
+                                        displayTitle: false,
+                                        description: Text(
+                                          "Download complete",
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        animationDuration:
+                                            const Duration(milliseconds: 500),
+                                        autoDismiss: true)
+                                    .show(context);
+                              });
+                        },
+                        icon: Icon(
+                          Icons.download_rounded,
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
               ),
             ],
           ),

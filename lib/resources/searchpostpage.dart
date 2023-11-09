@@ -20,9 +20,7 @@ class SearchPostPage extends StatefulWidget {
 }
 
 class _SearchPostPageState extends State<SearchPostPage> {
-  final ScrollController _scrollController =
-      ScrollController(); // Add this line
-
+  final ScrollController _scrollController = ScrollController();
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
   String? content;
@@ -39,7 +37,7 @@ class _SearchPostPageState extends State<SearchPostPage> {
       setState(() {
         isloading = true;
       });
-      final url = Uri.parse('$baseUrl/getposts'); // Replace with your JSON URL
+      final url = Uri.parse('$baseUrl/getposts');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -58,6 +56,12 @@ class _SearchPostPageState extends State<SearchPostPage> {
           media = item['media'];
           title = item['username'];
         }
+
+        // Manipulate the data list to ensure the chosen post is at index 0
+        data.insert(
+            0,
+            data.removeAt(
+                data.indexWhere((item) => item["id"] == widget.postId)));
       } else {
         throw Exception('Failed to load data');
       }
@@ -88,160 +92,110 @@ class _SearchPostPageState extends State<SearchPostPage> {
 
   @override
   void dispose() {
-    _scrollController.dispose(); // Dispose the scroll controller
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 40,
-          leading: FadeInLeft(child: const DrawerWidget()),
-          backgroundColor: Colors.black,
-          flexibleSpace: FlexibleSpaceBar(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                FadeInRight(
-                    child: Text('Kibabii Campus Talk',
-                        style: GoogleFonts.aguafinaScript(
-                          textStyle: TextStyle(
-                            color: Colors.grey.shade300,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
+      body: isloading
+          ? ListView.builder(
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                final item = data[index];
+                return Column(
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    GFShimmer(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 300,
+                            color: Colors.grey.shade800.withOpacity(0.4),
                           ),
-                        ))),
-              ],
+                          const SizedBox(height: 12),
+                          Container(
+                            width: double.infinity,
+                            height: 8,
+                            color: Colors.grey.shade800.withOpacity(0.4),
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            height: 8,
+                            color: Colors.grey.shade800.withOpacity(0.4),
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.25,
+                            height: 8,
+                            color: Colors.grey.shade800.withOpacity(0.4),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    )
+                  ],
+                );
+              },
+            )
+          : InViewNotifierList(
+              scrollDirection: Axis.vertical,
+              initialInViewIds: const ['0'],
+              isInViewPortCondition: (double deltaTop, double deltaBottom,
+                  double viewPortDimension) {
+                return deltaTop < (0.5 * viewPortDimension) &&
+                    deltaBottom > (0.5 * viewPortDimension);
+              },
+              itemCount: data.length,
+              builder: (BuildContext context, int index) {
+                return LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    return InViewNotifierWidget(
+                      id: '$index',
+                      builder:
+                          (BuildContext context, bool isInView, Widget? child) {
+                        final item = data[index];
+                        return isVideoLink(item["media"])
+                            ? VUserPost(
+                                profilepic: item['profilepicture'],
+                                scrollController: _scrollController,
+                                addlikelink: "postlikes",
+                                minuslikelink: "postlikesminus",
+                                id: item['id'],
+                                play: isInView,
+                                name: item['username'],
+                                url: item['media'],
+                                content: item['content'],
+                                likes: item['likes'],
+                                getcommenturl: 'getpostcomments',
+                                postcommenturl: 'comments',
+                              )
+                            : UserPost(
+                                profilepic: item['profilepicture'],
+                                addlikelink: "postlikes",
+                                minuslikelink: "postlikesminus",
+                                scrollController: _scrollController,
+                                id: item["id"],
+                                name: item['username'],
+                                image: item['media'],
+                                content: item['content'],
+                                likes: item['likes'],
+                                getcommenturl: 'getpostcomments',
+                                postcommenturl: 'comments',
+                              );
+                      },
+                    );
+                  },
+                );
+              },
             ),
-          ),
-        ),
-        body: isloading
-            ? ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      GFShimmer(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 300,
-                              color: Colors.grey.shade800.withOpacity(0.4),
-                            ),
-                            const SizedBox(height: 12),
-                            Container(
-                              width: double.infinity,
-                              height: 8,
-                              color: Colors.grey.shade800.withOpacity(0.4),
-                            ),
-                            const SizedBox(height: 6),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              height: 8,
-                              color: Colors.grey.shade800.withOpacity(0.4),
-                            ),
-                            const SizedBox(height: 6),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.25,
-                              height: 8,
-                              color: Colors.grey.shade800.withOpacity(0.4),
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      )
-                    ],
-                  );
-                },
-              )
-            : InViewNotifierList(
-                scrollDirection: Axis.vertical,
-                initialInViewIds: ["${widget.postId}"],
-                isInViewPortCondition: (double deltaTop, double deltaBottom,
-                    double viewPortDimension) {
-                  return deltaTop < (0.5 * viewPortDimension) &&
-                      deltaBottom > (0.5 * viewPortDimension);
-                },
-                itemCount: data.length,
-                builder: (BuildContext context, int index) {
-                  return LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return InViewNotifierWidget(
-                        id: '${data[index]["id"]}',
-                        builder: (BuildContext context, bool isInView,
-                            Widget? child) {
-                          final item = data[index];
-                          if (item["id"] == widget.postId) {
-                            // Display the item whose ID matches widget.postId as the first item
-                            return isVideoLink(item["media"])
-                                ? VUserPost(
-                                    scrollController: _scrollController,
-                                    addlikelink: "postlikes",
-                                    minuslikelink: "postlikesminus",
-                                    id: item['id'],
-                                    play: isInView,
-                                    name: item['username'],
-                                    url: item['media'],
-                                    content: item['content'],
-                                    likes: item['likes'],
-                                    getcommenturl: 'getpostcomments',
-                                    postcommenturl: 'comments',
-                                  )
-                                : UserPost(
-                                    scrollController: _scrollController,
-                                    addlikelink: "postlikes",
-                                    minuslikelink: "postlikesminus",
-                                    id: item["id"],
-                                    name: item['username'],
-                                    image: item['media'],
-                                    content: item['content'],
-                                    likes: item['likes'],
-                                    getcommenturl: 'getpostcomments',
-                                    postcommenturl: 'comments',
-                                  );
-                          } else {
-                            // Display other media items
-                            return isVideoLink(item["media"])
-                                ? VUserPost(
-                                    scrollController: _scrollController,
-                                    addlikelink: "postlikes",
-                                    minuslikelink: "postlikesminus",
-                                    id: item['id'],
-                                    play: isInView,
-                                    name: item['username'],
-                                    url: item['media'],
-                                    content: item['content'],
-                                    likes: item['likes'],
-                                    getcommenturl: 'getpostcomments',
-                                    postcommenturl: 'comments',
-                                  )
-                                : UserPost(
-                                    scrollController: _scrollController,
-                                    addlikelink: "postlikes",
-                                    minuslikelink: "postlikesminus",
-                                    id: item["id"],
-                                    name: item['username'],
-                                    image: item['media'],
-                                    content: item['content'],
-                                    likes: item['likes'],
-                                    getcommenturl: 'getpostcomments',
-                                    postcommenturl: 'comments',
-                                  );
-                          }
-                        },
-                      );
-                    },
-                  );
-                },
-              ));
+    );
   }
 }

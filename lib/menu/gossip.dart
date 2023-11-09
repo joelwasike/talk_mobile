@@ -34,34 +34,39 @@ class _GossipState extends State<Gossip> {
 
   //get notices
   Future<void> fetchData() async {
-    setState(() {
-      isloading = true;
-    });
-    final url = Uri.parse('$baseUrl/getgossips'); // Replace with your JSON URL
-    final response = await http.get(url);
+    try {
+      // setState(() {
+      //   isloading = true;
+      // });
+      final url =
+          Uri.parse('$baseUrl/getgossips'); // Replace with your JSON URL
+      final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-
-      setState(() {
-        data = jsonData.cast<Map<String, dynamic>>();
-      });
-
-      // Now you can access the data as needed.
-      for (final item in data) {
-        content = item['content'];
-        email = item['email'];
-        id = item['id'];
-        likes = item['likes'];
-        media = item['media'];
-        title = item['title'];
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
 
         setState(() {
-          isloading = false;
+          data = jsonData.cast<Map<String, dynamic>>();
         });
+
+        // Now you can access the data as needed.
+        for (final item in data) {
+          content = item['content'];
+          email = item['email'];
+          id = item['id'];
+          likes = item['likes'];
+          media = item['media'];
+          title = item['title'];
+        }
+      } else {
+        throw Exception('Failed to load data');
       }
-    } else {
+    } catch (e) {
       throw Exception('Failed to load data');
+    } finally {
+      // setState(() {
+      //   isloading = false;
+      // });
     }
   }
 
@@ -157,59 +162,69 @@ class _GossipState extends State<Gossip> {
                 );
               },
             )
-          : InViewNotifierList(
-              physics: BouncingScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              initialInViewIds: const ['0'],
-              isInViewPortCondition: (double deltaTop, double deltaBottom,
-                  double viewPortDimension) {
-                return deltaTop < (0.5 * viewPortDimension) &&
-                    deltaBottom > (0.5 * viewPortDimension);
+          : RefreshIndicator(
+              onRefresh: () async {
+                fetchData();
               },
-              itemCount: data.length,
-              builder: (BuildContext context, int index) {
-                return LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    return InViewNotifierWidget(
-                      id: '$index',
-                      builder:
-                          (BuildContext context, bool isInView, Widget? child) {
-                        final item = data[index];
-                        return isVideoLink(item["media"])
-                            ? FadeInRight(
-                                child: VUserPost(
-                                  scrollController: _scrollController,
-                                  addlikelink: "postlikes",
-                                  minuslikelink: "postlikesminus",
-                                  id: item["id"],
-                                  play: isInView,
-                                  name: item['title'],
-                                  url: item['media'],
-                                  content: item['content'],
-                                  likes: item['likes'],
-                                  getcommenturl: 'getgossipcomments',
-                                  postcommenturl: 'gossipcomments',
-                                ),
-                              )
-                            : FadeInRight(
-                                child: UserPost(
-                                  scrollController: _scrollController,
-                                  addlikelink: "gossiplikes",
-                                  minuslikelink: "minusgossiplikes",
-                                  id: item["id"],
-                                  name: item['title'],
-                                  image: item['media'],
-                                  content: item['content'],
-                                  likes: item['likes'],
-                                  getcommenturl: 'getgossipcomments',
-                                  postcommenturl: 'gossipcomments',
-                                ),
-                              );
-                      },
-                    );
-                  },
-                );
-              },
+              backgroundColor: LightColor.scaffold,
+              color: LightColor.maincolor,
+              child: InViewNotifierList(
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                initialInViewIds: const ['0'],
+                isInViewPortCondition: (double deltaTop, double deltaBottom,
+                    double viewPortDimension) {
+                  return deltaTop < (0.5 * viewPortDimension) &&
+                      deltaBottom > (0.5 * viewPortDimension);
+                },
+                itemCount: data.length,
+                builder: (BuildContext context, int index) {
+                  return LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return InViewNotifierWidget(
+                        id: '$index',
+                        builder: (BuildContext context, bool isInView,
+                            Widget? child) {
+                          final item = data[index];
+                          return isVideoLink(item["media"])
+                              ? FadeInRight(
+                                  child: VUserPost(
+                                    scrollController: _scrollController,
+                                    profilepic: item['profilepic'],
+                                    addlikelink: "postlikes",
+                                    minuslikelink: "postlikesminus",
+                                    id: item["id"],
+                                    play: isInView,
+                                    name: item['title'],
+                                    url: item['media'],
+                                    content: item['content'],
+                                    likes: item['likes'],
+                                    getcommenturl: 'getgossipcomments',
+                                    postcommenturl: 'gossipcomments',
+                                  ),
+                                )
+                              : FadeInRight(
+                                  child: UserPost(
+                                    scrollController: _scrollController,
+                                    profilepic: item['profilepic'],
+                                    addlikelink: "gossiplikes",
+                                    minuslikelink: "minusgossiplikes",
+                                    id: item["id"],
+                                    name: item['title'],
+                                    image: item['media'],
+                                    content: item['content'],
+                                    likes: item['likes'],
+                                    getcommenturl: 'getgossipcomments',
+                                    postcommenturl: 'gossipcomments',
+                                  ),
+                                );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
       floatingActionButton: FloatingActionButton(
         backgroundColor:

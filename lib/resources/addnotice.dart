@@ -78,8 +78,6 @@ class _AddnoticeState extends State<Addnotice> {
         ),
       ]);
 
-    
-
       final response = await dio.post(
         '$baseUrl/uploadnotice',
         data: formData,
@@ -260,7 +258,7 @@ class _AddnoticeState extends State<Addnotice> {
         toolbarHeight: 30,
         iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
-        backgroundColor: LightColor.maincolor1,
+        backgroundColor: LightColor.scaffold,
         title: Padding(
           padding: const EdgeInsets.only(left: 56),
           child: Row(
@@ -290,10 +288,10 @@ class _AddnoticeState extends State<Addnotice> {
               },
               backgroundColor: LightColor.maincolor,
               child: isloading
-                  ?  const SpinKitThreeBounce(
-                          color: Colors.white,
-                          size: 20,
-                        )
+                  ? const SpinKitThreeBounce(
+                      color: Colors.white,
+                      size: 20,
+                    )
                   : const Text(
                       "Post",
                       style: TextStyle(color: Colors.white),
@@ -460,7 +458,6 @@ class _AddnoticeState extends State<Addnotice> {
                   "Attach a pdf notice",
                   style: TextStyle(color: Colors.grey.shade600),
                 ),
-               
               ],
             ),
           ),

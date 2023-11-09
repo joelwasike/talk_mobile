@@ -9,7 +9,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Following extends StatefulWidget {
-  const Following({Key? key});
+  final int id;
+  const Following({Key? key, required this.id});
 
   @override
   State<Following> createState() => _FollowingState();
@@ -46,7 +47,7 @@ class _FollowingState extends State<Following> {
       setState(() {
         isloading = true;
       });
-      final url = Uri.parse('$baseUrl/getfollowers/$idd');
+      final url = Uri.parse('$baseUrl/getfollowings/${widget.id}');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -172,6 +173,7 @@ class _FollowingState extends State<Following> {
               itemCount: data.length,
               itemBuilder: (context, index) {
                 return PeopleFCard(
+                  isfollowing: true,
                   id: data[index]["ID"],
                   email: data[index]["email"],
                   name: data[index]["username"],

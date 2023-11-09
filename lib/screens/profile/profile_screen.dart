@@ -68,7 +68,6 @@ class _ProfileScrenState extends State<ProfileScren> {
         for (final item in data) {
           content = item['content'];
           email1 = item['email'];
-          id = item['id'];
           likes = item['likes'];
           media = item['media'];
           title = item['username'];
@@ -337,7 +336,9 @@ class _ProfileScrenState extends State<ProfileScren> {
                             Navigator.push(
                               (context),
                               MaterialPageRoute(
-                                  builder: (context) => const Following()),
+                                  builder: (context) => Following(
+                                        id: id!,
+                                      )),
                             );
                           },
                           child: Stat(title: 'Following', value: followings)),

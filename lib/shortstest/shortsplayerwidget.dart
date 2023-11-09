@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
+import 'package:usersms/resources/comments.dart';
 import 'package:usersms/resources/heartanimationwidget.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:video_player/video_player.dart';
@@ -32,6 +36,7 @@ class ShortsPlayer extends StatefulWidget {
 }
 
 class _ShortsPlayerState extends State<ShortsPlayer> {
+  double? _progress;
   late VideoPlayerController videoPlayerController;
   bool isHeartAnimating = false;
   bool isliked = false;
@@ -316,11 +321,29 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
                             Padding(
                               padding: const EdgeInsets.only(bottom: 25),
                               child: InkWell(
-                                // onTap: (){
-                                //   setState(() {
-                                //     //open modal box
-                                //   });
-                                // },
+                                onTap: () {
+                                  showModalBottomSheet(
+                                      useSafeArea: true,
+                                      isScrollControlled: true,
+                                      enableDrag: true,
+                                      context: context,
+                                      builder: (context) => Container(
+                                          padding: EdgeInsets.only(
+                                              bottom: MediaQuery.of(context)
+                                                  .viewInsets
+                                                  .bottom),
+                                          decoration: const BoxDecoration(
+                                              color: LightColor.maincolor1,
+                                              borderRadius: BorderRadius.only(
+                                                  topRight: Radius.circular(25),
+                                                  topLeft:
+                                                      Radius.circular(25))),
+                                          child: Comments(
+                                            getcommenturl: "getpostcomments",
+                                            postcommenturl: "comments",
+                                            postid: widget.id,
+                                          )));
+                                },
                                 child: Column(
                                   children: [
                                     Icon(
@@ -340,26 +363,50 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
                             //save btn
                             Padding(
                               padding: const EdgeInsets.only(bottom: 25),
-                              child: InkWell(
-                                // onTap: (){
-                                //   setState(() {
-                                //     //open share modal box
-                                //   });
-                                // },
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.bookmark_border_rounded,
+                              child: _progress != null
+                                  ? SpinKitThreeBounce(
                                       color: Colors.white,
-                                      size: 30,
+                                      size: 25,
+                                    )
+                                  : IconButton(
+                                      onPressed: () async {
+                                        FileDownloader.downloadFile(
+                                            url: widget.shortsUrl.trim(),
+                                            onProgress: (name, progress) {
+                                              setState(() {
+                                                _progress = progress;
+                                              });
+                                            },
+                                            onDownloadCompleted: (value) {
+                                              print('path  $value ');
+                                              setState(() {
+                                                _progress = null;
+                                              });
+                                              CherryToast.success(
+                                                      title: const Text(""),
+                                                      backgroundColor: Colors
+                                                          .black
+                                                          .withOpacity(0.9),
+                                                      displayTitle: false,
+                                                      description: Text(
+                                                        "Download complete",
+                                                        style: const TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      animationDuration:
+                                                          const Duration(
+                                                              milliseconds:
+                                                                  500),
+                                                      autoDismiss: true)
+                                                  .show(context);
+                                            });
+                                      },
+                                      icon: Icon(
+                                        Icons.download_rounded,
+                                        color: Colors.grey.shade300,
+                                      ),
                                     ),
-                                    Text(
-                                      'Save',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
                             ),
 
                             // share btn

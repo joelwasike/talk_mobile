@@ -4,6 +4,7 @@ import 'package:cherry_toast/cherry_toast.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -80,9 +81,9 @@ class _AddClubPostState extends State<AddClubPost> {
       var formData = FormData();
 
       formData.fields.addAll([
-         MapEntry('clubid', "${widget.clubid}"),
+        MapEntry('clubid', "${widget.clubid}"),
         MapEntry('userid', "1"),
-         MapEntry('email', "joelwasike97@gmail.com"),
+        MapEntry('email', "joelwasike97@gmail.com"),
         MapEntry('content', descriptionController.text),
         const MapEntry('username', "thejoel"),
       ]);
@@ -101,7 +102,7 @@ class _AddClubPostState extends State<AddClubPost> {
       );
       //print(jsonDecode(response.data));
       if (response.statusCode == 200) {
-      //  Handle successful response
+        //  Handle successful response
         titleController.clear();
         descriptionController.clear();
         setState(() {
@@ -125,8 +126,6 @@ class _AddClubPostState extends State<AddClubPost> {
       });
     }
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -166,8 +165,9 @@ class _AddClubPostState extends State<AddClubPost> {
               },
               backgroundColor: LightColor.maincolor,
               child: isloading
-                  ? const CircularProgressIndicator(
+                  ? const SpinKitThreeBounce(
                       color: Colors.white,
+                      size: 20,
                     )
                   : const Text(
                       "Post",
@@ -178,9 +178,6 @@ class _AddClubPostState extends State<AddClubPost> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       body: ListView(
         children: [
-         
-          
-         
           const SizedBox(
             height: 10,
           ),
@@ -273,17 +270,15 @@ class _AddClubPostState extends State<AddClubPost> {
                     if (pickedFile != null)
                       pickedFile!.extension == 'mp4' ||
                               pickedFile!.extension == 'mov'
-                          ?Text(pickedFile!.name)
+                          ? Text(pickedFile!.name)
                           : Image.file(
                               File(path!),
                               width: 100,
                               height: 100,
                               fit: BoxFit.cover,
                             ),
-                  
                   ],
                 ),
-               
               ],
             ),
           ),

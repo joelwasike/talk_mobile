@@ -36,9 +36,9 @@ class _ClubpostState extends State<Clubpost> {
   //get notices
   Future<void> fetchData() async {
     try {
-      setState(() {
-        isloading = true;
-      });
+      // setState(() {
+      //   isloading = true;
+      // });
       final url = Uri.parse(
           '$baseUrl/getclubposts/${widget.clubid}'); // Replace with your JSON URL
       final response = await http.get(url);
@@ -65,9 +65,9 @@ class _ClubpostState extends State<Clubpost> {
     } catch (e) {
       print(e);
     } finally {
-      setState(() {
-        isloading = false;
-      });
+      // setState(() {
+      //   isloading = false;
+      // });
     }
   }
 
@@ -195,59 +195,69 @@ class _ClubpostState extends State<Clubpost> {
                 );
               },
             )
-          : InViewNotifierList(
-              physics: BouncingScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              initialInViewIds: const ['0'],
-              isInViewPortCondition: (double deltaTop, double deltaBottom,
-                  double viewPortDimension) {
-                return deltaTop < (0.5 * viewPortDimension) &&
-                    deltaBottom > (0.5 * viewPortDimension);
+          : RefreshIndicator(
+              onRefresh: () async {
+                fetchData();
               },
-              itemCount: data.length,
-              builder: (BuildContext context, int index) {
-                return LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    return InViewNotifierWidget(
-                      id: '$index',
-                      builder:
-                          (BuildContext context, bool isInView, Widget? child) {
-                        final item = data[index];
-                        return isVideoLink(item["media"])
-                            ? FadeInRight(
-                                child: VUserPost(
-                                  scrollController: _scrollController,
-                                  addlikelink: "postlikes",
-                                  minuslikelink: "postlikesminus",
-                                  id: item["id"],
-                                  play: isInView,
-                                  name: 'Club',
-                                  url: item['media'],
-                                  content: item['content'],
-                                  likes: item['likes'],
-                                  getcommenturl: 'getclubcomments',
-                                  postcommenturl: 'clubcomments',
-                                ),
-                              )
-                            : FadeInRight(
-                                child: UserPost(
-                                  scrollController: _scrollController,
-                                  addlikelink: "clublikes",
-                                  minuslikelink: "minusclublikes",
-                                  id: item["id"],
-                                  name: "thejoel",
-                                  image: item['media'],
-                                  content: item['content'],
-                                  likes: item['likes'],
-                                  getcommenturl: 'getclubcomments',
-                                  postcommenturl: 'clubcomments',
-                                ),
-                              );
-                      },
-                    );
-                  },
-                );
-              },
+              backgroundColor: LightColor.scaffold,
+              color: LightColor.maincolor,
+              child: InViewNotifierList(
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                initialInViewIds: const ['0'],
+                isInViewPortCondition: (double deltaTop, double deltaBottom,
+                    double viewPortDimension) {
+                  return deltaTop < (0.5 * viewPortDimension) &&
+                      deltaBottom > (0.5 * viewPortDimension);
+                },
+                itemCount: data.length,
+                builder: (BuildContext context, int index) {
+                  return LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return InViewNotifierWidget(
+                        id: '$index',
+                        builder: (BuildContext context, bool isInView,
+                            Widget? child) {
+                          final item = data[index];
+                          return isVideoLink(item["media"])
+                              ? FadeInRight(
+                                  child: VUserPost(
+                                    profilepic: item["profilepic"],
+                                    scrollController: _scrollController,
+                                    addlikelink: "postlikes",
+                                    minuslikelink: "postlikesminus",
+                                    id: item["id"],
+                                    play: isInView,
+                                    name: 'Club',
+                                    url: item['media'],
+                                    content: item['content'],
+                                    likes: item['likes'],
+                                    getcommenturl: 'getclubcomments',
+                                    postcommenturl: 'clubcomments',
+                                  ),
+                                )
+                              : FadeInRight(
+                                  child: UserPost(
+                                    profilepic: item["profilepic"],
+                                    scrollController: _scrollController,
+                                    addlikelink: "clublikes",
+                                    minuslikelink: "minusclublikes",
+                                    id: item["id"],
+                                    name: "thejoel",
+                                    image: item['media'],
+                                    content: item['content'],
+                                    likes: item['likes'],
+                                    getcommenturl: 'getclubcomments',
+                                    postcommenturl: 'clubcomments',
+                                  ),
+                                );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
     );
   }

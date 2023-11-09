@@ -143,24 +143,53 @@ class _FProfileScrenState extends State<FProfileScren> {
                         ),
                       ),
                     ),
-                    ClipPath(
-                      clipper: ProfileImageClipper(),
-                      child: Stack(alignment: Alignment.center, children: [
-                        CachedNetworkImage(
-                          imageUrl: widget.profilepic,
-                          width: 180.0,
-                          height: 180.0,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(
-                            Icons.error,
-                            color: LightColor.background,
-                            size: 30,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute<void>(
+                          builder: (context) {
+                            return Scaffold(
+                              body: Center(
+                                child: Hero(
+                                  tag: 'profile_image',
+                                  child: CachedNetworkImage(
+                                    imageUrl: widget.profilepic,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) => Icon(
+                                      Icons.error,
+                                      color: LightColor.background,
+                                      size: 30,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ));
+                      },
+                      child: ClipPath(
+                        clipper: ProfileImageClipper(),
+                        child: Stack(alignment: Alignment.center, children: [
+                          Hero(
+                            tag: 'profile_image',
+                            child: CachedNetworkImage(
+                              imageUrl: widget.profilepic,
+                              width: 180.0,
+                              height: 180.0,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.error,
+                                color: LightColor.background,
+                                size: 30,
+                              ),
+                            ),
                           ),
-                        )
-                      ]),
-                    )
+                        ]),
+                      ),
+                    ),
                   ],
                 ),
                 Text(
@@ -193,7 +222,9 @@ class _FProfileScrenState extends State<FProfileScren> {
                             Navigator.push(
                               (context),
                               MaterialPageRoute(
-                                  builder: (context) => const Following()),
+                                  builder: (context) => Following(
+                                        id: widget.id,
+                                      )),
                             );
                           },
                           child: Stat(title: 'Following', value: followings)),

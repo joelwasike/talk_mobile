@@ -342,7 +342,7 @@ class _NoticePostState extends State<NoticePost> {
                 "Liked by ",
               ),
               Text(
-                "${widget.likes} ",
+                "$likes ",
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const Text(

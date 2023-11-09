@@ -19,10 +19,10 @@ class Clubs extends StatefulWidget {
 }
 
 class _ClubsState extends State<Clubs> {
-   
-   List<Map<String, dynamic>> data = [];
+  List<Map<String, dynamic>> filteredData = []; // Store filtered data
+
+  List<Map<String, dynamic>> data = [];
   bool isloading = false;
- 
 
   Future<void> fetchData() async {
     setState(() {
@@ -36,6 +36,7 @@ class _ClubsState extends State<Clubs> {
 
       setState(() {
         data = jsonData.cast<Map<String, dynamic>>();
+        filteredData = List.from(data);
       });
       setState(() {
         isloading = false;
@@ -43,7 +44,16 @@ class _ClubsState extends State<Clubs> {
     } else {
       throw Exception('Failed to load data');
     }
-    
+  }
+
+  // Method to filter data based on search query
+  void filterData(String query) {
+    setState(() {
+      filteredData = data
+          .where((item) =>
+              item['name'].toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   @override
@@ -52,11 +62,11 @@ class _ClubsState extends State<Clubs> {
     super.initState();
     fetchData();
   }
+
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-       appBar: AppBar(
-  
+    return Scaffold(
+      appBar: AppBar(
         leading: DrawerWidget(),
         toolbarHeight: 30,
         backgroundColor: LightColor.scaffold,
@@ -67,15 +77,14 @@ class _ClubsState extends State<Clubs> {
             children: [
               Spacer(),
               FadeInRight(
-                    child: Text('Clubs & Societies',
-                        style: GoogleFonts.aguafinaScript(
-                          textStyle: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ))),
-           
+                  child: Text('Clubs & Societies',
+                      style: GoogleFonts.aguafinaScript(
+                        textStyle: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ))),
             ],
           ),
         ),
@@ -84,14 +93,13 @@ class _ClubsState extends State<Clubs> {
         backgroundColor:
             Colors.transparent, // Set the background color to transparent
         mini: false,
-        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        shape:
+            const CircleBorder(), // Use CircleBorder to create a round button
         onPressed: () {
-           Navigator.push(
-                      (context),
-                      MaterialPageRoute(builder: (context) => const ClubCred()
-                         
-                          ),
-                    );
+          Navigator.push(
+            (context),
+            MaterialPageRoute(builder: (context) => const ClubCred()),
+          );
         },
         child: Container(
           decoration: BoxDecoration(
@@ -100,72 +108,79 @@ class _ClubsState extends State<Clubs> {
               color: LightColor.maincolor, // Specify the border color here
             ),
           ),
-          child:  Center(
-            child: Icon(Icons.add_box,color: LightColor.maincolor,)
-          ),
+          child: Center(
+              child: Icon(
+            Icons.add_box,
+            color: LightColor.maincolor,
+          )),
         ),
       ),
-      body:isloading? Isloading(): Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
-            child: TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey.shade600),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(6),
-                  borderSide: BorderSide(color: Colors.grey.shade600),
-                ),
-                hintText: "Search clubs and societies...",
-                hintStyle: TextStyle(color: Colors.grey.shade600),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey.shade600,
-                  size: 20,
-                ),
-                filled: true,
-                fillColor: LightColor.maincolor1,
-                contentPadding: const EdgeInsets.all(8),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-        
-          Expanded(
-            child: ListView.builder(
-              physics: const BouncingScrollPhysics(),
-              itemCount: data.length,
-              
-              itemBuilder: (context, index) {
-                final club = data[index];
-                return GestureDetector(
-                  onTap: () {
-                     Navigator.push(
-                    (context),
-                    MaterialPageRoute(builder: (context) =>  Clubpost(title: club['name'], clubid: club["id"] ,)
-                       
-                        ),
-                  );
-                  },
-                  child: FadeInRight(
-                    child: ClubCard(
-                      name: club['name'],
-                      image: club['profilepicture'],
-                      description: club['description'],
+      body: isloading
+          ? Isloading()
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.grey.shade600),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: BorderSide(color: Colors.grey.shade600),
+                      ),
+                      hintText: "Search clubs and societies...",
+                      hintStyle: TextStyle(color: Colors.grey.shade600),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Colors.grey.shade600,
+                        size: 20,
+                      ),
+                      filled: true,
+                      fillColor: LightColor.maincolor1,
+                      contentPadding: const EdgeInsets.all(8),
                     ),
+                    onChanged: (query) {
+                      filterData(query);
+                    },
                   ),
-                );
-              },
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: filteredData.length,
+                    itemBuilder: (context, index) {
+                      final club = filteredData[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            (context),
+                            MaterialPageRoute(
+                                builder: (context) => Clubpost(
+                                      title: club['name'],
+                                      clubid: club["id"],
+                                    )),
+                          );
+                        },
+                        child: FadeInRight(
+                          child: ClubCard(
+                            name: club['name'],
+                            image: club['profilepicture'],
+                            description: club['description'],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
