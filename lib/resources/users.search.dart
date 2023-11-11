@@ -1,3 +1,4 @@
+import 'package:cached_video_player/cached_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
@@ -30,7 +31,7 @@ class _UserrPostState extends State<UserrPost> {
   bool isHeartAnimating = false;
   SampleItem? selectedMenu;
   final TextEditingController _messageController = TextEditingController();
-  VideoPlayerController? _videoPlayerController;
+  CachedVideoPlayerController? _videoPlayerController;
   bool _isPlaying = false;
 
   @override
@@ -38,7 +39,7 @@ class _UserrPostState extends State<UserrPost> {
     super.initState();
     if (isVideoLink(widget.image.imageUrl)) {
       _videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(widget.image.imageUrl))
+          CachedVideoPlayerController.network(widget.image.imageUrl)
             ..initialize().then((_) {
               _videoPlayerController!.setLooping(true);
               // Ensure the first frame is shown
@@ -186,7 +187,7 @@ class _UserrPostState extends State<UserrPost> {
                       _videoPlayerController!.value.isInitialized
                   ? AspectRatio(
                       aspectRatio: _videoPlayerController!.value.aspectRatio,
-                      child: VideoPlayer(_videoPlayerController!),
+                      child: CachedVideoPlayer(_videoPlayerController!),
                     )
                   : Image.network(widget.image.imageUrl, fit: BoxFit.cover),
             ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_video_player/cached_video_player.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -55,7 +56,7 @@ class _UserPostState extends State<VUserPost> {
   bool isHeartAnimating = false;
   SampleItem? selectedMenu;
   final TextEditingController _messageController = TextEditingController();
-  late VideoPlayerController _controller;
+  late CachedVideoPlayerController _controller;
   late Future<void> _initializeVideoPlayerFuture;
   bool boom = false;
   int likes = 1;
@@ -125,7 +126,7 @@ class _UserPostState extends State<VUserPost> {
   void initState() {
     super.initState();
 
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url!));
+    _controller = CachedVideoPlayerController.network(widget.url!);
     _initializeVideoPlayerFuture = _controller.initialize().then((_) {
       // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
       setState(() {});
@@ -244,7 +245,7 @@ class _UserPostState extends State<VUserPost> {
                       future: _initializeVideoPlayerFuture,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.done) {
-                          return VideoPlayer(_controller);
+                          return CachedVideoPlayer(_controller);
                         } else {
                           return GFShimmer(
                             child: Column(

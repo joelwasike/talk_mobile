@@ -23,9 +23,8 @@ class _ShortsMainScreenState extends State<ShortsMainScreen> {
           ? Scaffold(
               body: PreloadPageView.builder(
                 physics: BouncingScrollPhysics(),
-                itemCount: widget.url.length,
-                preloadPagesCount: 5,
-                controller: PreloadPageController(initialPage: 1),
+                preloadPagesCount: 3,
+                controller: PreloadPageController(initialPage: 0, viewportFraction: 1.0,),
                 scrollDirection: Axis.vertical,
                 itemBuilder: (context, index) {
                   return Stack(

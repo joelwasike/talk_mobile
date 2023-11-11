@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_video_player/cached_video_player.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -37,7 +38,7 @@ class ShortsPlayer extends StatefulWidget {
 
 class _ShortsPlayerState extends State<ShortsPlayer> {
   double? _progress;
-  late VideoPlayerController videoPlayerController;
+  late CachedVideoPlayerController videoPlayerController;
   bool isHeartAnimating = false;
   bool isliked = false;
   Color likeBtnColor = Colors.white,
@@ -98,7 +99,7 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
   void initState() {
     super.initState();
     videoPlayerController =
-        VideoPlayerController.networkUrl(Uri.parse(widget.shortsUrl))
+        CachedVideoPlayerController.network(widget.shortsUrl)
           ..initialize().then((_) {
             videoPlayerController.setLooping(true); // Enable video looping
             videoPlayerController.play();
@@ -164,7 +165,7 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            VideoPlayer(videoPlayerController),
+            CachedVideoPlayer(videoPlayerController),
             Opacity(
               opacity: isHeartAnimating ? 1 : 0,
               child: HeartAnimationWidget(
