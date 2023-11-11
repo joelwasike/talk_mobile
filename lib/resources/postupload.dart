@@ -3,9 +3,7 @@ import 'dart:io';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:photo_gallery/photo_gallery.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:video_player/video_player.dart';
 

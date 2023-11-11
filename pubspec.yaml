@@ -83,6 +83,9 @@ dependencies:
   video_compress: ^3.1.2
   flutter_image_compress: ^2.0.4
   hive_flutter: ^1.1.0
+  share_plus: ^7.2.1
+  dio_cache_interceptor: ^3.4.4
+  preload_page_view: ^0.2.0
 dev_dependencies:
   flutter_launcher_icons: "^0.13.1"
   change_app_package_name: ^1.1.0

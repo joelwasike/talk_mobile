@@ -112,50 +112,56 @@ class _NoticesState extends State<Notices> {
                   ),
                 );
               })
-          : CustomScrollView(
-              slivers: <Widget>[
-                SliverAppBar(
-                  leading: FadeInLeft(child: const DrawerWidget()),
-                  backgroundColor: LightColor.scaffold,
-                  floating: true,
-                  pinned: false,
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        FadeInRight(
-                            child: Text('Campus Notice',
-                                style: GoogleFonts.aguafinaScript(
-                                  textStyle: TextStyle(
-                                    color: Colors.grey.shade300,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ))),
-                      ],
+          : RefreshIndicator(
+              onRefresh: () async {
+                fetchData();
+              },
+              backgroundColor: LightColor.scaffold,
+              color: LightColor.maincolor,
+              child: CustomScrollView(
+                slivers: <Widget>[
+                  SliverAppBar(
+                    leading: FadeInLeft(child: const DrawerWidget()),
+                    backgroundColor: LightColor.scaffold,
+                    floating: true,
+                    pinned: false,
+                    flexibleSpace: FlexibleSpaceBar(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          FadeInRight(
+                              child: Text('Campus Notice',
+                                  style: GoogleFonts.aguafinaScript(
+                                    textStyle: TextStyle(
+                                      color: Colors.grey.shade300,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ))),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    
-                    (BuildContext context, int index) {
-                      final item = data[index];
-                      return FadeInRight(
-                        child: NoticePost(
-                          id: item['id'],
-                          file: item['pdf'],
-                          name: item['title'],
-                          image: item['media'],
-                          content: item['content'],
-                          likes: item['likes'],
-                        ),
-                      );
-                    },
-                    childCount: data.length,
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        final item = data[index];
+                        return FadeInRight(
+                          child: NoticePost(
+                            id: item['id'],
+                            file: item['pdf'],
+                            name: item['title'],
+                            image: item['media'],
+                            content: item['content'],
+                            likes: item['likes'],
+                          ),
+                        );
+                      },
+                      childCount: data.length,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
       floatingActionButton: FloatingActionButton(
         backgroundColor:

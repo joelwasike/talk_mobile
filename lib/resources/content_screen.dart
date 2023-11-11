@@ -1,6 +1,5 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:video_player/video_player.dart';
 
@@ -14,7 +13,8 @@ class ContentScreen extends StatefulWidget {
   final Uri? src;
   final List<Uri> videos;
 
-  const ContentScreen({Key? key, this.src, required this.videos}) : super(key: key);
+  const ContentScreen({Key? key, this.src, required this.videos})
+      : super(key: key);
 
   @override
   _ContentScreenState createState() => _ContentScreenState();
@@ -24,6 +24,7 @@ class _ContentScreenState extends State<ContentScreen> {
   late VideoPlayerController _videoPlayerController;
   VideoPlayerController? _nextVideoController;
   final TextEditingController _messageController = TextEditingController();
+  int currentIndex = 0;
 
   ChewieController? _chewieController;
   ChewieController? _nextChewieController;
@@ -34,16 +35,18 @@ class _ContentScreenState extends State<ContentScreen> {
 
   @override
   void initState() {
-    initializePlayer();
+    initializePlayer(currentIndex);
     super.initState();
   }
 
-  Future initializePlayer() async {
+  Future initializePlayer(int currentIndex) async {
     try {
       _videoPlayerController = VideoPlayerController.networkUrl(widget.src!);
-      await Future.wait([_videoPlayerController.initialize().then((_) {
-      setState(() {});
-    })]);
+      await Future.wait([
+        _videoPlayerController.initialize().then((_) {
+          setState(() {});
+        })
+      ]);
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
@@ -54,7 +57,7 @@ class _ContentScreenState extends State<ContentScreen> {
       );
 
       // Preload the next video
-      _loadNextVideo();
+      _loadNextVideo(currentIndex);
 
       setState(() {});
     } catch (e) {
@@ -62,23 +65,20 @@ class _ContentScreenState extends State<ContentScreen> {
     }
   }
 
-  Future<void> _loadNextVideo() async {
-    const nextIndex = 1; // Change this to load the appropriate next video
+  Future<void> _loadNextVideo(int currentIndex) async {
+    final nextIndex = currentIndex + 1;
     if (nextIndex < widget.videos.length) {
       final nextVideoSource = widget.videos[nextIndex].toString();
 
-      // Use flutter_cache_manager to get the cached video file
-      final file = await DefaultCacheManager().getSingleFile(nextVideoSource);
-      
-      _nextVideoController = VideoPlayerController.file(file);
+      _nextVideoController =
+          VideoPlayerController.networkUrl(Uri.parse(nextVideoSource));
       await _nextVideoController!.initialize().then((_) {
-      // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-      if (mounted) {
-        setState(() {});
-      }
-      
-    });
-      
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        if (mounted) {
+          setState(() {});
+        }
+      });
+
       _nextChewieController = ChewieController(
         videoPlayerController: _nextVideoController!,
         autoPlay: false,
@@ -88,7 +88,8 @@ class _ContentScreenState extends State<ContentScreen> {
       );
     }
   }
- @override
+
+  @override
   void dispose() {
     _videoPlayerController.dispose();
     _chewieController?.dispose();
@@ -96,6 +97,7 @@ class _ContentScreenState extends State<ContentScreen> {
     _nextChewieController?.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -224,7 +226,7 @@ class _ContentScreenState extends State<ContentScreen> {
                                           const Expanded(
                                               child: Column(
                                             children: [
-                                              CommentCard(),
+                                              // CommentCard(),
                                             ],
                                           )),
                                           _buildMessageInput()

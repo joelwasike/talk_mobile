@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
-
-import '../resources/image_data.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../resources/searchpostpage.dart';
 import '../widgets/followerspeople.dart';
 
@@ -62,6 +64,113 @@ class PinterestGrid extends StatefulWidget {
 }
 
 class _PinterestGridState extends State<PinterestGrid> {
+  List<Map<String, dynamic>> data = [];
+  bool isloading = false;
+  String? content;
+  String? email;
+  int? id;
+  int? likes;
+  String? media;
+  String? pdf;
+  String? title;
+  final TextEditingController searchController =
+      TextEditingController(); // Add this line
+
+  //fetchdata
+  Future<void> fetchData() async {
+    try {
+      setState(() {
+        isloading = true;
+      });
+      final url = Uri.parse('$baseUrl/getposts'); // Replace with your JSON URL
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+
+        setState(() {
+          data = jsonData.cast<Map<String, dynamic>>();
+        });
+
+        // Now you can access the data as needed.
+        for (final item in data) {
+          content = item['content'];
+          email = item['email'];
+          id = item['id'];
+          likes = item['likes'];
+          media = item['media'];
+          title = item['username'];
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isloading = false;
+      });
+    }
+  }
+
+  //search endpoint
+  Future<void> search(String query) async {
+    if (query.isEmpty) {
+      //clearGrid(); // Clear the grid when the search query is empty
+      return;
+    }
+
+    try {
+      setState(() {
+        isloading = true;
+      });
+
+      final url = Uri.parse(
+          '$baseUrl/search'); // Modify the URL to your search endpoint
+      final response = await http.post(
+        url,
+        body: jsonEncode({
+          'searchstring': query
+        }), // Send the query as JSON in the request body
+        headers: {
+          'Content-Type': 'application/json'
+        }, // Specify the content type
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+
+        setState(() {
+          data = jsonData.cast<Map<String, dynamic>>();
+        });
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isloading = false;
+      });
+    }
+  }
+
+  // Function to clear the grid
+  void clearGrid() {
+    setState(() {
+      data.clear();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    searchController.addListener(() {
+      search(searchController.text);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -70,6 +179,7 @@ class _PinterestGridState extends State<PinterestGrid> {
           Padding(
             padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
             child: TextField(
+              controller: searchController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -100,20 +210,21 @@ class _PinterestGridState extends State<PinterestGrid> {
                 crossAxisSpacing: 2.0,
                 crossAxisCount: 3,
                 children: List.generate(
-                  imageList.length,
+                  data.length,
                   (index) => StaggeredGridTile.fit(
                     crossAxisCellCount: 1,
                     child: GestureDetector(
                         onTap: () {
+                          print(data[index]["id"]);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  SearchPostPage(postId: imageList[index].id),
+                                  SearchPostPage(postId: data[index]["id"]),
                             ),
                           );
                         },
-                        child: ImageCard(imageData: imageList[index])),
+                        child: ImageCard(imageData: data[index]["media"])),
                   ),
                 ),
               ),
@@ -128,7 +239,7 @@ class _PinterestGridState extends State<PinterestGrid> {
 class ImageCard extends StatelessWidget {
   const ImageCard({Key? key, required this.imageData}) : super(key: key);
 
-  final ImageData imageData;
+  final String imageData;
 
   Future<String> generateVideoThumbnail(String videoUrl) async {
     final thumbnailPath = await VideoThumbnail.thumbnailFile(
@@ -153,12 +264,12 @@ class ImageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isVideo = isVideoLink(imageData.imageUrl);
+    bool isVideo = isVideoLink(imageData);
     return ClipRRect(
       borderRadius: BorderRadius.circular(6.0),
       child: isVideo
           ? FutureBuilder<String>(
-              future: generateVideoThumbnail(imageData.imageUrl),
+              future: generateVideoThumbnail(imageData),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return Stack(
@@ -181,25 +292,25 @@ class ImageCard extends StatelessWidget {
                   return Container(); // Show a loading indicator
                 }
               },
-            ): CachedNetworkImage(
-                imageUrl: imageData.imageUrl, fit: BoxFit.cover,
-                
-                placeholder: (context, url) => GFShimmer(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: MediaQuery.of(context).size.height/4,
-                                  color: Colors.grey.shade800.withOpacity(0.4),
-                                ),
-                              
-                              ],
-                            ),
-                          ),
-                // Placeholder while loading
+            )
+          : CachedNetworkImage(
+              imageUrl: imageData, fit: BoxFit.cover,
+
+              placeholder: (context, url) => GFShimmer(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height / 4,
+                      color: Colors.grey.shade800.withOpacity(0.4),
+                    ),
+                  ],
+                ),
               ),
-          // Image.network(imageData.imageUrl, fit: BoxFit.cover),
+              // Placeholder while loading
+            ),
+      // Image.network(imageData.imageUrl, fit: BoxFit.cover),
     );
   }
 }
@@ -212,69 +323,175 @@ class FriendsTab extends StatefulWidget {
 }
 
 class _FriendsTabState extends State<FriendsTab> {
-  List people = [
-    "Joel",
-    "Davis",
-    "Peris",
-    "Delan",
-    "Wiky",
-    "Felo",
-    "Bena",
-    "Chalo"
-  ];
+  List<Map<String, dynamic>> data = [];
+  bool isloading = false;
+  String? campus = "";
+  String? email = "";
+  int? id = 0;
+  String? media = "";
+  String? username = "";
+  final TextEditingController searchController =
+      TextEditingController(); // Add this line
+
+  //fetchdata
+  Future<void> fetchData() async {
+    try {
+      setState(() {
+        isloading = true;
+      });
+      var box = Hive.box("Talk");
+      var id = box.get("id");
+      final url =
+          Uri.parse('$baseUrl/getusers/$id'); // Replace with your JSON URL
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+
+        setState(() {
+          data = jsonData.cast<Map<String, dynamic>>();
+        });
+
+        // Now you can access the data as needed.
+        for (final item in data) {
+          campus = item['campus'];
+          email = item['email'];
+          id = item['ID'];
+          media = item['profile_picture'];
+          username = item['username'];
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isloading = false;
+      });
+    }
+  }
+
+  //search endpoint
+  Future<void> search(String query) async {
+    if (query.isEmpty) {
+      // clearGrid(); // Clear the grid when the search query is empty
+      return;
+    }
+
+    try {
+      setState(() {
+        isloading = true;
+      });
+
+      final url = Uri.parse(
+          '$baseUrl/searchusers/$id'); // Modify the URL to your search endpoint
+      final response = await http.post(
+        url,
+        body: jsonEncode({
+          'searchstring': query
+        }), // Send the query as JSON in the request body
+        headers: {
+          'Content-Type': 'application/json'
+        }, // Specify the content type
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+
+        setState(() {
+          data = jsonData.cast<Map<String, dynamic>>();
+        });
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isloading = false;
+      });
+    }
+  }
+
+  // Function to clear the grid
+  void clearGrid() {
+    setState(() {
+      data.clear();
+    });
+  }
+
+  void getid() {
+    var box = Hive.box("Talk");
+    setState(() {
+      id = box.get("id");
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    searchController.addListener(() {
+      search(searchController.text);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-       Padding(
-            padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
-            child: TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey.shade600),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(6),
-                  borderSide: BorderSide(color: Colors.grey.shade600),
-                ),
-                hintText: "Search friends...",
-                hintStyle: TextStyle(color: Colors.grey.shade600),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey.shade600,
-                  size: 20,
-                ),
-                filled: true,
-                fillColor: LightColor.scaffold,
-                contentPadding: const EdgeInsets.all(8),
+        Padding(
+          padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
+          child: TextField(
+            controller: searchController,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade600),
               ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide(color: Colors.grey.shade600),
+              ),
+              hintText: "Search friends...",
+              hintStyle: TextStyle(color: Colors.grey.shade600),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.grey.shade600,
+                size: 20,
+              ),
+              filled: true,
+              fillColor: LightColor.scaffold,
+              contentPadding: const EdgeInsets.all(8),
             ),
           ),
+        ),
         const SizedBox(
           height: 20,
         ),
         Expanded(
           child: ListView.builder(
             physics: const BouncingScrollPhysics(),
-            itemCount: people.length,
+            itemCount: data.length,
             itemBuilder: (context, index) {
               return GestureDetector(
-                onTap: () {
-                  // Navigator.push(
-                  //   (context),
-                  //   MaterialPageRoute(builder: (context) =>  ChatPagee(name: people[index])
+                  onTap: () {
+                    // Navigator.push(
+                    //   (context),
+                    //   MaterialPageRoute(builder: (context) =>  ChatPagee(name: people[index])
 
-                  //       ),
-                  // );
-                },
-                child: PeopleFCard(
-                  name: people[index],
-                  image: imageList[index],
-                  school: "kibabii university",
-                ),
-              );
+                    //       ),
+                    // );
+                  },
+                  child: PeopleFCard(
+                      image: data[index]["profile_picture"],
+                      name: data[index]["username"],
+                      school: data[index]["campus"],
+                      id: data[index]["ID"],
+                      email: data[index]["email"],
+                      isfollowing: data[index]["following"]));
             },
           ),
         ),

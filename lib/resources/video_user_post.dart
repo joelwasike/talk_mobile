@@ -1,5 +1,13 @@
+import 'dart:convert';
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
+import 'package:usersms/resources/apiconstatnts.dart';
+import 'package:usersms/resources/comments.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:usersms/widgets/comment_card.dart';
 import 'package:video_player/video_player.dart';
@@ -9,6 +17,12 @@ import 'image_data.dart';
 enum SampleItem { itemOne, itemTwo, itemThree }
 
 class VUserPost extends StatefulWidget {
+  final String profilepic;
+  final String getcommenturl;
+  final String postcommenturl;
+  final String addlikelink;
+  final String minuslikelink;
+  final int id;
   final String name;
   final String content;
   final int likes;
@@ -23,7 +37,13 @@ class VUserPost extends StatefulWidget {
     required this.content,
     required this.likes,
     required this.url,
-    required this.play, 
+    required this.play,
+    required this.id,
+    required this.addlikelink,
+    required this.minuslikelink,
+    required this.getcommenturl,
+    required this.postcommenturl,
+    required this.profilepic,
   });
 
   @override
@@ -37,6 +57,9 @@ class _UserPostState extends State<VUserPost> {
   final TextEditingController _messageController = TextEditingController();
   late VideoPlayerController _controller;
   late Future<void> _initializeVideoPlayerFuture;
+  bool boom = false;
+  int likes = 1;
+  var userid;
 
   List people = [
     "Joel",
@@ -56,15 +79,59 @@ class _UserPostState extends State<VUserPost> {
     "Wasike",
     "Fello"
   ];
+  double? _progress;
+
+  Future likepost() async {
+    Map body = {"userid": userid, "postid": widget.id};
+    final url = Uri.parse('$baseUrl/${widget.addlikelink}');
+    final response = await http.post(url, body: jsonEncode(body));
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      print("liked succesfully");
+    } else {
+      print('HTTP Request Error: ${response.statusCode}');
+    }
+  }
+
+  Future minuslikepost() async {
+    Map body = {"userid": userid, "postid": widget.id};
+    final url = Uri.parse('$baseUrl/${widget.minuslikelink}');
+    final response = await http.post(url, body: jsonEncode(body));
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      print("liked succesfully");
+    } else {
+      print('HTTP Request Error: ${response.statusCode}');
+    }
+  }
+
+  void func() {
+    setState(() {
+      likes = widget.likes;
+    });
+  }
+
+  void id() {
+    var box = Hive.box("Talk");
+    setState(() {
+      userid = box.get("id");
+      print(userid);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+
     _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url!));
     _initializeVideoPlayerFuture = _controller.initialize().then((_) {
       // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
       setState(() {});
     });
+    func();
+    id();
 
     if (widget.play) {
       _controller.play();
@@ -102,8 +169,8 @@ class _UserPostState extends State<VUserPost> {
             children: [
               Row(
                 children: [
-                  const CircleAvatar(
-                    backgroundImage: AssetImage('assets/airtime.jpg'),
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(widget.profilepic),
                   ),
                   const SizedBox(
                     width: 10,
@@ -137,16 +204,6 @@ class _UserPostState extends State<VUserPost> {
                       ],
                     ),
                   ),
-                  const PopupMenuItem<SampleItem>(
-                    value: SampleItem.itemTwo,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Download'),
-                        Icon(Icons.download),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ],
@@ -157,6 +214,21 @@ class _UserPostState extends State<VUserPost> {
               setState(() {
                 isHeartAnimating = true;
                 isliked = true;
+                if (!boom) {
+                  if (isliked) {
+                    setState(() {
+                      likes++;
+                    });
+                    likepost();
+                  }
+                  if (!isliked) {
+                    setState(() {
+                      likes--;
+                    });
+                    minuslikepost();
+                  }
+                }
+                boom = true;
               });
             },
             child: Stack(
@@ -198,8 +270,8 @@ class _UserPostState extends State<VUserPost> {
                                 ),
                                 const SizedBox(height: 6),
                                 Container(
-                                  width: MediaQuery.of(context).size.width *
-                                      0.25,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.25,
                                   height: 8,
                                   color: Colors.grey.shade800.withOpacity(0.2),
                                 )
@@ -250,6 +322,18 @@ class _UserPostState extends State<VUserPost> {
                       onPressed: () {
                         setState(() {
                           isliked = !isliked;
+                          if (isliked) {
+                            setState(() {
+                              likes++;
+                            });
+                            likepost();
+                          }
+                          if (!isliked) {
+                            setState(() {
+                              likes--;
+                            });
+                            minuslikepost();
+                          }
                         });
                       },
                     ),
@@ -262,45 +346,19 @@ class _UserPostState extends State<VUserPost> {
                           enableDrag: true,
                           context: context,
                           builder: (context) => Container(
-                                padding: EdgeInsets.only(
-                                    bottom: MediaQuery.of(context)
-                                        .viewInsets
-                                        .bottom),
-                                decoration: const BoxDecoration(
-                                    color: LightColor.maincolor1,
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(25),
-                                        topLeft: Radius.circular(25))),
-                                child: Column(
-                                  children: [
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      "Comments",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey.shade300),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey.shade800,
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Expanded(
-                                      child: ListView.builder(
-                                        physics: const BouncingScrollPhysics(),
-                                        itemCount: people.length,
-                                        itemBuilder: (context, index) {
-                                          return const CommentCard();
-                                        },
-                                      ),
-                                    ),
-                                    _buildMessageInput()
-                                  ],
-                                ),
-                              ));
+                              padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom),
+                              decoration: const BoxDecoration(
+                                  color: LightColor.maincolor1,
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(25),
+                                      topLeft: Radius.circular(25))),
+                              child: Comments(
+                                getcommenturl: widget.getcommenturl,
+                                postcommenturl: widget.postcommenturl,
+                                postid: widget.id,
+                              )));
                     },
                     icon: Icon(
                       Icons.chat_bubble_outline_outlined,
@@ -440,10 +498,46 @@ class _UserPostState extends State<VUserPost> {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Icon(
-                  Icons.bookmark_add_outlined,
-                  color: Colors.grey.shade300,
-                ),
+                child: _progress != null
+                    ? SpinKitThreeBounce(
+                        color: Colors.white,
+                        size: 25,
+                      )
+                    : IconButton(
+                        onPressed: () async {
+                          FileDownloader.downloadFile(
+                              url: widget.url!.trim(),
+                              onProgress: (name, progress) {
+                                setState(() {
+                                  _progress = progress;
+                                });
+                              },
+                              onDownloadCompleted: (value) {
+                                print('path  $value ');
+                                setState(() {
+                                  _progress = null;
+                                });
+                                CherryToast.success(
+                                        title: const Text(""),
+                                        backgroundColor:
+                                            Colors.black.withOpacity(0.9),
+                                        displayTitle: false,
+                                        description: Text(
+                                          "Download complete",
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        animationDuration:
+                                            const Duration(milliseconds: 500),
+                                        autoDismiss: true)
+                                    .show(context);
+                              });
+                        },
+                        icon: Icon(
+                          Icons.download_rounded,
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
               ),
             ],
           ),
@@ -456,7 +550,7 @@ class _UserPostState extends State<VUserPost> {
                 "Liked by ",
               ),
               Text(
-                widget.likes.toString(),
+                likes.toString(),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const Text(

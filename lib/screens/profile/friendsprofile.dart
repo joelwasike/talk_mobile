@@ -3,8 +3,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/followers.dart';
@@ -13,7 +11,6 @@ import 'package:usersms/utils/colors.dart';
 import 'dart:math' as math;
 import 'package:usersms/screens/profile/widgets/profile_background.dart';
 import 'package:usersms/screens/profile/widgets/stat.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import '../../resources/searchpostpage.dart';
 import 'dart:convert';
@@ -21,18 +18,27 @@ import 'package:http/http.dart' as http;
 
 List<Map<String, dynamic>> data = [];
 
-class ProfileScren extends StatefulWidget {
-  const ProfileScren({Key? key}) : super(key: key);
+class FProfileScren extends StatefulWidget {
+  final String campus;
+  final int id;
+  final String email;
+  final String profilepic;
+  final String username;
+
+  const FProfileScren(
+      {Key? key,
+      required this.campus,
+      required this.id,
+      required this.email,
+      required this.profilepic,
+      required this.username})
+      : super(key: key);
 
   @override
-  State<ProfileScren> createState() => _ProfileScrenState();
+  State<FProfileScren> createState() => _FProfileScrenState();
 }
 
-class _ProfileScrenState extends State<ProfileScren> {
-  File? imagefile;
-  String name = "";
-  String email = "";
-  String pic = "";
+class _FProfileScrenState extends State<FProfileScren> {
   int posts = 0;
   int followers = 0;
   int followings = 0;
@@ -52,8 +58,8 @@ class _ProfileScrenState extends State<ProfileScren> {
       setState(() {
         isloading = true;
       });
-      final url =
-          Uri.parse('$baseUrl/getposts/$id'); // Replace with your JSON URL
+      final url = Uri.parse(
+          '$baseUrl/getposts/${widget.id}'); // Replace with your JSON URL
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -68,6 +74,7 @@ class _ProfileScrenState extends State<ProfileScren> {
         for (final item in data) {
           content = item['content'];
           email1 = item['email'];
+          id = item['id'];
           likes = item['likes'];
           media = item['media'];
           title = item['username'];
@@ -84,155 +91,30 @@ class _ProfileScrenState extends State<ProfileScren> {
     }
   }
 
-//post data
-  fetchdata() {
-    var box = Hive.box("Talk");
-    setState(() {
-      name = box.get("username");
-      email = box.get("email");
-      pic = box.get("profile_picture");
-      posts = box.get("postscount");
-      followers = box.get("followerscount");
-      followings = box.get("followingscount");
-      id = box.get("id");
-    });
+  Future<void> profiledetails() async {
+    Map body = {"userid": widget.id};
+    final url = Uri.parse('$baseUrl/showprofiledetails');
+    final response = await http.post(url, body: jsonEncode(body));
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      var jsonData = jsonDecode(response.body);
+      setState(() {
+        posts = jsonData["postscount"];
+        followings = jsonData["followingscount"];
+        followers = jsonData["followerscount"];
+      });
+    } else {
+      print('HTTP Request Error: ${response.statusCode}');
+    }
   }
 
   @override
   void initState() {
     super.initState();
     // TODO: implement initState
-    fetchdata();
-    fetchposts();
-  }
 
-  void showImagePicker(BuildContext context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (builder) {
-          return Container(
-            height: MediaQuery.of(context).size.height / 10.2,
-            decoration: const BoxDecoration(
-                color: LightColor.maincolor1,
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(25),
-                    topLeft: Radius.circular(25))),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                    child: InkWell(
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.image,
-                        size: 30.0,
-                        color: LightColor.maincolor,
-                      ),
-                      Text(
-                        "Gallery",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16, color: LightColor.maincolor),
-                      )
-                    ],
-                  ),
-                  onTap: () {
-                    _imgFromGallery();
-                    Navigator.pop(context);
-                  },
-                )),
-                Expanded(
-                    child: InkWell(
-                  child: const SizedBox(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.camera_alt,
-                          size: 30.0,
-                          color: LightColor.maincolor,
-                        ),
-                        Text(
-                          "Camera",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 16, color: LightColor.maincolor),
-                        )
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    _imgFromCamera();
-                    Navigator.pop(context);
-                  },
-                ))
-              ],
-            ),
-          );
-        });
-  }
-
-  _imgFromGallery() async {
-    await picker
-        .pickImage(source: ImageSource.gallery, imageQuality: 50)
-        .then((value) {
-      if (value != null) {
-        _cropImage(File(value.path));
-      }
-    });
-  }
-
-  _imgFromCamera() async {
-    await picker
-        .pickImage(source: ImageSource.camera, imageQuality: 50)
-        .then((value) {
-      if (value != null) {
-        _cropImage(File(value.path));
-      }
-    });
-  }
-
-  _cropImage(File imgFile) async {
-    final croppedFile = await ImageCropper().cropImage(
-        sourcePath: imgFile.path,
-        aspectRatioPresets: Platform.isAndroid
-            ? [
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio16x9
-              ]
-            : [
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio5x3,
-                CropAspectRatioPreset.ratio5x4,
-                CropAspectRatioPreset.ratio7x5,
-                CropAspectRatioPreset.ratio16x9
-              ],
-        uiSettings: [
-          AndroidUiSettings(
-              toolbarTitle: "Crop",
-              toolbarColor: LightColor.maincolor1,
-              toolbarWidgetColor: Colors.white,
-              initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
-          IOSUiSettings(
-            title: "Crop",
-          )
-        ]);
-    if (croppedFile != null) {
-      imageCache.clear();
-      setState(() {
-        imagefile = File(croppedFile.path);
-      });
-      // reload();
-    }
+    fetchposts().then((_) => profiledetails());
   }
 
   @override
@@ -262,26 +144,15 @@ class _ProfileScrenState extends State<ProfileScren> {
                       ),
                     ),
                     GestureDetector(
-                        onTap: () async {
-                          Map<Permission, PermissionStatus> statuses = await [
-                            Permission.storage,
-                            Permission.camera,
-                          ].request();
-                          if (statuses[Permission.storage]!.isDenied &&
-                              statuses[Permission.camera]!.isDenied) {
-                            print('no permission provided');
-                          } else {
-                            showImagePicker(context);
-                          }
-                        },
-                        child: ClipPath(
-                          clipper: ProfileImageClipper(),
-                          child: Stack(alignment: Alignment.center, children: [
-                            imagefile == null
-                                ? CachedNetworkImage(
-                                    imageUrl: pic,
-                                    width: 180.0,
-                                    height: 180.0,
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute<void>(
+                          builder: (context) {
+                            return Scaffold(
+                              body: Center(
+                                child: Hero(
+                                  tag: 'profile_image',
+                                  child: CachedNetworkImage(
+                                    imageUrl: widget.profilepic,
                                     fit: BoxFit.cover,
                                     placeholder: (context, url) =>
                                         CircularProgressIndicator(),
@@ -290,29 +161,44 @@ class _ProfileScrenState extends State<ProfileScren> {
                                       color: LightColor.background,
                                       size: 30,
                                     ),
-                                  )
-                                : Image.file(
-                                    imagefile!,
-                                    width: 180.0,
-                                    height: 180.0,
-                                    fit: BoxFit.cover,
                                   ),
-                            const Icon(
-                              Icons.add_a_photo,
-                              color: LightColor.background,
-                              size: 30,
-                            )
-                          ]),
-                        ))
+                                ),
+                              ),
+                            );
+                          },
+                        ));
+                      },
+                      child: ClipPath(
+                        clipper: ProfileImageClipper(),
+                        child: Stack(alignment: Alignment.center, children: [
+                          Hero(
+                            tag: 'profile_image',
+                            child: CachedNetworkImage(
+                              imageUrl: widget.profilepic,
+                              width: 180.0,
+                              height: 180.0,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.error,
+                                color: LightColor.background,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ]),
+                      ),
+                    ),
                   ],
                 ),
                 Text(
-                  "@$name",
+                  "@${widget.username}",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 4.0),
                 Text(
-                  "$email",
+                  "${widget.email}",
                   style: TextStyle(color: Colors.grey.shade300),
                 ),
                 const SizedBox(height: 80.0),
@@ -337,7 +223,7 @@ class _ProfileScrenState extends State<ProfileScren> {
                               (context),
                               MaterialPageRoute(
                                   builder: (context) => Following(
-                                        id: id!,
+                                        id: widget.id,
                                       )),
                             );
                           },

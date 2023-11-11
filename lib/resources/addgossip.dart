@@ -4,7 +4,9 @@ import 'package:cherry_toast/cherry_toast.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
@@ -71,8 +73,8 @@ class _AddGossipState extends State<AddGossip> {
       isloading = true;
     });
     try {
-      //print("image selected is: ${imagefile!.path}");
-      //print("video selected is: ${videoFile!.path}");
+      var box = Hive.box("Talk");
+      var userid = box.get("id");
 
       Dio dio = Dio();
 
@@ -81,7 +83,7 @@ class _AddGossipState extends State<AddGossip> {
       formData.fields.addAll([
         MapEntry('title', titleController.text),
         MapEntry('content', descriptionController.text),
-        const MapEntry('email', "daviswasike@gmail.com"),
+        MapEntry('id', userid.toString()),
       ]);
       if (pickedFile != null) {
         formData.files.addAll([
@@ -123,8 +125,6 @@ class _AddGossipState extends State<AddGossip> {
     }
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,7 +132,7 @@ class _AddGossipState extends State<AddGossip> {
         toolbarHeight: 30,
         iconTheme: const IconThemeData(color: LightColor.background),
         automaticallyImplyLeading: true,
-        backgroundColor: LightColor.maincolor1,
+        backgroundColor: LightColor.scaffold,
         title: Padding(
           padding: const EdgeInsets.only(left: 56),
           child: Row(
@@ -162,8 +162,9 @@ class _AddGossipState extends State<AddGossip> {
               },
               backgroundColor: LightColor.maincolor,
               child: isloading
-                  ? const CircularProgressIndicator(
+                  ? SpinKitThreeBounce(
                       color: Colors.white,
+                      size: 25,
                     )
                   : const Text(
                       "Post",
@@ -289,17 +290,15 @@ class _AddGossipState extends State<AddGossip> {
                     if (pickedFile != null)
                       pickedFile!.extension == 'mp4' ||
                               pickedFile!.extension == 'mov'
-                          ?Text(pickedFile!.name)
+                          ? Text(pickedFile!.name)
                           : Image.file(
                               File(path!),
                               width: 100,
                               height: 100,
                               fit: BoxFit.cover,
                             ),
-                  
                   ],
                 ),
-               
               ],
             ),
           ),

@@ -271,7 +271,7 @@ class _UserrPostState extends State<UserrPost> {
                                         physics: const BouncingScrollPhysics(),
                                         itemCount: people.length,
                                         itemBuilder: (context, index) {
-                                          return const CommentCard();
+                                          return Container();
                                         },
                                       ),
                                     ),

@@ -6,13 +6,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 
 import '../utils/colors.dart';
-import 'groupcredentials.dart';
 
 class ForumCred extends StatefulWidget {
   const ForumCred({super.key});
@@ -24,10 +24,10 @@ class ForumCred extends StatefulWidget {
 class _ForumCredState extends State<ForumCred> {
   File? imagefile;
   bool isloading = false;
-   TextEditingController titleController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-   toast(String message) {
+  toast(String message) {
     CherryToast.info(
             title: const Text(""),
             backgroundColor: Colors.black,
@@ -45,6 +45,8 @@ class _ForumCredState extends State<ForumCred> {
     setState(() {
       isloading = true;
     });
+    var box = Hive.box("Talk");
+    var ownerid = box.get("id");
     try {
       if (imagefile == null) {
         toast("The files should not be empty");
@@ -58,7 +60,7 @@ class _ForumCredState extends State<ForumCred> {
       formData.fields.addAll([
         MapEntry('name', titleController.text),
         MapEntry('description', descriptionController.text),
-         MapEntry('ownerid', "1"),
+        MapEntry('ownerid', ownerid.toString()),
       ]);
       formData.files.addAll([
         MapEntry(
@@ -67,11 +69,8 @@ class _ForumCredState extends State<ForumCred> {
         ),
       ]);
 
-
-    
-
       final response = await dio.post(
-        '$baseUrl/createclub',
+        '$baseUrl/addforum',
         data: formData,
       );
       //print(jsonDecode(response.data));
@@ -82,10 +81,10 @@ class _ForumCredState extends State<ForumCred> {
         setState(() {
           imagefile = null;
         });
-        toast('Club created successfully');
+        toast('Forum created successfully');
       } else {
         // Handle error response
-        toast("Error creating club");
+        toast("Error creating Forum");
       }
     } catch (e) {
       // Handle exceptions
@@ -253,23 +252,25 @@ class _ForumCredState extends State<ForumCred> {
           ],
         ),
       ),
-        floatingActionButton: Padding(
+      floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 40, right: 10),
         child: SizedBox(
           height: 50,
           width: 50,
           child: FloatingActionButton(
               onPressed: () {
-              // createclub();
+                createclub();
               },
               backgroundColor: LightColor.maincolor,
-              child:isloading? const SpinKitThreeBounce(
-                          color: Colors.white,
-                          size: 20,
-                        ): const Text(
-                "create",
-                style: TextStyle(color: Colors.white),
-              )),
+              child: isloading
+                  ? const SpinKitThreeBounce(
+                      color: Colors.white,
+                      size: 20,
+                    )
+                  : const Text(
+                      "create",
+                      style: TextStyle(color: Colors.white),
+                    )),
         ),
       ),
       body: ListView(
@@ -279,21 +280,20 @@ class _ForumCredState extends State<ForumCred> {
             child: Column(
               children: [
                 GestureDetector(
-                   onTap: () async {
-                        Map<Permission, PermissionStatus> statuses = await [
-                          Permission.storage,
-                          Permission.camera,
-                        ].request();
-                        if (statuses[Permission.storage]!.isDenied &&
-                            statuses[Permission.camera]!.isDenied) {
-                          print('no permission provided');
-                        } else {
-                          showImagePicker(context);
-                        }
-                      },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children:[ CircleAvatar(
+                  onTap: () async {
+                    Map<Permission, PermissionStatus> statuses = await [
+                      Permission.storage,
+                      Permission.camera,
+                    ].request();
+                    if (statuses[Permission.storage]!.isDenied &&
+                        statuses[Permission.camera]!.isDenied) {
+                      print('no permission provided');
+                    } else {
+                      showImagePicker(context);
+                    }
+                  },
+                  child: Stack(alignment: Alignment.center, children: [
+                    CircleAvatar(
                       maxRadius: 60,
                       backgroundColor: LightColor.maincolor,
                       child: ClipOval(
@@ -316,9 +316,12 @@ class _ForumCredState extends State<ForumCred> {
                         ),
                       ),
                     ),
-                    Icon(Icons.add_a_photo, color: Colors.white,size: 30,)
-                    ]
-                  ),
+                    Icon(
+                      Icons.add_a_photo,
+                      color: Colors.white,
+                      size: 30,
+                    )
+                  ]),
                 ),
                 Text(
                   "Profile picture",
@@ -334,6 +337,7 @@ class _ForumCredState extends State<ForumCred> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              controller: titleController,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: "eg. Literature forum..",
@@ -381,9 +385,9 @@ class _ForumCredState extends State<ForumCred> {
                   ),
                 ],
               ),
-              child: const TextField(
+              child: TextField(
+                controller: descriptionController,
                 style: TextStyle(fontSize: 14),
-                //controller: desc,
                 maxLines: null,
                 decoration: InputDecoration(
                   border: InputBorder.none,

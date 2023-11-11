@@ -34,34 +34,39 @@ class _GossipState extends State<Gossip> {
 
   //get notices
   Future<void> fetchData() async {
-    setState(() {
-      isloading = true;
-    });
-    final url = Uri.parse('$baseUrl/getgossips'); // Replace with your JSON URL
-    final response = await http.get(url);
+    try {
+      // setState(() {
+      //   isloading = true;
+      // });
+      final url =
+          Uri.parse('$baseUrl/getgossips'); // Replace with your JSON URL
+      final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-
-      setState(() {
-        data = jsonData.cast<Map<String, dynamic>>();
-      });
-
-      // Now you can access the data as needed.
-      for (final item in data) {
-        content = item['content'];
-        email = item['email'];
-        id = item['id'];
-        likes = item['likes'];
-        media = item['media'];
-        title = item['title'];
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
 
         setState(() {
-          isloading = false;
+          data = jsonData.cast<Map<String, dynamic>>();
         });
+
+        // Now you can access the data as needed.
+        for (final item in data) {
+          content = item['content'];
+          email = item['email'];
+          id = item['id'];
+          likes = item['likes'];
+          media = item['media'];
+          title = item['title'];
+        }
+      } else {
+        throw Exception('Failed to load data');
       }
-    } else {
+    } catch (e) {
       throw Exception('Failed to load data');
+    } finally {
+      // setState(() {
+      //   isloading = false;
+      // });
     }
   }
 
@@ -150,68 +155,88 @@ class _GossipState extends State<Gossip> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 10,)
+                    SizedBox(
+                      height: 10,
+                    )
                   ],
                 );
               },
             )
-          : InViewNotifierList(
-            physics: BouncingScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              initialInViewIds: const ['0'],
-              isInViewPortCondition: (double deltaTop, double deltaBottom,
-                  double viewPortDimension) {
-                return deltaTop < (0.5 * viewPortDimension) &&
-                    deltaBottom > (0.5 * viewPortDimension);
+          : RefreshIndicator(
+              onRefresh: () async {
+                fetchData();
               },
-              itemCount: data.length,
-              builder: (BuildContext context, int index) {
-                return LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    return InViewNotifierWidget(
-                      
-                      id: '$index',
-                      builder:
-                          (BuildContext context, bool isInView, Widget? child) {
-                        final item = data[index];
-                        return isVideoLink(item["media"])
-                            ? FadeInRight(
-                              child: VUserPost(
-                                  scrollController: _scrollController,
-                                  play: isInView,
-                                  name: item['title'],
-                                  url: item['media'],
-                                  content: item['content'],
-                                  likes: item['likes'],
-                                ),
-                            )
-                            : FadeInRight(
-                              child: UserPost(
-                                  scrollController: _scrollController,
-                                  name: item['title'],
-                                  image: item['media'],
-                                  content: item['content'],
-                                  likes: item['likes'],
-                                ),
-                            );
-                      },
-                    );
-                  },
-                );
-              },
+              backgroundColor: LightColor.scaffold,
+              color: LightColor.maincolor,
+              child: InViewNotifierList(
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                initialInViewIds: const ['0'],
+                isInViewPortCondition: (double deltaTop, double deltaBottom,
+                    double viewPortDimension) {
+                  return deltaTop < (0.5 * viewPortDimension) &&
+                      deltaBottom > (0.5 * viewPortDimension);
+                },
+                itemCount: data.length,
+                builder: (BuildContext context, int index) {
+                  return LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return InViewNotifierWidget(
+                        id: '$index',
+                        builder: (BuildContext context, bool isInView,
+                            Widget? child) {
+                          final item = data[index];
+                          return isVideoLink(item["media"])
+                              ? FadeInRight(
+                                  child: VUserPost(
+                                    scrollController: _scrollController,
+                                    profilepic: item['profilepic'],
+                                    addlikelink: "postlikes",
+                                    minuslikelink: "postlikesminus",
+                                    id: item["id"],
+                                    play: isInView,
+                                    name: item['title'],
+                                    url: item['media'],
+                                    content: item['content'],
+                                    likes: item['likes'],
+                                    getcommenturl: 'getgossipcomments',
+                                    postcommenturl: 'gossipcomments',
+                                  ),
+                                )
+                              : FadeInRight(
+                                  child: UserPost(
+                                    scrollController: _scrollController,
+                                    profilepic: item['profilepic'],
+                                    addlikelink: "gossiplikes",
+                                    minuslikelink: "minusgossiplikes",
+                                    id: item["id"],
+                                    name: item['title'],
+                                    image: item['media'],
+                                    content: item['content'],
+                                    likes: item['likes'],
+                                    getcommenturl: 'getgossipcomments',
+                                    postcommenturl: 'gossipcomments',
+                                  ),
+                                );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
       floatingActionButton: FloatingActionButton(
         backgroundColor:
             Colors.transparent, // Set the background color to transparent
         mini: false,
-        shape: const CircleBorder(), // Use CircleBorder to create a round button
+        shape:
+            const CircleBorder(), // Use CircleBorder to create a round button
         onPressed: () {
-           Navigator.push(
-                      (context),
-                      MaterialPageRoute(builder: (context) => const AddGossip()
-                         
-                          ),
-                    );
+          Navigator.push(
+            (context),
+            MaterialPageRoute(builder: (context) => const AddGossip()),
+          );
         },
         child: Container(
           decoration: BoxDecoration(
@@ -220,9 +245,11 @@ class _GossipState extends State<Gossip> {
               color: LightColor.maincolor, // Specify the border color here
             ),
           ),
-          child:  Center(
-            child: Icon(Icons.add_box,color: LightColor.maincolor,)
-          ),
+          child: Center(
+              child: Icon(
+            Icons.add_box,
+            color: LightColor.maincolor,
+          )),
         ),
       ),
     );

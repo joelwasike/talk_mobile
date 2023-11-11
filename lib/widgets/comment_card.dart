@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-
 import '../utils/colors.dart';
-import 'commentcomment_card.dart';
 
 class CommentCard extends StatefulWidget {
+  final String username;
+  final String profilepic;
+  final String content;
+  final String date;
   const CommentCard({
     Key? key,
+    required this.username,
+    required this.profilepic,
+    required this.content,
+    required this.date,
   }) : super(key: key);
 
   @override
@@ -14,28 +20,17 @@ class CommentCard extends StatefulWidget {
 
 class _CommentCardState extends State<CommentCard> {
   bool isliked = false;
-
-  List people = [
-    "Joel",
-    "Delan",
-    "Wicky",
-    "Salim",
-    "Benna",
-    "Chalo",
-    "Wasike",
-    "Fello"
-  ];
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       child: Row(
         children: [
-          const CircleAvatar(
-            backgroundImage: AssetImage(
-              "assets/airtime.jpg",
+          CircleAvatar(
+            backgroundImage: NetworkImage(
+              widget.profilepic,
             ),
-            radius: 30,
+            radius: 20,
           ),
           Expanded(
             child: Padding(
@@ -45,100 +40,35 @@ class _CommentCardState extends State<CommentCard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
                         TextSpan(
-                            text: "Joel:  ",
+                            text: "${widget.username}:  ",
                             // text: snap.data()['name'],
                             style: TextStyle(
-                              color: LightColor.maincolor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16
-                            )),
+                                color: LightColor.maincolor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16)),
                         TextSpan(
-                          text:
-                              "joel wasike is a good boy ajdgfoua DADSBCIUaugsdui sbhdugsdfhias idsahgiudhgfdsaf uagfsagfuasb",
-                          // text: ' ${snap.data()['text']}',
-                           style: TextStyle(
-                            color: LightColor.background,
+                            text: widget.content,
+                            style: TextStyle(
+                              color: LightColor.background,
                               fontWeight: FontWeight.normal,
-                            )
-                          
-                        ),
+                            )),
                       ],
                     ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(top: 4),
                         child: Text(
-                          "02-02-2020",
+                          widget.date,
                           style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w300,
                               color: Colors.grey),
-                        ),
-                      ),
-                      
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: GestureDetector(
-                          onTap: () {
-                            showModalBottomSheet(
-                                useSafeArea: true,
-                                isScrollControlled: true,
-                                enableDrag: true,
-                                context: context,
-                                builder: (context) => Container(
-                                    padding: EdgeInsets.only(
-                                    bottom: MediaQuery.of(context)
-                                        .viewInsets
-                                        .bottom),
-                                      decoration: const BoxDecoration(
-                                          color: LightColor.maincolor1,
-                                          borderRadius: BorderRadius.only(
-                                              topRight: Radius.circular(25),
-                                              topLeft: Radius.circular(25))),
-                                      child: Column(
-                                        children: [
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          const Text(
-                                            "Joel's Comment",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: LightColor.background),
-                                          ),
-                                          Divider(
-                                            color: Colors.grey.shade800,
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Expanded(
-                                            child: ListView.builder(
-                                              physics: const BouncingScrollPhysics(),
-                                              itemCount: people.length,
-                                              itemBuilder: (context, index) {
-                                                return const CommentofcommentCard();
-                                              },
-                                            ),
-                                          ),
-                                          _buildMessageInput()
-                                        ],
-                                      ),
-                                    ));
-                          },
-                          child: const Text(
-                            "- Make a comment",
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.grey),
-                          ),
                         ),
                       ),
                     ],
@@ -175,11 +105,11 @@ class _CommentCardState extends State<CommentCard> {
 
   Widget _buildMessageInput() {
     return Container(
-       decoration: BoxDecoration(
-      border: Border(
-        top: BorderSide(color: Colors.grey.shade700),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Colors.grey.shade700),
+        ),
       ),
-    ),
       child: Row(
         children: [
           const Padding(
@@ -190,8 +120,7 @@ class _CommentCardState extends State<CommentCard> {
           ),
           Expanded(
             child: TextField(
-              
-             // controller: _messageController,
+              // controller: _messageController,
               decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(vertical: 16),
                   border: InputBorder.none,
@@ -199,7 +128,12 @@ class _CommentCardState extends State<CommentCard> {
                   hintStyle: TextStyle(color: Colors.grey.shade400)),
             ),
           ),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.send,color: LightColor.maincolor,))
+          IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.send,
+                color: LightColor.maincolor,
+              ))
         ],
       ),
     );

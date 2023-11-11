@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
-import 'package:usersms/glassbox.dart';
 import 'package:usersms/menu/clubs.dart';
 import 'package:usersms/menu/forums.dart';
 import 'package:usersms/menu/gossip.dart';
@@ -13,13 +13,14 @@ import 'package:usersms/menu/groups.dart';
 import 'package:usersms/menu/messenger.dart';
 import 'package:usersms/menu/notices.dart';
 import 'package:usersms/menu/portal.dart';
-import 'package:usersms/menu/tv.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/photo_user_posts.dart';
 import 'package:usersms/resources/video_user_post.dart';
 import '../utils/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
@@ -62,7 +63,7 @@ class _HomepageState extends State<Homepage> {
       case 2:
         return const Groups();
       case 3:
-        return  Forums();
+        return Forums();
       case 4:
         return const Notices();
       case 5:
@@ -71,7 +72,7 @@ class _HomepageState extends State<Homepage> {
         return const Clubs();
       case 7:
         return const Portal();
-     
+
       default:
         return const HomeScreen();
     }
@@ -99,14 +100,13 @@ class _HomeScreenState extends State<HomeScreen> {
   String? pdf;
   String? title;
 
-  //get notices
-Future<void> fetchData() async {
+  //get posts
+  Future<void> fetchData() async {
     try {
       setState(() {
-        isloading = true;
+        // isloading = true;
       });
-      final url = Uri.parse(
-          '$baseUrl/getposts'); // Replace with your JSON URL
+      final url = Uri.parse('$baseUrl/getposts'); // Replace with your JSON URL
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -132,8 +132,27 @@ Future<void> fetchData() async {
       print(e);
     } finally {
       setState(() {
-        isloading = false;
+        //isloading = false;
       });
+    }
+  }
+
+  Future<void> profiledetails() async {
+    var box = Hive.box("Talk");
+    var email = box.get("id");
+    Map body = {"userid": email};
+    final url = Uri.parse('$baseUrl/showprofiledetails');
+    final response = await http.post(url, body: jsonEncode(body));
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      var jsonData = jsonDecode(response.body);
+      var box = Hive.box("Talk");
+      box.put("followerscount", jsonData["followerscount"]);
+      box.put("followingscount", jsonData["followingscount"]);
+      box.put("postscount", jsonData["postscount"]);
+    } else {
+      print('HTTP Request Error: ${response.statusCode}');
     }
   }
 
@@ -150,7 +169,7 @@ Future<void> fetchData() async {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    fetchData().then((_) => profiledetails());
   }
 
   @override
@@ -185,7 +204,7 @@ Future<void> fetchData() async {
       ),
       body: isloading
           ? ListView.builder(
-              itemCount: 5,
+              itemCount: data.length,
               itemBuilder: (context, index) {
                 return Column(
                   children: [
@@ -229,44 +248,65 @@ Future<void> fetchData() async {
                 );
               },
             )
-          : InViewNotifierList(
-              scrollDirection: Axis.vertical,
-              initialInViewIds: const ['0'],
-              isInViewPortCondition: (double deltaTop, double deltaBottom,
-                  double viewPortDimension) {
-                return deltaTop < (0.5 * viewPortDimension) &&
-                    deltaBottom > (0.5 * viewPortDimension);
+          : RefreshIndicator(
+              onRefresh: () async {
+                fetchData();
               },
-              itemCount: data.length,
-              builder: (BuildContext context, int index) {
-                return LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    return InViewNotifierWidget(
-                      id: '$index',
-                      builder:
-                          (BuildContext context, bool isInView, Widget? child) {
-                        final item = data[index];
-                        return isVideoLink(item["media"])
-                            ? VUserPost(
-                                scrollController: _scrollController,
-                                play: isInView,
-                                name: item['username'],
-                                url: item['media'],
-                                content: item['content'],
-                                likes: item['likes'],
-                              )
-                            : UserPost(
-                                scrollController: _scrollController,
-                                name: item['username'],
-                                image: item['media'],
-                                content: item['content'],
-                                likes: item['likes'],
-                              );
-                      },
-                    );
-                  },
-                );
-              },
+              backgroundColor: LightColor.scaffold,
+              color: LightColor.maincolor,
+              child: InViewNotifierList(
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                initialInViewIds: const ['0'],
+                isInViewPortCondition: (double deltaTop, double deltaBottom,
+                    double viewPortDimension) {
+                  return deltaTop < (0.5 * viewPortDimension) &&
+                      deltaBottom > (0.5 * viewPortDimension);
+                },
+                itemCount: data.length,
+                builder: (BuildContext context, int index) {
+                  return LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return InViewNotifierWidget(
+                        id: '$index',
+                        builder: (BuildContext context, bool isInView,
+                            Widget? child) {
+                          final item = data[index];
+                          return isVideoLink(item["media"])
+                              ? VUserPost(
+                                  scrollController: _scrollController,
+                                  profilepic: item['profilepicture'],
+                                  addlikelink: "postlikes",
+                                  minuslikelink: "postlikesminus",
+                                  id: item['id'],
+                                  play: isInView,
+                                  name: item['username'],
+                                  url: item['media'],
+                                  content: item['content'],
+                                  likes: item['likes'],
+                                  getcommenturl: 'getpostcomments',
+                                  postcommenturl: 'comments',
+                                )
+                              : UserPost(
+                                  profilepic: item['profilepicture'],
+                                  addlikelink: "postlikes",
+                                  minuslikelink: "postlikesminus",
+                                  scrollController: _scrollController,
+                                  id: item["id"],
+                                  name: item['username'],
+                                  image: item['media'],
+                                  content: item['content'],
+                                  likes: item['likes'],
+                                  getcommenturl: 'getpostcomments',
+                                  postcommenturl: 'comments',
+                                );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
     );
   }
@@ -291,31 +331,31 @@ class _DrawerScreenState extends State<DrawerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-                  height: MediaQuery.of(context).size.height/5,
-                  child: DrawerHeader(
-                    
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width/3,
-                          height: 70,
-                          padding: EdgeInsets.only(
-                            bottom: 30, ),
-                          child: DecoratedBox(
-                            decoration: ShapeDecoration(
-                                shape: CircleBorder(),
-                                image: DecorationImage(
-                                  fit: BoxFit.contain,
-                                  image: AssetImage("assets/talklogo.v1.cropped-modified.png"),
-                                )),
-                          ),
-                        ),
-                       
-                      ],
+              height: MediaQuery.of(context).size.height / 5,
+              child: DrawerHeader(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width / 3,
+                      height: 70,
+                      padding: EdgeInsets.only(
+                        bottom: 30,
+                      ),
+                      child: DecoratedBox(
+                        decoration: ShapeDecoration(
+                            shape: CircleBorder(),
+                            image: DecorationImage(
+                              fit: BoxFit.contain,
+                              image: AssetImage(
+                                  "assets/talklogo.v1.cropped-modified.png"),
+                            )),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
+              ),
+            ),
             drawerList(Icons.home, "Home", 0),
             const SizedBox(
               height: 10,
