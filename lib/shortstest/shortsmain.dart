@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:preload_page_view/preload_page_view.dart';
 import 'package:usersms/shortstest/shortsplayerwidget.dart';
 import 'package:usersms/utils/colors.dart';
 
@@ -20,10 +21,11 @@ class _ShortsMainScreenState extends State<ShortsMainScreen> {
     return SafeArea(
       child: (widget.url.isNotEmpty)
           ? Scaffold(
-              body: PageView.builder(
-                //to make the whole page scrollable
+              body: PreloadPageView.builder(
+                physics: BouncingScrollPhysics(),
                 itemCount: widget.url.length,
-                controller: PageController(viewportFraction: 1),
+                preloadPagesCount: 5,
+                controller: PreloadPageController(initialPage: 1),
                 scrollDirection: Axis.vertical,
                 itemBuilder: (context, index) {
                   return Stack(

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
@@ -12,10 +13,14 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:uuid/uuid.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatPagee extends StatefulWidget {
+  final WebSocketChannel channel =
+      IOWebSocketChannel.connect('ws://7251-197-232-22-252.ngrok-free.app/ws');
   final String name;
-  const ChatPagee({super.key, required this.name});
+  ChatPagee({super.key, required this.name});
 
   @override
   State<ChatPagee> createState() => _ChatPageeState();
@@ -23,14 +28,44 @@ class ChatPagee extends StatefulWidget {
 
 class _ChatPageeState extends State<ChatPagee> {
   List<types.Message> _messages = [];
-  final _user = const types.User(
-    id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
+  var id = 0;
+  late var _user = types.User(
+    id: id.toString(),
   );
 
   @override
   void initState() {
     super.initState();
-    _loadMessages();
+
+    var box = Hive.box("Talk");
+    setState(() {
+      id = box.get("id");
+    });
+    widget.channel.stream.listen(
+      (message) {
+        final messageData = json.decode(message);
+
+        switch (messageData['type']) {
+          case 'text':
+            final receivedMessage = types.TextMessage(
+              author: types.User.fromJson(messageData['author']),
+              createdAt: messageData['createdAt'],
+              id: messageData['id'],
+              text: messageData['text'],
+            );
+
+            _addMessage(receivedMessage);
+            break;
+          // Handle other message types (e.g., image, file) if needed
+        }
+      },
+      onError: (error) {
+        print('WebSocket error: $error');
+      },
+      onDone: () {
+        print('WebSocket connection closed.');
+      },
+    );
   }
 
   void _addMessage(types.Message message) {
@@ -195,7 +230,24 @@ class _ChatPageeState extends State<ChatPagee> {
       text: message.text,
     );
 
+    // Add the new message to the UI immediately
     _addMessage(textMessage);
+
+    // Send the message to the server through the WebSocket channel
+    final Map<String, dynamic> messageData = {
+      'author': {
+        'id': _user.id,
+        'firstName': _user.firstName,
+        'lastName': _user.lastName,
+      },
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+      'id': textMessage.id,
+      'text': message.text,
+      'type': 'text',
+    };
+
+    final jsonMessage = json.encode(messageData);
+    widget.channel.sink.add(jsonMessage);
   }
 
   void _loadMessages() async {
@@ -214,7 +266,7 @@ class _ChatPageeState extends State<ChatPagee> {
         backgroundColor: LightColor.scaffold,
         appBar: AppBar(
           iconTheme: const IconThemeData(
-            color: Colors.white, 
+            color: Colors.white,
           ),
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
@@ -227,9 +279,10 @@ class _ChatPageeState extends State<ChatPagee> {
             child: Container(
               padding: const EdgeInsets.only(right: 16),
               child: Row(
-
                 children: <Widget>[
-                 const SizedBox(width: 50,),
+                  const SizedBox(
+                    width: 50,
+                  ),
                   const SizedBox(
                     width: 2,
                   ),
@@ -268,13 +321,13 @@ class _ChatPageeState extends State<ChatPagee> {
           ),
         ),
         body: Chat(
-          theme:  DarkChatTheme(
+          theme: DarkChatTheme(
             backgroundColor: LightColor.scaffold,
             primaryColor: LightColor.maincolor,
-            inputBorderRadius: BorderRadius.only(topLeft: Radius.circular(6),topRight: Radius.circular(6)),
+            inputBorderRadius: BorderRadius.only(
+                topLeft: Radius.circular(6), topRight: Radius.circular(6)),
             inputBackgroundColor: Colors.black,
             secondaryColor: Colors.grey.shade900,
-            
           ),
           messages: _messages,
           onAttachmentPressed: _handleAttachmentPressed,
