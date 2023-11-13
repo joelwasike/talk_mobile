@@ -56,9 +56,12 @@ class _ReelsState extends State<Reels> {
     } catch (e) {
       print(e);
     } finally {
-      setState(() {
+      if (mounted) {
+        setState(() {
         isloading = false;
       });
+      }
+      
     }
   }
 

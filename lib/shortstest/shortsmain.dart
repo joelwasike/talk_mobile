@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:preload_page_view/preload_page_view.dart';
 import 'package:usersms/shortstest/shortsplayerwidget.dart';
 import 'package:usersms/utils/colors.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class ShortsMainScreen extends StatefulWidget {
   final List url;
@@ -16,32 +16,61 @@ class ShortsMainScreen extends StatefulWidget {
 }
 
 class _ShortsMainScreenState extends State<ShortsMainScreen> {
+  PageController _pageController = PageController(initialPage: 0, viewportFraction: 1.0);
+  List<bool> playStates = List.filled(100, false); // Assuming a maximum of 100 videos
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: (widget.url.isNotEmpty)
           ? Scaffold(
-              body: PreloadPageView.builder(
+              body: PageView.builder(
+                allowImplicitScrolling: true,
                 physics: BouncingScrollPhysics(),
-                preloadPagesCount: 3,
-                controller: PreloadPageController(initialPage: 0, viewportFraction: 1.0,),
+                itemCount: widget.url.length,
+                controller: _pageController,
                 scrollDirection: Axis.vertical,
                 itemBuilder: (context, index) {
-                  return Stack(
-                    //to put all other elements on top of the video
-                    children: [
-                      ShortsPlayer(
-                        profilepic: widget.url[index]["profile_pictire"],
-                        username: widget.url[index]["username"],
-                        userid: widget.url[index]["userid"],
-                        likes: widget.url[index]["likes"],
-                        id: widget.url[index]["id"],
-                        content: widget.url[index]["content"],
-                        shortsUrl: widget.url[index]["media"],
-                      ),
+                  String currentShortsUrl = widget.url[index]["media"];
+                  String nextShortsUrl = (index < widget.url.length - 1)
+                      ? widget.url[index + 1]["media"]
+                      : ""; // Check if not at the end
+                  String previousShortsUrl =
+                      (index > 0) ? widget.url[index - 1]["media"] : ""; // Check if not at the beginning
 
-                      //all stacked options
-                    ],
+                  return VisibilityDetector(
+                    key: Key(index.toString()),
+                    onVisibilityChanged: (visibilityInfo) {
+                      if (visibilityInfo.visibleFraction == 1.0) {
+                        if (mounted) {
+                          setState(() {
+                            playStates[index] = true;
+                          });
+                        }
+                      } else {
+                        if (mounted) {
+                          setState(() {
+                            playStates[index] = false;
+                          });
+                        }
+                      }
+                    },
+                    child: Stack(
+                      children: [
+                        ShortsPlayer(
+                          nextvidurl: nextShortsUrl,
+                          previousvidvidurl: previousShortsUrl,
+                          play: playStates[index],
+                          profilepic: widget.url[index]["profile_pictire"],
+                          username: widget.url[index]["username"],
+                          userid: widget.url[index]["userid"],
+                          likes: widget.url[index]["likes"],
+                          id: widget.url[index]["id"],
+                          content: widget.url[index]["content"],
+                          shortsUrl: currentShortsUrl,
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
