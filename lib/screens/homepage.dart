@@ -58,19 +58,19 @@ class _HomepageState extends State<Homepage> {
     switch (currentIndex) {
       case 0:
         return const HomeScreen();
+      //case 1:
+       // return const Messenger();
+     // case 2:
+       // return const Groups();
       case 1:
-        return const Messenger();
-      case 2:
-        return const Groups();
-      case 3:
         return Forums();
-      case 4:
+      case 2:
         return const Notices();
-      case 5:
+      case 3:
         return const Gossip();
-      case 6:
+      case 4:
         return const Clubs();
-      case 7:
+      case 5:
         return const Portal();
 
       default:
@@ -360,31 +360,31 @@ class _DrawerScreenState extends State<DrawerScreen> {
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.message, "Messenger", 1),
+            // drawerList(Icons.message, "Messenger", 1),
+            // const SizedBox(
+            //   height: 10,
+            // ),
+            // drawerList(Icons.group, "Groups", 2),
+            // const SizedBox(
+            //   height: 10,
+            // ),
+            drawerList(Icons.forum, "Forums", 1),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.group, "Groups", 2),
+            drawerList(Icons.notification_add, "Notices", 2),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.forum, "Forums", 3),
+            drawerList(Icons.people_alt, " Gossip", 3),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.notification_add, "Notices", 4),
+            drawerList(Icons.speaker, "Clubs", 4),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.people_alt, " Gossip", 5),
-            const SizedBox(
-              height: 10,
-            ),
-            drawerList(Icons.speaker, "Clubs", 6),
-            const SizedBox(
-              height: 10,
-            ),
-            drawerList(Icons.school, "School Portal", 7),
+            drawerList(Icons.school, "School Portal", 5),
             const SizedBox(
               height: 10,
             ),
