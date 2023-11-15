@@ -12,6 +12,8 @@ import 'package:usersms/resources/heartanimationwidget.dart';
 import 'package:usersms/utils/colors.dart';
 
 class ShortsPlayer extends StatefulWidget {
+  final String previousvidvidurl;
+  final String nextvidurl;
   final String shortsUrl;
   final int likes;
   final String content;
@@ -19,6 +21,7 @@ class ShortsPlayer extends StatefulWidget {
   final int id;
   final String username;
   final String profilepic;
+  final bool play;
 
   const ShortsPlayer(
       {Key? key,
@@ -28,7 +31,10 @@ class ShortsPlayer extends StatefulWidget {
       required this.userid,
       required this.id,
       required this.username,
-      required this.profilepic})
+      required this.profilepic,
+      required this.play,
+      required this.previousvidvidurl,
+      required this.nextvidurl})
       : super(key: key);
 
   @override
@@ -37,7 +43,10 @@ class ShortsPlayer extends StatefulWidget {
 
 class _ShortsPlayerState extends State<ShortsPlayer> {
   double? _progress;
-  late CachedVideoPlayerController videoPlayerController;
+  CachedVideoPlayerController? nextVideoController;
+  CachedVideoPlayerController? previousVideoController;
+
+  late CachedVideoPlayerController? videoPlayerController;
   bool isHeartAnimating = false;
   bool isliked = false;
   Color likeBtnColor = Colors.white,
@@ -97,20 +106,73 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
   @override
   void initState() {
     super.initState();
-    videoPlayerController =
-        CachedVideoPlayerController.network(widget.shortsUrl)
-          ..initialize().then((_) {
-            videoPlayerController.setLooping(true); // Enable video looping
-            videoPlayerController.play();
-            videoPlayerController.setVolume(1);
-          });
+    initVideoController();
+    
     func();
     id();
   }
 
   @override
+  void didUpdateWidget(ShortsPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.play != oldWidget.play) {
+      if (widget.play) {
+        videoPlayerController!.play();
+      } else {
+        videoPlayerController!.pause();
+      }
+    }
+  }
+
+  void initVideoController() {
+    videoPlayerController =
+        CachedVideoPlayerController.network(widget.shortsUrl)
+          ..initialize().then((_) {
+            videoPlayerController!.setLooping(true);
+            videoPlayerController!.setVolume(1);
+            // Play or pause based on the value of widget.play
+            if (widget.play) {
+              videoPlayerController!.play();
+            } else {
+              videoPlayerController!.pause();
+            }
+            setState(
+                () {}); // Ensure the first frame is shown after video initialization
+          });
+  }
+
+  void initNextVideoController() {
+    nextVideoController = CachedVideoPlayerController.network(widget.nextvidurl)
+      ..initialize().then((_) {
+        nextVideoController!.setLooping(true);
+        nextVideoController!.setVolume(1);
+        if (widget.play) {
+          videoPlayerController!.pause();
+        } else {
+          videoPlayerController!.play();
+        }
+        setState(() {});
+      });
+  }
+
+  void initPrevVideoController() {
+    previousVideoController =
+        CachedVideoPlayerController.network(widget.previousvidvidurl)
+          ..initialize().then((_) {
+            previousVideoController!.setLooping(true);
+            previousVideoController!.setVolume(1);
+            if (widget.play) {
+              videoPlayerController!.pause();
+            } else {
+              videoPlayerController!.play();
+            }
+            setState(() {});
+          });
+  }
+
+  @override
   void dispose() {
-    videoPlayerController.dispose();
+    videoPlayerController!.dispose();
     super.dispose();
   }
 
@@ -127,12 +189,12 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
           tapCount++;
         });
         if (tapCount % 2 == 0) {
-          videoPlayerController.play();
+          videoPlayerController!.play();
           setState(() {
             playIconVisible = true;
           });
         } else {
-          videoPlayerController.pause();
+          videoPlayerController!.pause();
           setState(() {
             playIconVisible = false;
           });
@@ -164,7 +226,7 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            CachedVideoPlayer(videoPlayerController),
+            CachedVideoPlayer(videoPlayerController!),
             Opacity(
               opacity: isHeartAnimating ? 1 : 0,
               child: HeartAnimationWidget(
