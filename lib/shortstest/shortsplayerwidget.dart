@@ -10,7 +10,6 @@ import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/comments.dart';
 import 'package:usersms/resources/heartanimationwidget.dart';
 import 'package:usersms/utils/colors.dart';
-import 'package:video_player/video_player.dart';
 
 class ShortsPlayer extends StatefulWidget {
   final String shortsUrl;

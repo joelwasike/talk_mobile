@@ -3,7 +3,6 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
-import 'package:usersms/resources/isloadong.dart';
 import 'package:usersms/shortstest/shortsmain.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;

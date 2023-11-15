@@ -8,7 +8,6 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/comments.dart';
 import 'package:usersms/utils/colors.dart';
-import 'package:usersms/widgets/comment_card.dart';
 import 'heartanimationwidget.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;

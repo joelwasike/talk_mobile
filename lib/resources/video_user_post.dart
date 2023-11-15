@@ -10,8 +10,6 @@ import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/comments.dart';
 import 'package:usersms/utils/colors.dart';
-import 'package:usersms/widgets/comment_card.dart';
-import 'package:video_player/video_player.dart';
 import 'heartanimationwidget.dart';
 import 'image_data.dart';
 

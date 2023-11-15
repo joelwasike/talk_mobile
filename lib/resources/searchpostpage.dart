@@ -1,14 +1,11 @@
 import 'dart:convert';
-import 'package:animate_do/animate_do.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/photo_user_posts.dart';
 import 'package:usersms/resources/video_user_post.dart';
-import 'package:usersms/screens/homepage.dart';
 
 class SearchPostPage extends StatefulWidget {
   final int postId;
