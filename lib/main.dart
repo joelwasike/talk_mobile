@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:usersms/auth/auth.dart';
 import 'package:usersms/auth/forgotpassword.dart';
@@ -16,6 +17,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -23,8 +25,8 @@ void main() async {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
   await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
-   await Hive.initFlutter();
-    await Hive.openBox('Talk');
+  await Hive.initFlutter();
+  await Hive.openBox('Talk');
 
   runApp(const MyApp());
 }
