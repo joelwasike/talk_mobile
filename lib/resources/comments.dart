@@ -66,9 +66,11 @@ class _CommentsState extends State<Comments> {
     } catch (e) {
       print(e);
     } finally {
-      setState(() {
-        isloading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isloading = false;
+        });
+      }
     }
   }
 

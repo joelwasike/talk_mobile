@@ -6,14 +6,14 @@ import 'package:usersms/resources/comments.dart';
 import 'package:usersms/resources/heartanimationwidget.dart';
 import 'package:usersms/utils/colors.dart';
 
-class NativeExample extends StatefulWidget {
-  const NativeExample({super.key});
+class GoogleAds extends StatefulWidget {
+  const GoogleAds({super.key});
 
   @override
-  NativeExampleState createState() => NativeExampleState();
+  GoogleAdsState createState() => GoogleAdsState();
 }
 
-class NativeExampleState extends State<NativeExample> {
+class GoogleAdsState extends State<GoogleAds> {
   NativeAd? nativeAd;
   bool _nativeAdIsLoaded = false;
   bool boom = false;
@@ -58,23 +58,23 @@ class NativeExampleState extends State<NativeExample> {
             mainBackgroundColor: Colors.black,
             cornerRadius: 10.0,
             callToActionTextStyle: NativeTemplateTextStyle(
-                textColor: Colors.cyan,
-                backgroundColor: Colors.red,
+                textColor: LightColor.background,
+                backgroundColor: LightColor.maincolor,
                 style: NativeTemplateFontStyle.monospace,
                 size: 16.0),
             primaryTextStyle: NativeTemplateTextStyle(
-                textColor: Colors.red,
+                textColor: LightColor.scaffold,
                 backgroundColor: Colors.cyan,
                 style: NativeTemplateFontStyle.italic,
                 size: 16.0),
             secondaryTextStyle: NativeTemplateTextStyle(
-                textColor: Colors.green,
+                textColor: LightColor.scaffold,
                 backgroundColor: Colors.black,
                 style: NativeTemplateFontStyle.bold,
                 size: 16.0),
             tertiaryTextStyle: NativeTemplateTextStyle(
-                textColor: Colors.brown,
-                backgroundColor: Colors.amber,
+                textColor: LightColor.scaffold,
+                backgroundColor: LightColor.maincolor,
                 style: NativeTemplateFontStyle.normal,
                 size: 16.0)))
       ..load();
@@ -95,9 +95,6 @@ class NativeExampleState extends State<NativeExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Native Example'),
-      ),
       body: Column(
         children: [
           Padding(
@@ -115,7 +112,7 @@ class NativeExampleState extends State<NativeExample> {
                       width: 10,
                     ),
                     Text(
-                      "widget.name",
+                      "Talk",
                       style: TextStyle(
                         color: Colors.grey.shade300,
                         fontWeight: FontWeight.bold,
@@ -150,11 +147,10 @@ class NativeExampleState extends State<NativeExample> {
               _nativeAdIsLoaded && nativeAd != null
                   ? ConstrainedBox(
                       constraints: const BoxConstraints(
-                        minWidth: 320, // minimum recommended width
-                        minHeight: 320, // minimum recommended height
-                        maxWidth: 400,
-                        maxHeight: 400,
-                      ),
+                          minWidth: 320, // minimum recommended width
+                          minHeight: 320, // minimum recommended height
+                          maxHeight: 350,
+                          maxWidth: 350),
                       child: AdWidget(ad: nativeAd!),
                     )
                   : Container(
@@ -162,9 +158,7 @@ class NativeExampleState extends State<NativeExample> {
                       width: 320,
                       height: 320,
                       color: Colors.grey,
-                      child: Center(
-                        child: Text('Ad not loaded'),
-                      ),
+                      child: Center(),
                     ),
               Opacity(
                 opacity: isHeartAnimating ? 1 : 0,
@@ -259,7 +253,7 @@ class NativeExampleState extends State<NativeExample> {
                   "Liked by ",
                 ),
                 Text(
-                  "",
+                  "50",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const Text(
