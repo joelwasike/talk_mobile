@@ -23,14 +23,13 @@ class ClubCred extends StatefulWidget {
 class _ClubCredState extends State<ClubCred> {
   File? imagefile;
   bool isloading = false;
-    TextEditingController titleController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-   toast(String message) {
+  toast(String message) {
     CherryToast.success(
             title: const Text(""),
             backgroundColor: Colors.black,
-            displayTitle: false,
             description: Text(
               message,
               style: const TextStyle(color: Colors.white),
@@ -57,7 +56,7 @@ class _ClubCredState extends State<ClubCred> {
       formData.fields.addAll([
         MapEntry('name', titleController.text),
         MapEntry('description', descriptionController.text),
-         MapEntry('ownerid', "1"),
+        MapEntry('ownerid', "1"),
       ]);
       formData.files.addAll([
         MapEntry(
@@ -65,9 +64,6 @@ class _ClubCredState extends State<ClubCred> {
           await MultipartFile.fromFile(imagefile!.path),
         ),
       ]);
-
-
-    
 
       final response = await dio.post(
         '$baseUrl/createclub',
@@ -259,16 +255,18 @@ class _ClubCredState extends State<ClubCred> {
           width: 50,
           child: FloatingActionButton(
               onPressed: () {
-               createclub();
+                createclub();
               },
               backgroundColor: LightColor.maincolor,
-              child:isloading? const SpinKitThreeBounce(
-                          color: Colors.white,
-                          size: 20,
-                        ): const Text(
-                "create",
-                style: TextStyle(color: Colors.white),
-              )),
+              child: isloading
+                  ? const SpinKitThreeBounce(
+                      color: Colors.white,
+                      size: 20,
+                    )
+                  : const Text(
+                      "create",
+                      style: TextStyle(color: Colors.white),
+                    )),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
@@ -291,9 +289,8 @@ class _ClubCredState extends State<ClubCred> {
                       showImagePicker(context);
                     }
                   },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children:[ CircleAvatar(
+                  child: Stack(alignment: Alignment.center, children: [
+                    CircleAvatar(
                       maxRadius: 60,
                       backgroundColor: LightColor.maincolor,
                       child: ClipOval(
@@ -316,9 +313,12 @@ class _ClubCredState extends State<ClubCred> {
                         ),
                       ),
                     ),
-                    Icon(Icons.add_a_photo, color: Colors.white,size: 30,)
-                    ]
-                  ),
+                    Icon(
+                      Icons.add_a_photo,
+                      color: Colors.white,
+                      size: 30,
+                    )
+                  ]),
                 ),
                 Text(
                   "Profile picture",
@@ -334,7 +334,7 @@ class _ClubCredState extends State<ClubCred> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              controller: titleController ,
+              controller: titleController,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: "eg. Salsa Dance Club..",
@@ -382,7 +382,7 @@ class _ClubCredState extends State<ClubCred> {
                   ),
                 ],
               ),
-              child:  TextField(
+              child: TextField(
                 controller: descriptionController,
                 style: TextStyle(fontSize: 14),
                 //controller: desc,

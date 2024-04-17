@@ -58,7 +58,6 @@ class _AddForumPostState extends State<AddForumPost> {
     CherryToast.info(
             title: const Text(""),
             backgroundColor: Colors.black,
-            displayTitle: false,
             description: Text(
               message,
               style: const TextStyle(color: Colors.white),

@@ -58,7 +58,6 @@ class _AddGossipState extends State<AddGossip> {
     CherryToast.success(
             title: const Text(""),
             backgroundColor: Colors.black,
-            displayTitle: false,
             description: Text(
               message,
               style: const TextStyle(color: Colors.white),

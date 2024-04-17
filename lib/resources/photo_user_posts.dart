@@ -451,7 +451,6 @@ class _UserPostState extends State<UserPost> {
                                         title: const Text(""),
                                         backgroundColor:
                                             Colors.black.withOpacity(0.9),
-                                        displayTitle: false,
                                         description: Text(
                                           "Download complete",
                                           style: const TextStyle(

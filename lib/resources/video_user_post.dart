@@ -258,7 +258,8 @@ class _UserPostState extends State<VUserPost> {
                                 Container(
                                   width: double.infinity,
                                   height: 8,
-                                  color: Colors.grey.shade800.withOpacity(0.2),
+                                  color: Color.fromARGB(255, 66, 66, 66)
+                                      .withOpacity(0.2),
                                 ),
                                 const SizedBox(height: 6),
                                 Container(
@@ -375,7 +376,7 @@ class _UserPostState extends State<VUserPost> {
                           context: context,
                           builder: (context) => Container(
                                 decoration: const BoxDecoration(
-                                    color: LightColor.maincolor1,
+                                    color: Color.fromARGB(255, 23, 23, 23),
                                     borderRadius: BorderRadius.only(
                                         topRight: Radius.circular(25),
                                         topLeft: Radius.circular(25))),
@@ -391,7 +392,7 @@ class _UserPostState extends State<VUserPost> {
                                           color: Colors.grey.shade300),
                                     ),
                                     Divider(
-                                      color: Colors.grey.shade800,
+                                      color: Color.fromARGB(255, 66, 66, 66),
                                     ),
                                     const SizedBox(
                                       height: 10,
@@ -520,7 +521,6 @@ class _UserPostState extends State<VUserPost> {
                                         title: const Text(""),
                                         backgroundColor:
                                             Colors.black.withOpacity(0.9),
-                                        displayTitle: false,
                                         description: Text(
                                           "Download complete",
                                           style: const TextStyle(
@@ -603,7 +603,7 @@ class _UserPostState extends State<VUserPost> {
               onPressed: () {},
               icon: const Icon(
                 Icons.send,
-                color: LightColor.maincolor,
+                color: Color.fromARGB(255, 22, 136, 230),
               ))
         ],
       ),

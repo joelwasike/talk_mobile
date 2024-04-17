@@ -55,7 +55,6 @@ class _LoginState extends State<Login> {
       CherryToast.error(
               title: const Text(""),
               backgroundColor: Colors.black45,
-              displayTitle: false,
               description: Text(
                 e.message.toString(),
                 style: const TextStyle(color: Colors.white),

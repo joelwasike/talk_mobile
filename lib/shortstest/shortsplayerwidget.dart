@@ -107,7 +107,7 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
   void initState() {
     super.initState();
     initVideoController();
-    
+
     func();
     id();
   }
@@ -449,7 +449,6 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
                                                       backgroundColor: Colors
                                                           .black
                                                           .withOpacity(0.9),
-                                                      displayTitle: false,
                                                       description: Text(
                                                         "Download complete",
                                                         style: const TextStyle(

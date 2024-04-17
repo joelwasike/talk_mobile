@@ -38,7 +38,6 @@ class _RegisterState extends State<Register> {
     CherryToast.info(
             title: const Text(""),
             backgroundColor: Colors.black,
-            displayTitle: false,
             description: Text(
               message,
               style: const TextStyle(color: Colors.white),
@@ -96,7 +95,6 @@ class _RegisterState extends State<Register> {
         CherryToast.error(
           title: const Text(""),
           backgroundColor: Colors.black45,
-          displayTitle: false,
           description: const Text(
             "Password Mismatch",
             style: TextStyle(color: Colors.white),
@@ -109,7 +107,6 @@ class _RegisterState extends State<Register> {
       CherryToast.error(
         title: const Text(""),
         backgroundColor: Colors.black45,
-        displayTitle: false,
         description: Text(
           e.message.toString(),
           style: const TextStyle(color: Colors.white),

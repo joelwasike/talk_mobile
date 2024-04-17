@@ -6,6 +6,7 @@ import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
+import 'package:usersms/match/match.dart';
 import 'package:usersms/menu/clubs.dart';
 import 'package:usersms/menu/forums.dart';
 import 'package:usersms/menu/gossip.dart';
@@ -56,19 +57,21 @@ class _HomepageState extends State<Homepage> {
     switch (currentIndex) {
       case 0:
         return const HomeScreen();
-      //case 1:
-      // return const Messenger();
-      // case 2:
-      // return const Groups();
       case 1:
-        return Forums();
+        return const Messenger();
       case 2:
-        return const Notices();
+        return const Groups();
       case 3:
-        return const Gossip();
+        return Forums();
       case 4:
-        return const Clubs();
+        return const Notices();
       case 5:
+        return const Gossip();
+      case 6:
+        return const Clubs();
+      case 7:
+        return Match();
+      case 8:
         return const Portal();
 
       default:
@@ -129,9 +132,11 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print(e);
     } finally {
-      setState(() {
-        //isloading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isloading = false;
+        });
+      }
     }
   }
 
@@ -328,63 +333,41 @@ class _DrawerScreenState extends State<DrawerScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: MediaQuery.of(context).size.height / 5,
-              child: DrawerHeader(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width / 3,
-                      height: 70,
-                      padding: EdgeInsets.only(
-                        bottom: 30,
-                      ),
-                      child: DecoratedBox(
-                        decoration: ShapeDecoration(
-                            shape: CircleBorder(),
-                            image: DecorationImage(
-                              fit: BoxFit.contain,
-                              image: AssetImage(
-                                  "assets/talklogo.v1.cropped-modified.png"),
-                            )),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
             drawerList(Icons.home, "Home", 0),
             const SizedBox(
               height: 10,
             ),
-            // drawerList(Icons.message, "Messenger", 1),
-            // const SizedBox(
-            //   height: 10,
-            // ),
-            // drawerList(Icons.group, "Groups", 2),
-            // const SizedBox(
-            //   height: 10,
-            // ),
-            drawerList(Icons.forum, "Forums", 1),
+            drawerList(Icons.message, "Messenger", 1),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.notification_add, "Notices", 2),
+            drawerList(Icons.group, "Groups", 2),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.people_alt, " Gossip", 3),
+            drawerList(Icons.forum, "Forums", 3),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.speaker, "Clubs", 4),
+            drawerList(Icons.notification_add, "Notices", 4),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.school, "School Portal", 5),
+            drawerList(Icons.people_alt, " Gossip", 5),
             const SizedBox(
               height: 10,
+            ),
+            drawerList(Icons.speaker, "Clubs", 6),
+            const SizedBox(
+              height: 10,
+            ),
+            drawerList(Icons.favorite, "Match", 7),
+            const SizedBox(
+              height: 10,
+            ),
+            drawerList(Icons.school, "School Portal", 8),
+            const SizedBox(
+              height: 20,
             ),
             const Logout()
           ],

@@ -33,7 +33,6 @@ class _AddnoticeState extends State<Addnotice> {
     CherryToast.success(
             title: const Text(""),
             backgroundColor: Colors.black,
-            displayTitle: false,
             description: Text(
               message,
               style: const TextStyle(color: Colors.white),
