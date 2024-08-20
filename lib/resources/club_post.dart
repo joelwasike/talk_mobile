@@ -1,10 +1,11 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
 import 'package:usersms/resources/addclubpost.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
+import 'package:usersms/resources/postsloading.dart';
 import 'package:usersms/resources/video_user_post.dart';
 import '../resources/photo_user_posts.dart';
 import '../utils/colors.dart';
@@ -25,49 +26,40 @@ class _ClubpostState extends State<Clubpost> {
       ScrollController(); // Add this line
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
-  String? content;
-  String? email;
-  int? id;
-  int? likes;
-  String? media;
-  String? pdf;
-  int? title;
+  var hiveforums = [];
 
   //get notices
   Future<void> fetchData() async {
     try {
-      // setState(() {
-      //   isloading = true;
-      // });
+      setState(() {
+        isloading = true;
+      });
       final url = Uri.parse(
           '$baseUrl/getclubposts/${widget.clubid}'); // Replace with your JSON URL
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
+        var box = Hive.box("Talk");
 
-        setState(() {
-          data = jsonData.cast<Map<String, dynamic>>();
-        });
-
-        // Now you can access the data as needed.
-        for (final item in data) {
-          content = item['content'];
-          email = item['email'];
-          id = item['id'];
-          likes = item['likes'];
-          media = item['media'];
-          title = item['userID'];
+        if (hiveforums != jsonData) {
+          setState(() {
+            data = jsonData.cast<Map<String, dynamic>>();
+          });
         }
+
+        box.put("clubposts${widget.clubid}", jsonData);
       } else {
         throw Exception('Failed to load data');
       }
     } catch (e) {
       print(e);
     } finally {
-      // setState(() {
-      //   isloading = false;
-      // });
+      if (mounted) {
+        setState(() {
+          isloading = false;
+        });
+      }
     }
   }
 
@@ -85,6 +77,10 @@ class _ClubpostState extends State<Clubpost> {
   void initState() {
     super.initState();
     fetchData();
+    var box = Hive.box("Talk");
+    setState(() {
+      hiveforums = box.get("clubposts${widget.clubid}") ?? [];
+    });
   }
 
   @override
@@ -150,51 +146,68 @@ class _ClubpostState extends State<Clubpost> {
         ),
       ),
       body: isloading
-          ? ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    SizedBox(
-                      height: 10,
-                    ),
-                    GFShimmer(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 300,
-                            color: Colors.grey.shade800.withOpacity(0.2),
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            width: double.infinity,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.2),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.2),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.25,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.2),
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    )
-                  ],
-                );
-              },
-            )
+          ? hiveforums.isNotEmpty
+              ? RefreshIndicator(
+                  onRefresh: () async {
+                    fetchData();
+                  },
+                  backgroundColor: LightColor.scaffold,
+                  color: LightColor.maincolor,
+                  child: InViewNotifierList(
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    initialInViewIds: const ['0'],
+                    isInViewPortCondition: (double deltaTop, double deltaBottom,
+                        double viewPortDimension) {
+                      return deltaTop < (0.5 * viewPortDimension) &&
+                          deltaBottom > (0.5 * viewPortDimension);
+                    },
+                    itemCount: hiveforums.length,
+                    builder: (BuildContext context, int index) {
+                      return LayoutBuilder(
+                        builder:
+                            (BuildContext context, BoxConstraints constraints) {
+                          return InViewNotifierWidget(
+                            id: '$index',
+                            builder: (BuildContext context, bool isInView,
+                                Widget? child) {
+                              final item = hiveforums[index];
+                              return isVideoLink(item["media"])
+                                  ? VUserPost(
+                                      profilepic: item["profilepic"],
+                                      scrollController: _scrollController,
+                                      addlikelink: "postlikes",
+                                      minuslikelink: "postlikesminus",
+                                      id: item["id"],
+                                      play: isInView,
+                                      name: 'Club',
+                                      url: item['media'],
+                                      content: item['content'],
+                                      likes: item['likes'],
+                                      getcommenturl: 'getclubcomments',
+                                      postcommenturl: 'clubcomments',
+                                    )
+                                  : UserPost(
+                                      profilepic: item["profilepic"],
+                                      scrollController: _scrollController,
+                                      addlikelink: "clublikes",
+                                      minuslikelink: "minusclublikes",
+                                      id: item["id"],
+                                      name: "thejoel",
+                                      image: item['media'],
+                                      content: item['content'],
+                                      likes: item['likes'],
+                                      getcommenturl: 'getclubcomments',
+                                      postcommenturl: 'clubcomments',
+                                    );
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
+                )
+              : Postsloading()
           : RefreshIndicator(
               onRefresh: () async {
                 fetchData();
@@ -221,36 +234,32 @@ class _ClubpostState extends State<Clubpost> {
                             Widget? child) {
                           final item = data[index];
                           return isVideoLink(item["media"])
-                              ? FadeInRight(
-                                  child: VUserPost(
-                                    profilepic: item["profilepic"],
-                                    scrollController: _scrollController,
-                                    addlikelink: "postlikes",
-                                    minuslikelink: "postlikesminus",
-                                    id: item["id"],
-                                    play: isInView,
-                                    name: 'Club',
-                                    url: item['media'],
-                                    content: item['content'],
-                                    likes: item['likes'],
-                                    getcommenturl: 'getclubcomments',
-                                    postcommenturl: 'clubcomments',
-                                  ),
+                              ? VUserPost(
+                                  profilepic: item["profilepic"],
+                                  scrollController: _scrollController,
+                                  addlikelink: "postlikes",
+                                  minuslikelink: "postlikesminus",
+                                  id: item["id"],
+                                  play: isInView,
+                                  name: 'Club',
+                                  url: item['media'],
+                                  content: item['content'],
+                                  likes: item['likes'],
+                                  getcommenturl: 'getclubcomments',
+                                  postcommenturl: 'clubcomments',
                                 )
-                              : FadeInRight(
-                                  child: UserPost(
-                                    profilepic: item["profilepic"],
-                                    scrollController: _scrollController,
-                                    addlikelink: "clublikes",
-                                    minuslikelink: "minusclublikes",
-                                    id: item["id"],
-                                    name: "thejoel",
-                                    image: item['media'],
-                                    content: item['content'],
-                                    likes: item['likes'],
-                                    getcommenturl: 'getclubcomments',
-                                    postcommenturl: 'clubcomments',
-                                  ),
+                              : UserPost(
+                                  profilepic: item["profilepic"],
+                                  scrollController: _scrollController,
+                                  addlikelink: "clublikes",
+                                  minuslikelink: "minusclublikes",
+                                  id: item["id"],
+                                  name: "thejoel",
+                                  image: item['media'],
+                                  content: item['content'],
+                                  likes: item['likes'],
+                                  getcommenturl: 'getclubcomments',
+                                  postcommenturl: 'clubcomments',
                                 );
                         },
                       );

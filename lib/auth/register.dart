@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:animate_do/animate_do.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:dio/dio.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -71,55 +70,55 @@ class _RegisterState extends State<Register> {
   }
 
   //register
-  Future register() async {
-    try {
-      setState(() {
-        isloading = true;
-      });
+  // Future register() async {
+  //   try {
+  //     setState(() {
+  //       isloading = true;
+  //     });
 
-      if (passwordconfirm()) {
-        final addUserResult = await addUser();
-        if (addUserResult) {
-          await fetchData();
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: emailAddressControllerR.text.trim(),
-            password: passwordController.text.trim(),
-          );
-        } else {
-          setState(() {
-            isloading = false;
-          });
-          toast('An error occurred. Please try again');
-        }
-      } else {
-        CherryToast.error(
-          title: const Text(""),
-          backgroundColor: Colors.black45,
-          description: const Text(
-            "Password Mismatch",
-            style: TextStyle(color: Colors.white),
-          ),
-          animationDuration: const Duration(seconds: 1),
-          autoDismiss: true,
-        ).show(context);
-      }
-    } on FirebaseAuthException catch (e) {
-      CherryToast.error(
-        title: const Text(""),
-        backgroundColor: Colors.black45,
-        description: Text(
-          e.message.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-        animationDuration: const Duration(seconds: 1),
-        autoDismiss: true,
-      ).show(context);
-    } finally {
-      setState(() {
-        isloading = true;
-      });
-    }
-  }
+  //     if (passwordconfirm()) {
+  //       final addUserResult = await addUser();
+  //       if (addUserResult) {
+  //         await fetchData();
+  //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  //           email: emailAddressControllerR.text.trim(),
+  //           password: passwordController.text.trim(),
+  //         );
+  //       } else {
+  //         setState(() {
+  //           isloading = false;
+  //         });
+  //         toast('An error occurred. Please try again');
+  //       }
+  //     } else {
+  //       CherryToast.error(
+  //         title: const Text(""),
+  //         backgroundColor: Colors.black45,
+  //         description: const Text(
+  //           "Password Mismatch",
+  //           style: TextStyle(color: Colors.white),
+  //         ),
+  //         animationDuration: const Duration(seconds: 1),
+  //         autoDismiss: true,
+  //       ).show(context);
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     CherryToast.error(
+  //       title: const Text(""),
+  //       backgroundColor: Colors.black45,
+  //       description: Text(
+  //         e.message.toString(),
+  //         style: const TextStyle(color: Colors.white),
+  //       ),
+  //       animationDuration: const Duration(seconds: 1),
+  //       autoDismiss: true,
+  //     ).show(context);
+  //   } finally {
+  //     setState(() {
+  //       isloading = true;
+  //     });
+  //   }
+  // }
 
   Future<bool> addUser() async {
     setState(() {
@@ -271,37 +270,24 @@ class _RegisterState extends State<Register> {
   }
 
   _cropImage(File imgFile) async {
-    final croppedFile = await ImageCropper().cropImage(
-        sourcePath: imgFile.path,
-        aspectRatioPresets: Platform.isAndroid
-            ? [
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio16x9
-              ]
-            : [
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio5x3,
-                CropAspectRatioPreset.ratio5x4,
-                CropAspectRatioPreset.ratio7x5,
-                CropAspectRatioPreset.ratio16x9
-              ],
-        uiSettings: [
-          AndroidUiSettings(
-              toolbarTitle: "Crop",
-              toolbarColor: LightColor.maincolor1,
-              toolbarWidgetColor: Colors.white,
-              initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
-          IOSUiSettings(
-            title: "Crop",
-          )
-        ]);
+    final croppedFile =
+        await ImageCropper().cropImage(sourcePath: imgFile.path, uiSettings: [
+      AndroidUiSettings(
+        toolbarTitle: "Crop",
+        toolbarColor: LightColor.maincolor1,
+        toolbarWidgetColor: Colors.white,
+        initAspectRatio: CropAspectRatioPreset.original,
+        lockAspectRatio: false,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio4x3,
+        ],
+      ),
+      IOSUiSettings(
+        title: "Crop",
+      )
+    ]);
     if (croppedFile != null) {
       imageCache.clear();
       setState(() {
@@ -522,7 +508,7 @@ class _RegisterState extends State<Register> {
                 height: 10,
               ),
               GestureDetector(
-                onTap: register,
+                //  onTap: register,
                 child: Container(
                     height: 50,
                     decoration: BoxDecoration(

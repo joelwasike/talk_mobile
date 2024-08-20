@@ -28,37 +28,24 @@ class _AddPostScreenState extends State<AddPostScreen> {
   }
 
   _cropImage(File imgFile) async {
-    final croppedFile = await ImageCropper().cropImage(
-        sourcePath: imgFile.path,
-        aspectRatioPresets: Platform.isAndroid
-            ? [
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio16x9
-              ]
-            : [
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio5x3,
-                CropAspectRatioPreset.ratio5x4,
-                CropAspectRatioPreset.ratio7x5,
-                CropAspectRatioPreset.ratio16x9
-              ],
-        uiSettings: [
-          AndroidUiSettings(
-              toolbarTitle: "Crop",
-              toolbarColor: LightColor.maincolor1,
-              toolbarWidgetColor: Colors.white,
-              initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
-          IOSUiSettings(
-            title: "Crop",
-          )
-        ]);
+    final croppedFile =
+        await ImageCropper().cropImage(sourcePath: imgFile.path, uiSettings: [
+      AndroidUiSettings(
+        toolbarTitle: "Crop",
+        toolbarColor: LightColor.maincolor1,
+        toolbarWidgetColor: Colors.white,
+        initAspectRatio: CropAspectRatioPreset.original,
+        lockAspectRatio: false,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio4x3,
+        ],
+      ),
+      IOSUiSettings(
+        title: "Crop",
+      )
+    ]);
     if (croppedFile != null) {
       imageCache.clear();
       setState(() {
@@ -86,7 +73,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: LightColor.maincolor1,
-        
         automaticallyImplyLeading: false,
         centerTitle: false,
         actions: <Widget>[
@@ -113,9 +99,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-             
               SizedBox(
-                width: MediaQuery.of(context).size.width/2,
+                width: MediaQuery.of(context).size.width / 2,
                 child: AspectRatio(
                   aspectRatio: 487 / 500,
                   child: Container(
@@ -131,7 +116,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   ),
                 ),
               ),
-               Padding(
+              Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   alignment: Alignment.center,

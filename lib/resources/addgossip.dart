@@ -82,7 +82,8 @@ class _AddGossipState extends State<AddGossip> {
       formData.fields.addAll([
         MapEntry('title', titleController.text),
         MapEntry('content', descriptionController.text),
-        MapEntry('id', userid.toString()),
+        MapEntry('id', "1"),
+        // MapEntry('id', userid.toString()),
       ]);
       if (pickedFile != null) {
         formData.files.addAll([
@@ -174,6 +175,9 @@ class _AddGossipState extends State<AddGossip> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       body: ListView(
         children: [
+          SizedBox(
+            height: 20,
+          ),
           const Text(
             "  Gossip Title",
             style: TextStyle(fontWeight: FontWeight.w700),

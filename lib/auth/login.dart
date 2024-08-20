@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:cherry_toast/cherry_toast.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -46,29 +44,29 @@ class _LoginState extends State<Login> {
   }
 
   Future login() async {
-    try {
-      await fetchData();
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailconroller.text.trim(),
-          password: passwordcontroller.text.trim());
-    } on FirebaseAuthException catch (e) {
-      CherryToast.error(
-              title: const Text(""),
-              backgroundColor: Colors.black45,
-              description: Text(
-                e.message.toString(),
-                style: const TextStyle(color: Colors.white),
-              ),
-              animationDuration: const Duration(milliseconds: 500),
-              autoDismiss: true)
-          .show(context);
-    } finally {
-      if (mounted) {
-        setState(() {
-          isloading = false;
-        });
-      }
-    }
+    // try {
+    //   await fetchData();
+    //   await FirebaseAuth.instance.signInWithEmailAndPassword(
+    //       email: emailconroller.text.trim(),
+    //       password: passwordcontroller.text.trim());
+    // } on FirebaseAuthException catch (e) {
+    //   CherryToast.error(
+    //           title: const Text(""),
+    //           backgroundColor: Colors.black45,
+    //           description: Text(
+    //             e.message.toString(),
+    //             style: const TextStyle(color: Colors.white),
+    //           ),
+    //           animationDuration: const Duration(milliseconds: 500),
+    //           autoDismiss: true)
+    //       .show(context);
+    // } finally {
+    //   if (mounted) {
+    //     setState(() {
+    //       isloading = false;
+    //     });
+    //   }
+    // }
   }
 
   @override

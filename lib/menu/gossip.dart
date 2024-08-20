@@ -1,16 +1,17 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:getwidget/components/shimmer/gf_shimmer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:inview_notifier_list/inview_notifier_list.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:usersms/cubit/fetchdatacubit.dart';
+import 'package:usersms/cubit/fetchdatastate.dart';
 import 'package:usersms/resources/addgossip.dart';
-import 'package:usersms/resources/apiconstatnts.dart';
+import 'package:usersms/resources/postsloading.dart';
 import 'package:usersms/resources/video_user_post.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 import '../resources/photo_user_posts.dart';
 import '../screens/homepage.dart';
 import '../utils/colors.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 class Gossip extends StatefulWidget {
   const Gossip({super.key});
@@ -20,55 +21,7 @@ class Gossip extends StatefulWidget {
 }
 
 class _GossipState extends State<Gossip> {
-  final ScrollController _scrollController =
-      ScrollController(); // Add this line
-  List<Map<String, dynamic>> data = [];
-  bool isloading = false;
-  String? content;
-  String? email;
-  int? id;
-  int? likes;
-  String? media;
-  String? pdf;
-  String? title;
-
-  //get notices
-  Future<void> fetchData() async {
-    try {
-      // setState(() {
-      //   isloading = true;
-      // });
-      final url =
-          Uri.parse('$baseUrl/getgossips'); // Replace with your JSON URL
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-
-        setState(() {
-          data = jsonData.cast<Map<String, dynamic>>();
-        });
-
-        // Now you can access the data as needed.
-        for (final item in data) {
-          content = item['content'];
-          email = item['email'];
-          id = item['id'];
-          likes = item['likes'];
-          media = item['media'];
-          title = item['title'];
-        }
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      throw Exception('Failed to load data');
-    } finally {
-      // setState(() {
-      //   isloading = false;
-      // });
-    }
-  }
+  final ScrollController _scrollController = ScrollController();
 
   bool isVideoLink(String link) {
     final videoExtensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv'];
@@ -83,155 +36,75 @@ class _GossipState extends State<Gossip> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    context.read<Fetchdatacubit>().fetchgossips();
   }
 
   @override
   void dispose() {
-    _scrollController.dispose(); // Dispose the scroll controller
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 40,
-        leading: FadeInLeft(child: const DrawerWidget()),
-        backgroundColor: Colors.black,
-        flexibleSpace: FlexibleSpaceBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              FadeInRight(
-                  child: Text('Campus Gossip',
+      body: CustomScrollView(
+        controller: _scrollController,
+        physics: BouncingScrollPhysics(),
+        slivers: <Widget>[
+          SliverAppBar(
+            floating: true,
+            snap: true,
+            toolbarHeight: 40,
+            leading: FadeInLeft(child: const DrawerWidget()),
+            backgroundColor: Colors.black,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  FadeInRight(
+                    child: Text(
+                      'Campus Trendings',
                       style: GoogleFonts.aguafinaScript(
                         textStyle: TextStyle(
                           color: Colors.grey.shade300,
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
                         ),
-                      ))),
-            ],
-          ),
-        ),
-      ),
-      body: isloading
-          ? ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    SizedBox(
-                      height: 10,
-                    ),
-                    GFShimmer(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 300,
-                            color: Colors.grey.shade800.withOpacity(0.2),
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            width: double.infinity,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.2),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.2),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.25,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.2),
-                          )
-                        ],
                       ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    )
-                  ],
-                );
-              },
-            )
-          : RefreshIndicator(
-              onRefresh: () async {
-                fetchData();
-              },
-              backgroundColor: LightColor.scaffold,
-              color: LightColor.maincolor,
-              child: InViewNotifierList(
-                physics: BouncingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                initialInViewIds: const ['0'],
-                isInViewPortCondition: (double deltaTop, double deltaBottom,
-                    double viewPortDimension) {
-                  return deltaTop < (0.5 * viewPortDimension) &&
-                      deltaBottom > (0.5 * viewPortDimension);
-                },
-                itemCount: data.length,
-                builder: (BuildContext context, int index) {
-                  return LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return InViewNotifierWidget(
-                        id: '$index',
-                        builder: (BuildContext context, bool isInView,
-                            Widget? child) {
-                          final item = data[index];
-                          return isVideoLink(item["media"])
-                              ? FadeInRight(
-                                  child: VUserPost(
-                                    scrollController: _scrollController,
-                                    profilepic: item['profilepic'],
-                                    addlikelink: "postlikes",
-                                    minuslikelink: "postlikesminus",
-                                    id: item["id"],
-                                    play: isInView,
-                                    name: item['title'],
-                                    url: item['media'],
-                                    content: item['content'],
-                                    likes: item['likes'],
-                                    getcommenturl: 'getgossipcomments',
-                                    postcommenturl: 'gossipcomments',
-                                  ),
-                                )
-                              : FadeInRight(
-                                  child: UserPost(
-                                    scrollController: _scrollController,
-                                    profilepic: item['profilepic'],
-                                    addlikelink: "gossiplikes",
-                                    minuslikelink: "minusgossiplikes",
-                                    id: item["id"],
-                                    name: item['title'],
-                                    image: item['media'],
-                                    content: item['content'],
-                                    likes: item['likes'],
-                                    getcommenturl: 'getgossipcomments',
-                                    postcommenturl: 'gossipcomments',
-                                  ),
-                                );
-                        },
-                      );
-                    },
-                  );
-                },
+                  ),
+                ],
               ),
             ),
+          ),
+          BlocBuilder<Fetchdatacubit, Getdatastate>(
+            builder: (context, state) {
+              if (state is Getdataloading || state is Getdatainitial) {
+                var box = Hive.box("Talk");
+                var posts = box.get("gossips");
+                if (posts != null && posts.isNotEmpty) {
+                  return buildSliverPostList(posts);
+                } else {
+                  return SliverToBoxAdapter(child: Postsloading());
+                }
+              } else if (state is Getdataloaded) {
+                return buildSliverPostList(state.data);
+              } else {
+                return SliverToBoxAdapter(
+                  child: Center(
+                    child: Text("Please check your internet"),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor:
-            Colors.transparent, // Set the background color to transparent
+        backgroundColor: Colors.transparent,
         mini: false,
-        shape:
-            const CircleBorder(), // Use CircleBorder to create a round button
+        shape: const CircleBorder(),
         onPressed: () {
           Navigator.push(
             (context),
@@ -242,15 +115,74 @@ class _GossipState extends State<Gossip> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: LightColor.maincolor, // Specify the border color here
+              color: LightColor.maincolor,
             ),
           ),
           child: Center(
-              child: Icon(
-            Icons.add_box,
-            color: LightColor.maincolor,
-          )),
+            child: Icon(
+              Icons.add_box,
+              color: LightColor.maincolor,
+            ),
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget buildSliverPostList(List posts) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (BuildContext context, int index) {
+          final item = posts[index];
+          return LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              if (isVideoLink(item["media"])) {
+                return VisibilityDetector(
+                  key: Key(item['id'].toString()),
+                  onVisibilityChanged: (visibilityInfo) {
+                    double visiblePercentage =
+                        visibilityInfo.visibleFraction * 100;
+                    bool isMoreThanHalfVisible = visiblePercentage > 50;
+                    if (mounted) {
+                      setState(() {
+                        item['isVisible'] = isMoreThanHalfVisible;
+                      });
+                    }
+                  },
+                  child: VUserPost(
+                    scrollController: _scrollController,
+                    profilepic: item['profilepic'],
+                    addlikelink: "postlikes",
+                    minuslikelink: "postlikesminus",
+                    id: item["id"],
+                    play: item['isVisible'] ?? false,
+                    name: item['title'],
+                    url: item['media'],
+                    content: item['content'],
+                    likes: item['likes'],
+                    getcommenturl: 'getgossipcomments',
+                    postcommenturl: 'gossipcomments',
+                  ),
+                );
+              } else {
+                return UserPost(
+                  scrollController: _scrollController,
+                  profilepic: item['profilepic'],
+                  addlikelink: "gossiplikes",
+                  minuslikelink: "minusgossiplikes",
+                  id: item["id"],
+                  name: item['title'],
+                  image: item['media'],
+                  content: item['content'],
+                  likes: item['likes'],
+                  getcommenturl: 'getgossipcomments',
+                  postcommenturl: 'gossipcomments',
+                );
+              }
+            },
+          );
+        },
+        childCount: posts.length,
       ),
     );
   }

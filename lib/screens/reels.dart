@@ -57,10 +57,9 @@ class _ReelsState extends State<Reels> {
     } finally {
       if (mounted) {
         setState(() {
-        isloading = false;
-      });
+          isloading = false;
+        });
       }
-      
     }
   }
 
@@ -81,11 +80,6 @@ class _ReelsState extends State<Reels> {
               Swiper(
                 itemBuilder: (BuildContext context, int index) {
                   return ShortsMainScreen(url: data, startIndex: index);
-
-                  // ContentScreen(
-                  //   videos: videos,
-                  //   src: videos[index],
-                  // );
                 },
                 itemCount: data.length,
                 scrollDirection: Axis.vertical,

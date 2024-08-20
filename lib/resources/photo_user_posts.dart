@@ -6,12 +6,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/comments.dart';
+import 'package:usersms/resources/sharepost.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'heartanimationwidget.dart';
 import 'image_data.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:page_transition/page_transition.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 
@@ -130,14 +132,16 @@ class _UserPostState extends State<UserPost> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(bottom: 8, top: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
                   CircleAvatar(
-                    backgroundImage: NetworkImage(widget.profilepic),
+                    maxRadius: 17,
+                    backgroundImage:
+                        CachedNetworkImageProvider(widget.profilepic),
                   ),
                   const SizedBox(
                     width: 10,
@@ -240,251 +244,185 @@ class _UserPostState extends State<UserPost> {
             children: [
               Row(
                 children: [
-                  HeartAnimationWidget(
-                    alwaysAnimate: true,
-                    isAnimating: isliked,
-                    child: IconButton(
-                      icon: Icon(
-                        isliked ? Icons.favorite : FontAwesomeIcons.heart,
-                        color: isliked ? Colors.red : Colors.grey.shade300,
-                        size: 28,
+                  Stack(
+                    children: [
+                      HeartAnimationWidget(
+                        alwaysAnimate: true,
+                        isAnimating: isliked,
+                        child: IconButton(
+                          icon: Icon(
+                            isliked ? Icons.favorite : FontAwesomeIcons.heart,
+                            color: isliked ? Colors.red : Colors.grey.shade300,
+                            size: 25,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isliked = !isliked;
+                              if (isliked) {
+                                setState(() {
+                                  likes++;
+                                });
+                                likepost();
+                              }
+                              if (!isliked) {
+                                setState(() {
+                                  likes--;
+                                });
+                                minuslikepost();
+                              }
+                            });
+                          },
+                        ),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          isliked = !isliked;
-                          if (isliked) {
-                            setState(() {
-                              likes++;
-                            });
-                            likepost();
-                          }
-                          if (!isliked) {
-                            setState(() {
-                              likes--;
-                            });
-                            minuslikepost();
-                          }
-                        });
-                      },
-                    ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Text(
+                            likes.toString(),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                          useSafeArea: true,
-                          isScrollControlled: true,
-                          enableDrag: true,
-                          context: context,
-                          builder: (context) => Container(
-                              padding: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom),
-                              decoration: const BoxDecoration(
-                                  color: LightColor.maincolor1,
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(25),
-                                      topLeft: Radius.circular(25))),
+                  Stack(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                              type: PageTransitionType.rightToLeft,
                               child: Comments(
                                 getcommenturl: widget.getcommenturl,
                                 postcommenturl: widget.postcommenturl,
                                 postid: widget.id,
-                              )));
-                    },
-                    icon: Icon(
-                      FontAwesomeIcons.message,
-                      color: Colors.grey.shade300,
-                    ),
+                              ),
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                          FontAwesomeIcons.comment,
+                          size: 23,
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Text(
+                            likes.toString(),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   IconButton(
                     onPressed: () {
-                      List<String> selectedNames = [];
-
-                      showModalBottomSheet(
-                          useSafeArea: true,
-                          isScrollControlled: true,
-                          enableDrag: true,
-                          context: context,
-                          builder: (context) => Container(
-                                decoration: const BoxDecoration(
-                                    color: LightColor.maincolor1,
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(25),
-                                        topLeft: Radius.circular(25))),
-                                child: Column(
-                                  children: [
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const Text(
-                                      "Select friends to share",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: LightColor.background),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey.shade800,
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 16, left: 16, right: 16),
-                                            child: TextField(
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                hintText: "Search friends...",
-                                                hintStyle: TextStyle(
-                                                    color:
-                                                        Colors.grey.shade600),
-                                                prefixIcon: Icon(
-                                                  Icons.search,
-                                                  color: Colors.grey.shade600,
-                                                  size: 20,
-                                                ),
-                                                filled: true,
-                                                fillColor:
-                                                    LightColor.maincolor1,
-                                                contentPadding:
-                                                    const EdgeInsets.all(8),
-                                                enabledBorder:
-                                                    OutlineInputBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20),
-                                                        borderSide: BorderSide(
-                                                            color: Colors.grey
-                                                                .shade600)),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 20),
-                                          Expanded(
-                                            child: ListView.builder(
-                                              physics:
-                                                  const BouncingScrollPhysics(),
-                                              itemCount: people.length,
-                                              itemBuilder: (context, index) {
-                                                final isSelected = selectedNames
-                                                    .contains(people[index]);
-
-                                                return LongPressSelectableTile(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      if (selectedNames
-                                                          .isNotEmpty) {
-                                                        if (isSelected) {
-                                                          selectedNames.remove(
-                                                              people[index]);
-                                                        }
-                                                        if (!isSelected) {
-                                                          selectedNames.add(
-                                                              people[index]);
-                                                        }
-                                                      }
-                                                    });
-                                                  },
-                                                  onLongPress: () {
-                                                    setState(() {
-                                                      if (!isSelected) {
-                                                        selectedNames
-                                                            .add(people[index]);
-                                                      } else {
-                                                        selectedNames.remove(
-                                                            people[index]);
-                                                      }
-                                                    });
-                                                  },
-                                                  isSelected: isSelected,
-                                                  name: people[index],
-                                                  image:
-                                                      imageList[index].imageUrl,
-                                                  followers: "200k",
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ));
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          type: PageTransitionType.rightToLeft,
+                          child: Sharepost(
+                            getcommenturl: widget.getcommenturl,
+                            postcommenturl: widget.postcommenturl,
+                            postid: widget.id,
+                          ),
+                        ),
+                      );
                     },
-                    icon: Transform(
-                      transform: Matrix4.rotationZ(5.8),
-                      child: Icon(
-                        Icons.send,
-                        color: Colors.grey.shade300,
-                      ),
+                    icon: Icon(
+                      FontAwesomeIcons.paperPlane,
+                      size: 21,
+                      color: Colors.grey.shade300,
                     ),
                   ),
                 ],
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: _progress != null
-                    ? SpinKitThreeBounce(
-                        color: Colors.white,
-                        size: 25,
-                      )
-                    : IconButton(
-                        onPressed: () async {
-                          FileDownloader.downloadFile(
-                              url: widget.image!.trim(),
-                              onProgress: (name, progress) {
-                                setState(() {
-                                  _progress = progress;
-                                });
-                              },
-                              onDownloadCompleted: (value) {
-                                print('path  $value ');
-                                setState(() {
-                                  _progress = null;
-                                });
-                                CherryToast.success(
-                                        title: const Text(""),
-                                        backgroundColor:
-                                            Colors.black.withOpacity(0.9),
-                                        description: Text(
-                                          "Download complete",
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
-                                        animationDuration:
-                                            const Duration(milliseconds: 500),
-                                        autoDismiss: true)
-                                    .show(context);
+              Flexible(
+                // Wrapping the Column with Flexible
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _progress != null
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            LinearProgressIndicator(
+                              // Removed SizedBox
+                              value: _progress,
+                              backgroundColor: Colors.grey.shade300,
+                              color: Colors.blue,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "${(_progress! * 100).toStringAsFixed(0)}%",
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        )
+                      : IconButton(
+                          onPressed: () async {
+                            setState(() {
+                              _progress = 0.0; // Initialize progress
+                            });
+                            try {
+                              //You can download a single file
+                              await FileDownloader.downloadFile(
+                                url: widget.image!.trim(),
+                                onProgress: (name, progress) {
+                                  setState(() {
+                                    _progress = progress;
+                                  });
+                                },
+                                onDownloadCompleted: (value) {
+                                  print('Downloaded to path: $value');
+                                  setState(() {
+                                    _progress = null;
+                                  });
+                                  CherryToast.success(
+                                    title: const Text(""),
+                                    backgroundColor:
+                                        Colors.black.withOpacity(0.9),
+                                    description: const Text(
+                                      "Download complete",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    animationDuration:
+                                        const Duration(milliseconds: 500),
+                                    autoDismiss: true,
+                                  ).show(context);
+                                },
+                              );
+                            } catch (e) {
+                              setState(() {
+                                _progress = null;
                               });
-                        },
-                        icon: Icon(
-                          Icons.download_rounded,
-                          color: Colors.grey.shade300,
+                              CherryToast.error(
+                                title: const Text("Download Failed"),
+                                backgroundColor: Colors.red.withOpacity(0.9),
+                                description: Text(
+                                  e.toString(),
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                animationDuration:
+                                    const Duration(milliseconds: 500),
+                                autoDismiss: true,
+                              ).show(context);
+                            }
+                          },
+                          icon: Icon(
+                            FontAwesomeIcons.download,
+                            color: Colors.grey.shade300,
+                            size: 21,
+                          ),
                         ),
-                      ),
+                ),
               ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              const Text(
-                "Liked by ",
-              ),
-              Text(
-                "$likes",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const Text(
-                " students",
-              )
             ],
           ),
         ),

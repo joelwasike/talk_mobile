@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/shimmer/gf_shimmer.dart';
@@ -7,6 +6,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -20,12 +20,17 @@ class SearchScreen extends StatefulWidget {
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends State<SearchScreen>
+    with AutomaticKeepAliveClientMixin {
   final TextEditingController searchController = TextEditingController();
   bool isShowUsers = false;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -63,7 +68,8 @@ class PinterestGrid extends StatefulWidget {
   State<PinterestGrid> createState() => _PinterestGridState();
 }
 
-class _PinterestGridState extends State<PinterestGrid> {
+class _PinterestGridState extends State<PinterestGrid>
+    with AutomaticKeepAliveClientMixin {
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
   String? content;
@@ -107,9 +113,11 @@ class _PinterestGridState extends State<PinterestGrid> {
     } catch (e) {
       print(e);
     } finally {
-      setState(() {
-        isloading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isloading = false;
+        });
+      }
     }
   }
 
@@ -172,7 +180,11 @@ class _PinterestGridState extends State<PinterestGrid> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -203,7 +215,7 @@ class _PinterestGridState extends State<PinterestGrid> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 2),
+            padding: const EdgeInsets.only(top: 8),
             child: Container(
               child: StaggeredGrid.count(
                 mainAxisSpacing: 2.0,
@@ -224,7 +236,9 @@ class _PinterestGridState extends State<PinterestGrid> {
                             ),
                           );
                         },
-                        child: ImageCard(imageData: data[index]["media"])),
+                        child: Hero(
+                            tag: data[index]["id"],
+                            child: ImageCard(imageData: data[index]["media"]))),
                   ),
                 ),
               ),
@@ -236,20 +250,18 @@ class _PinterestGridState extends State<PinterestGrid> {
   }
 }
 
-class ImageCard extends StatelessWidget {
+class ImageCard extends StatefulWidget {
   const ImageCard({Key? key, required this.imageData}) : super(key: key);
 
   final String imageData;
 
-  Future<String> generateVideoThumbnail(String videoUrl) async {
-    final thumbnailPath = await VideoThumbnail.thumbnailFile(
-      video: videoUrl,
-      quality: 75, // Adjust the quality (0 - 100)
-      maxHeight: 128, // Maximum height of the thumbnail
-    );
+  @override
+  State<ImageCard> createState() => _ImageCardState();
+}
 
-    return thumbnailPath!;
-  }
+class _ImageCardState extends State<ImageCard> {
+  VideoPlayerController? _videoController;
+  late Future<void> _initializeVideoPlayerFuture;
 
   bool isVideoLink(String link) {
     final videoExtensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv'];
@@ -258,26 +270,44 @@ class ImageCard extends StatelessWidget {
         return true;
       }
     }
-
     return false;
   }
 
   @override
+  void initState() {
+    super.initState();
+    if (isVideoLink(widget.imageData)) {
+      _videoController =
+          VideoPlayerController.networkUrl(Uri.parse(widget.imageData));
+      _initializeVideoPlayerFuture = _videoController!.initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized
+        setState(() {});
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    bool isVideo = isVideoLink(imageData);
+    bool isVideo = isVideoLink(widget.imageData);
     return ClipRRect(
       borderRadius: BorderRadius.circular(6.0),
       child: isVideo
-          ? FutureBuilder<String>(
-              future: generateVideoThumbnail(imageData),
+          ? FutureBuilder(
+              future: _initializeVideoPlayerFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return Stack(
                     alignment: Alignment.center,
                     children: [
-                      Image.file(
-                        File(snapshot.data!),
-                        fit: BoxFit.cover,
+                      AspectRatio(
+                        aspectRatio: _videoController!.value.aspectRatio,
+                        child: VideoPlayer(_videoController!),
                       ),
                       Center(
                         child: Icon(
@@ -289,13 +319,13 @@ class ImageCard extends StatelessWidget {
                     ],
                   );
                 } else {
-                  return Container(); // Show a loading indicator
+                  return Center(child: Container());
                 }
               },
             )
           : CachedNetworkImage(
-              imageUrl: imageData, fit: BoxFit.cover,
-
+              imageUrl: widget.imageData,
+              fit: BoxFit.cover,
               placeholder: (context, url) => GFShimmer(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,9 +338,7 @@ class ImageCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // Placeholder while loading
             ),
-      // Image.network(imageData.imageUrl, fit: BoxFit.cover),
     );
   }
 }
@@ -322,7 +350,8 @@ class FriendsTab extends StatefulWidget {
   State<FriendsTab> createState() => _FriendsTabState();
 }
 
-class _FriendsTabState extends State<FriendsTab> {
+class _FriendsTabState extends State<FriendsTab>
+    with AutomaticKeepAliveClientMixin {
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
   String? campus = "";
@@ -438,7 +467,11 @@ class _FriendsTabState extends State<FriendsTab> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

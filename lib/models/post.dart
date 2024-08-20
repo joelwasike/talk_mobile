@@ -1,48 +1,34 @@
-
 class Post {
-  final String description;
-  final String uid;
-  final String username;
-  final likes;
-  final String postId;
-  final DateTime datePublished;
-  final String postUrl;
-  final String profImage;
+  String content;
+  String email;
+  int id;
+  int likes;
+  String media;
+  String profilePicture;
+  int userId;
+  String username;
 
-  const Post(
-      {required this.description,
-      required this.uid,
-      required this.username,
-      required this.likes,
-      required this.postId,
-      required this.datePublished,
-      required this.postUrl,
-      required this.profImage,
-      });
+  Post({
+    required this.content,
+    required this.email,
+    required this.id,
+    required this.likes,
+    required this.media,
+    required this.profilePicture,
+    required this.userId,
+    required this.username,
+  });
 
-  static Post fromSnap(snap) {
-    var snapshot = snap.data() as Map<String, dynamic>;
-
+  factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
-      description: snapshot["description"],
-      uid: snapshot["uid"],
-      likes: snapshot["likes"],
-      postId: snapshot["postId"],
-      datePublished: snapshot["datePublished"],
-      username: snapshot["username"],
-      postUrl: snapshot['postUrl'],
-      profImage: snapshot['profImage']
+      content: json['content'] ?? '',
+      email: json['email'] ?? '',
+      id: json['id'] ?? 0,
+      likes: json['likes'] ?? 0,
+      media: json['media'] ?? '',
+      profilePicture: json['profilepicture'] ?? '',
+      userId: json['userid'] ?? 0,
+      username: json['username'] ?? '',
     );
   }
-
-   Map<String, dynamic> toJson() => {
-        "description": description,
-        "uid": uid,
-        "likes": likes,
-        "username": username,
-        "postId": postId,
-        "datePublished": datePublished,
-        'postUrl': postUrl,
-        'profImage': profImage
-      };
 }

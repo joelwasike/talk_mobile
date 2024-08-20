@@ -1,15 +1,16 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:usersms/resources/apiconstatnts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:usersms/cubit/fetchdatacubit.dart';
+import 'package:usersms/cubit/fetchdatastate.dart';
 import 'package:usersms/resources/club_post.dart';
 import 'package:usersms/resources/clubcred.dart';
 import 'package:usersms/resources/isloadong.dart';
 import 'package:usersms/widgets/club_card.dart';
 import '../screens/homepage.dart';
 import '../utils/colors.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 class Clubs extends StatefulWidget {
   const Clubs({super.key});
@@ -23,28 +24,6 @@ class _ClubsState extends State<Clubs> {
 
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
-
-  Future<void> fetchData() async {
-    setState(() {
-      isloading = true;
-    });
-    final url = Uri.parse('$baseUrl/getclubs'); // Replace with your JSON URL
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-
-      setState(() {
-        data = jsonData.cast<Map<String, dynamic>>();
-        filteredData = List.from(data);
-      });
-      setState(() {
-        isloading = false;
-      });
-    } else {
-      throw Exception('Failed to load data');
-    }
-  }
 
   // Method to filter data based on search query
   void filterData(String query) {
@@ -60,7 +39,7 @@ class _ClubsState extends State<Clubs> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchData();
+    context.read<Fetchdatacubit>().fetchClublist();
   }
 
   @override
@@ -120,6 +99,9 @@ class _ClubsState extends State<Clubs> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(
+                  height: 10,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 2, left: 6, right: 2),
                   child: TextField(
@@ -152,30 +134,100 @@ class _ClubsState extends State<Clubs> {
                   height: 5,
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: filteredData.length,
-                    itemBuilder: (context, index) {
-                      final club = filteredData[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            (context),
-                            MaterialPageRoute(
-                                builder: (context) => Clubpost(
-                                      title: club['name'],
-                                      clubid: club["id"],
-                                    )),
+                  child: BlocBuilder<Fetchdatacubit, Getdatastate>(
+                    builder: (context, state) {
+                      if (state is Getdatainitial) {
+                        var box = Hive.box("Talk");
+                        var posts = box.get("clublist");
+                        if (posts != null && posts.isNotEmpty) {
+                          return ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: posts.length,
+                            itemBuilder: (context, index) {
+                              final club = posts[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    (context),
+                                    MaterialPageRoute(
+                                        builder: (context) => Clubpost(
+                                              title: club['name'],
+                                              clubid: club["id"],
+                                            )),
+                                  );
+                                },
+                                child: ClubCard(
+                                  name: club['name'],
+                                  image: club['profilepicture'],
+                                  description: club['description'],
+                                ),
+                              );
+                            },
                           );
-                        },
-                        child: FadeInRight(
-                          child: ClubCard(
-                            name: club['name'],
-                            image: club['profilepicture'],
-                            description: club['description'],
-                          ),
-                        ),
-                      );
+                        } else {
+                          return Isloading();
+                        }
+                      } else if (state is Getdataloading) {
+                        var box = Hive.box("Talk");
+                        var posts = box.get("clublist");
+                        if (posts != null && posts.isNotEmpty) {
+                          return ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: posts.length,
+                            itemBuilder: (context, index) {
+                              final club = posts[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    (context),
+                                    MaterialPageRoute(
+                                        builder: (context) => Clubpost(
+                                              title: club['name'],
+                                              clubid: club["id"],
+                                            )),
+                                  );
+                                },
+                                child: ClubCard(
+                                  name: club['name'],
+                                  image: club['profilepicture'],
+                                  description: club['description'],
+                                ),
+                              );
+                            },
+                          );
+                        } else {
+                          return Isloading();
+                        }
+                      } else if (state is Getdataloaded) {
+                        return ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: state.data.length,
+                          itemBuilder: (context, index) {
+                            final club = state.data[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  (context),
+                                  MaterialPageRoute(
+                                      builder: (context) => Clubpost(
+                                            title: club['name'],
+                                            clubid: club["id"],
+                                          )),
+                                );
+                              },
+                              child: ClubCard(
+                                name: club['name'],
+                                image: club['profilepicture'],
+                                description: club['description'],
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return Center(
+                          child: Text("Please check your internet"),
+                        );
+                      }
                     },
                   ),
                 ),

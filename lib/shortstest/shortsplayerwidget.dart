@@ -1,15 +1,16 @@
 import 'dart:convert';
-import 'package:cached_video_player/cached_video_player.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/comments.dart';
 import 'package:usersms/resources/heartanimationwidget.dart';
 import 'package:usersms/utils/colors.dart';
+import 'package:video_player/video_player.dart';
 
 class ShortsPlayer extends StatefulWidget {
   final String previousvidvidurl;
@@ -43,10 +44,10 @@ class ShortsPlayer extends StatefulWidget {
 
 class _ShortsPlayerState extends State<ShortsPlayer> {
   double? _progress;
-  CachedVideoPlayerController? nextVideoController;
-  CachedVideoPlayerController? previousVideoController;
+  VideoPlayerController? nextVideoController;
+  VideoPlayerController? previousVideoController;
 
-  late CachedVideoPlayerController? videoPlayerController;
+  late VideoPlayerController? videoPlayerController;
   bool isHeartAnimating = false;
   bool isliked = false;
   Color likeBtnColor = Colors.white,
@@ -126,7 +127,7 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
 
   void initVideoController() {
     videoPlayerController =
-        CachedVideoPlayerController.network(widget.shortsUrl)
+        VideoPlayerController.networkUrl(Uri.parse(widget.shortsUrl))
           ..initialize().then((_) {
             videoPlayerController!.setLooping(true);
             videoPlayerController!.setVolume(1);
@@ -142,22 +143,23 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
   }
 
   void initNextVideoController() {
-    nextVideoController = CachedVideoPlayerController.network(widget.nextvidurl)
-      ..initialize().then((_) {
-        nextVideoController!.setLooping(true);
-        nextVideoController!.setVolume(1);
-        if (widget.play) {
-          videoPlayerController!.pause();
-        } else {
-          videoPlayerController!.play();
-        }
-        setState(() {});
-      });
+    nextVideoController =
+        VideoPlayerController.networkUrl(Uri.parse(widget.nextvidurl))
+          ..initialize().then((_) {
+            nextVideoController!.setLooping(true);
+            nextVideoController!.setVolume(1);
+            if (widget.play) {
+              videoPlayerController!.pause();
+            } else {
+              videoPlayerController!.play();
+            }
+            setState(() {});
+          });
   }
 
   void initPrevVideoController() {
     previousVideoController =
-        CachedVideoPlayerController.network(widget.previousvidvidurl)
+        VideoPlayerController.networkUrl(Uri.parse(widget.previousvidvidurl))
           ..initialize().then((_) {
             previousVideoController!.setLooping(true);
             previousVideoController!.setVolume(1);
@@ -226,7 +228,7 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            CachedVideoPlayer(videoPlayerController!),
+            VideoPlayer(videoPlayerController!),
             Opacity(
               opacity: isHeartAnimating ? 1 : 0,
               child: HeartAnimationWidget(
@@ -384,27 +386,16 @@ class _ShortsPlayerState extends State<ShortsPlayer> {
                               padding: const EdgeInsets.only(bottom: 25),
                               child: InkWell(
                                 onTap: () {
-                                  showModalBottomSheet(
-                                      useSafeArea: true,
-                                      isScrollControlled: true,
-                                      enableDrag: true,
-                                      context: context,
-                                      builder: (context) => Container(
-                                          padding: EdgeInsets.only(
-                                              bottom: MediaQuery.of(context)
-                                                  .viewInsets
-                                                  .bottom),
-                                          decoration: const BoxDecoration(
-                                              color: LightColor.maincolor1,
-                                              borderRadius: BorderRadius.only(
-                                                  topRight: Radius.circular(25),
-                                                  topLeft:
-                                                      Radius.circular(25))),
-                                          child: Comments(
-                                            getcommenturl: "getpostcomments",
-                                            postcommenturl: "comments",
-                                            postid: widget.id,
-                                          )));
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        child: Comments(
+                                          getcommenturl: "getpostcomments",
+                                          postcommenturl: "comments",
+                                          postid: widget.id,
+                                        )),
+                                  );
                                 },
                                 child: Column(
                                   children: [

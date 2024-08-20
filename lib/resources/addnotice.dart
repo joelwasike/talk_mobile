@@ -61,7 +61,7 @@ class _AddnoticeState extends State<Addnotice> {
       formData.fields.addAll([
         MapEntry('title', titleController.text),
         MapEntry('content', descriptionController.text),
-        const MapEntry('email', "daviswasike@gmail.com"),
+        MapEntry('id', "6"),
       ]);
       formData.files.addAll([
         MapEntry(
@@ -210,39 +210,26 @@ class _AddnoticeState extends State<Addnotice> {
   }
 
   _cropImage(File imgFile) async {
-    final croppedFile = await ImageCropper().cropImage(
-        sourcePath: imgFile.path,
-        aspectRatioPresets: Platform.isAndroid
-            ? [
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio16x9
-              ]
-            : [
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio5x3,
-                CropAspectRatioPreset.ratio5x4,
-                CropAspectRatioPreset.ratio7x5,
-                CropAspectRatioPreset.ratio16x9
-              ],
-        uiSettings: [
-          AndroidUiSettings(
-              toolbarTitle: "Crop",
-              toolbarColor: LightColor.maincolor1,
-              toolbarWidgetColor: Colors.white,
-              initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
-          IOSUiSettings(
-            title: "Crop",
-          )
-        ]);
+    final croppedFile =
+        await ImageCropper().cropImage(sourcePath: imgFile.path, uiSettings: [
+      AndroidUiSettings(
+        toolbarTitle: "Crop",
+        toolbarColor: LightColor.maincolor1,
+        toolbarWidgetColor: Colors.white,
+        initAspectRatio: CropAspectRatioPreset.original,
+        lockAspectRatio: false,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio4x3,
+        ],
+      ),
+      IOSUiSettings(
+        title: "Crop",
+      )
+    ]);
     if (croppedFile != null) {
-      imageCache.clear();
+      // imageCache.clear();
       setState(() {
         imagefile = File(croppedFile.path);
       });
@@ -300,6 +287,9 @@ class _AddnoticeState extends State<Addnotice> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       body: ListView(
         children: [
+          SizedBox(
+            height: 20,
+          ),
           const Text(
             "  Notice Title",
             style: TextStyle(fontWeight: FontWeight.w700),
@@ -429,11 +419,14 @@ class _AddnoticeState extends State<Addnotice> {
                             Icons.file_present,
                             color: LightColor.maincolor,
                           ),
-                          const SizedBox(height: 10),
-                          const SizedBox(height: 5),
-                          Text(
-                            selectedPdf!.path.split('/').last,
-                            style: const TextStyle(fontSize: 16),
+                          const SizedBox(width: 10), // Changed height to width
+                          Flexible(
+                            child: Text(
+                              selectedPdf!.path.split('/').last,
+                              style: const TextStyle(fontSize: 12),
+                              softWrap:
+                                  true, // Ensures the text wraps to the next line
+                            ),
                           ),
                         ],
                       )

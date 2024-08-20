@@ -195,37 +195,24 @@ class _ProfileScrenState extends State<ProfileScren> {
   }
 
   _cropImage(File imgFile) async {
-    final croppedFile = await ImageCropper().cropImage(
-        sourcePath: imgFile.path,
-        aspectRatioPresets: Platform.isAndroid
-            ? [
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio16x9
-              ]
-            : [
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio5x3,
-                CropAspectRatioPreset.ratio5x4,
-                CropAspectRatioPreset.ratio7x5,
-                CropAspectRatioPreset.ratio16x9
-              ],
-        uiSettings: [
-          AndroidUiSettings(
-              toolbarTitle: "Crop",
-              toolbarColor: LightColor.maincolor1,
-              toolbarWidgetColor: Colors.white,
-              initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
-          IOSUiSettings(
-            title: "Crop",
-          )
-        ]);
+    final croppedFile =
+        await ImageCropper().cropImage(sourcePath: imgFile.path, uiSettings: [
+      AndroidUiSettings(
+        toolbarTitle: "Crop",
+        toolbarColor: LightColor.maincolor1,
+        toolbarWidgetColor: Colors.white,
+        initAspectRatio: CropAspectRatioPreset.original,
+        lockAspectRatio: false,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio4x3,
+        ],
+      ),
+      IOSUiSettings(
+        title: "Crop",
+      )
+    ]);
     if (croppedFile != null) {
       imageCache.clear();
       setState(() {

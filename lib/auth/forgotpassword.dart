@@ -1,6 +1,5 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cherry_toast/cherry_toast.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:usersms/glassbox.dart';
@@ -16,29 +15,29 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   final emailconroller = TextEditingController();
 
   Future changePassword() async {
-    try {
-      FirebaseAuth.instance
-          .sendPasswordResetEmail(email: emailconroller.text.trim());
+    // try {
+    //   FirebaseAuth.instance
+    //       .sendPasswordResetEmail(email: emailconroller.text.trim());
 
-      CherryToast.info(
-        animationDuration: const Duration(milliseconds: 500),
-        backgroundColor: Colors.black45,
-        title: const Text("Password recovery", style: TextStyle(color: Colors.white),),
-        action: const Text("Email link sent. Check email",style: TextStyle(color: Colors.white)),
-        actionHandler: () {
-          print("Action button pressed");
-        },
-      ).show(context);
-    } on FirebaseAuthException catch (e) {
-      print(e);
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              content: Text(e.message.toString()),
-            );
-          });
-    }
+    //   CherryToast.info(
+    //     animationDuration: const Duration(milliseconds: 500),
+    //     backgroundColor: Colors.black45,
+    //     title: const Text("Password recovery", style: TextStyle(color: Colors.white),),
+    //     action: const Text("Email link sent. Check email",style: TextStyle(color: Colors.white)),
+    //     actionHandler: () {
+    //       print("Action button pressed");
+    //     },
+    //   ).show(context);
+    // } on FirebaseAuthException catch (e) {
+    //   print(e);
+    //   showDialog(
+    //       context: context,
+    //       builder: (context) {
+    //         return AlertDialog(
+    //           content: Text(e.message.toString()),
+    //         );
+    //       });
+    // }
   }
 
   @override

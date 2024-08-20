@@ -169,11 +169,13 @@ class _PeopleFCardState extends State<PeopleFCard> {
                         child: !following
                             ? Text(
                                 "Follow",
-                                style: TextStyle(color: LightColor.maincolor),
+                                style: TextStyle(
+                                    color: LightColor.maincolor, fontSize: 12),
                               )
                             : Text(
                                 "Unfollow",
-                                style: TextStyle(color: LightColor.maincolor),
+                                style: TextStyle(
+                                    color: LightColor.maincolor, fontSize: 12),
                               )),
                   ),
                 ),

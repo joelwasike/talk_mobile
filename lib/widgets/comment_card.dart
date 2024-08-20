@@ -20,122 +20,79 @@ class CommentCard extends StatefulWidget {
 
 class _CommentCardState extends State<CommentCard> {
   bool isliked = false;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundImage: NetworkImage(
-              widget.profilepic,
-            ),
-            radius: 20,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RichText(
-                    text: TextSpan(
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage(widget.profilepic),
+                radius: 20,
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        TextSpan(
-                            text: "${widget.username}:  ",
-                            // text: snap.data()['name'],
-                            style: TextStyle(
-                                color: LightColor.maincolor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16)),
-                        TextSpan(
-                            text: widget.content,
-                            style: TextStyle(
-                              color: LightColor.background,
-                              fontWeight: FontWeight.normal,
-                            )),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Text(
+                        Text(
+                          "Joel Wasike",
+                          style: TextStyle(
+                            color: LightColor.maincolor,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
                           widget.date,
                           style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.grey),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.grey,
+                          ),
                         ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                isliked = !isliked;
-              });
-            },
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              child: !isliked
-                  ? const Icon(
-                      Icons.favorite_border_outlined,
-                      color: Colors.white,
-                      size: 20,
-                    )
-                  : const Icon(
-                      Icons.favorite,
-                      color: Colors.red,
-                      size: 20,
+                      ],
                     ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMessageInput() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade700),
+                    SizedBox(height: 4),
+                    Text(
+                      widget.content,
+                      style: TextStyle(
+                          color: LightColor.background,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isliked = !isliked;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Icon(
+                    isliked ? Icons.favorite : Icons.favorite_border_outlined,
+                    color: isliked ? Colors.red : Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: CircleAvatar(
-              backgroundImage: AssetImage("assets/airtime.jpg"),
-            ),
-          ),
-          Expanded(
-            child: TextField(
-              // controller: _messageController,
-              decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                  border: InputBorder.none,
-                  hintText: "    Write Comment",
-                  hintStyle: TextStyle(color: Colors.grey.shade400)),
-            ),
-          ),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.send,
-                color: LightColor.maincolor,
-              ))
-        ],
-      ),
+        Divider(
+          color: Colors.grey.shade700,
+          height: .5,
+        ),
+      ],
     );
   }
 }

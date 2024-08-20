@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/services.dart';
+import 'package:usersms/widgets/bottomnav.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,7 +16,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     super.initState();
     // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushNamed(context, '/auth');
+      //  Navigator.pushNamed(context, '/auth');
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return BottomNav();
+      }));
     });
   }
 
@@ -58,9 +62,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     ),
                   ),
                 ),
-                
-               
-               
               ]),
             ),
           ),

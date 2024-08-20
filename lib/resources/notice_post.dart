@@ -5,8 +5,10 @@ import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/comments.dart';
+import 'package:usersms/resources/sharepost.dart';
 import 'package:usersms/utils/colors.dart';
 import 'heartanimationwidget.dart';
 import 'dart:convert';
@@ -186,165 +188,183 @@ class _NoticePostState extends State<NoticePost> {
             children: [
               Row(
                 children: [
-                  HeartAnimationWidget(
-                    alwaysAnimate: true,
-                    isAnimating: isliked,
-                    child: IconButton(
-                      icon: Icon(
-                        isliked ? Icons.favorite : Icons.favorite_outline,
-                        color: isliked ? Colors.red : Colors.grey.shade300,
-                        size: 28,
+                  Stack(
+                    children: [
+                      HeartAnimationWidget(
+                        alwaysAnimate: true,
+                        isAnimating: isliked,
+                        child: IconButton(
+                          icon: Icon(
+                            isliked ? Icons.favorite : Icons.favorite_outline,
+                            color: isliked ? Colors.red : Colors.grey.shade300,
+                            size: 28,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isliked = !isliked;
+                              if (isliked) {
+                                setState(() {
+                                  likes++;
+                                });
+                                likepost();
+                              }
+                              if (!isliked) {
+                                setState(() {
+                                  likes--;
+                                });
+                                minuslikepost();
+                              }
+                            });
+                          },
+                        ),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          isliked = !isliked;
-                          if (isliked) {
-                            setState(() {
-                              likes++;
-                            });
-                            likepost();
-                          }
-                          if (!isliked) {
-                            setState(() {
-                              likes--;
-                            });
-                            minuslikepost();
-                          }
-                        });
-                      },
-                    ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Text(
+                            likes.toString(),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Stack(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                                type: PageTransitionType.rightToLeft,
+                                child: Comments(
+                                  getcommenturl: "getnoticecomments",
+                                  postcommenturl: "noticecomments",
+                                  postid: widget.id!,
+                                )),
+                          );
+                        },
+                        icon: Icon(
+                          FontAwesomeIcons.comment,
+                          size: 23,
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Text(
+                            likes.toString(),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   IconButton(
                     onPressed: () {
-                      showModalBottomSheet(
-                          useSafeArea: true,
-                          isScrollControlled: true,
-                          enableDrag: true,
-                          context: context,
-                          builder: (context) => Container(
-                              padding: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom),
-                              decoration: const BoxDecoration(
-                                  color: LightColor.maincolor1,
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(25),
-                                      topLeft: Radius.circular(25))),
-                              child: Comments(
-                                getcommenturl: "getnoticecomments",
-                                postcommenturl: "noticecomments",
-                                postid: widget.id!,
-                              )));
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          type: PageTransitionType.rightToLeft,
+                          child: Sharepost(
+                            getcommenturl: "",
+                            postcommenturl: "",
+                            postid: 2,
+                          ),
+                        ),
+                      );
                     },
                     icon: Icon(
-                      Icons.chat_bubble_outline_outlined,
+                      FontAwesomeIcons.paperPlane,
+                      size: 21,
                       color: Colors.grey.shade300,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                          enableDrag: true,
-                          context: context,
-                          builder: (context) => Container(
-                                decoration: const BoxDecoration(
-                                    color: LightColor.maincolor1,
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(25),
-                                        topLeft: Radius.circular(25))),
-                                child: Column(
-                                  children: [
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      "Select friends to share",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey.shade300),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey.shade800,
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const Expanded(
-                                        child: Column(
-                                      children: [],
-                                    )),
-                                  ],
-                                ),
-                              ));
-                    },
-                    icon: Transform(
-                      transform: Matrix4.rotationZ(5.8),
-                      child: Icon(
-                        Icons.send,
-                        color: Colors.grey.shade300,
-                      ),
                     ),
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _progress != null
-                    ? SpinKitThreeBounce(
-                        color: Colors.white,
-                        size: 25,
-                      )
-                    : IconButton(
-                        onPressed: () async {
-                          FileDownloader.downloadFile(
-                              url: widget.file.trim(),
-                              onProgress: (name, progress) {
-                                setState(() {
-                                  _progress = progress;
-                                });
-                              },
-                              onDownloadCompleted: (value) {
-                                print('path  $value ');
-                                setState(() {
-                                  _progress = null;
-                                });
-                                CherryToast.success(
-                                        title: const Text(""),
-                                        backgroundColor:
-                                            Colors.black.withOpacity(0.9),
-                                        description: Text(
-                                          "Download complete",
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
-                                        animationDuration:
-                                            const Duration(milliseconds: 500),
-                                        autoDismiss: true)
-                                    .show(context);
+              Flexible(
+                // Wrapping the Column with Flexible
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _progress != null
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            LinearProgressIndicator(
+                              // Removed SizedBox
+                              value: _progress,
+                              backgroundColor: Colors.grey.shade300,
+                              color: Colors.blue,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "${(_progress! * 100).toStringAsFixed(0)}%",
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        )
+                      : IconButton(
+                          onPressed: () async {
+                            setState(() {
+                              _progress = 0.0; // Initialize progress
+                            });
+                            try {
+                              //You can download a single file
+                              await FileDownloader.downloadFile(
+                                url: widget.file.trim(),
+                                onProgress: (name, progress) {
+                                  setState(() {
+                                    _progress = progress;
+                                  });
+                                },
+                                onDownloadCompleted: (value) {
+                                  print('Downloaded to path: $value');
+                                  setState(() {
+                                    _progress = null;
+                                  });
+                                  CherryToast.success(
+                                    title: const Text(""),
+                                    backgroundColor:
+                                        Colors.black.withOpacity(0.9),
+                                    description: const Text(
+                                      "Download complete",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    animationDuration:
+                                        const Duration(milliseconds: 500),
+                                    autoDismiss: true,
+                                  ).show(context);
+                                },
+                              );
+                            } catch (e) {
+                              setState(() {
+                                _progress = null;
                               });
-                        },
-                        icon: Icon(
-                          Icons.download_rounded,
-                          color: Colors.grey.shade300,
+                              CherryToast.error(
+                                title: const Text("Download Failed"),
+                                backgroundColor: Colors.red.withOpacity(0.9),
+                                description: Text(
+                                  e.toString(),
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                animationDuration:
+                                    const Duration(milliseconds: 500),
+                                autoDismiss: true,
+                              ).show(context);
+                            }
+                          },
+                          icon: Icon(
+                            FontAwesomeIcons.download,
+                            color: Colors.grey.shade300,
+                            size: 21,
+                          ),
                         ),
-                      ),
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Row(
-            children: [
-              const Text(
-                "Liked by ",
-              ),
-              Text(
-                "$likes ",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const Text(
-                "students",
+                ),
               ),
             ],
           ),
@@ -357,7 +377,7 @@ class _NoticePostState extends State<NoticePost> {
                 text: TextSpan(children: [
               TextSpan(
                   text: widget.content,
-                  style: TextStyle(color: Colors.grey.shade200, fontSize: 12)),
+                  style: TextStyle(color: Colors.grey.shade200, fontSize: 14)),
             ])),
           ),
         )

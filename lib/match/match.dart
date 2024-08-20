@@ -1,12 +1,7 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:swipe_cards/draggable_card.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:usersms/match/content.dart';
-import 'package:usersms/screens/homepage.dart';
-import 'package:usersms/utils/colors.dart';
 
 class Match extends StatefulWidget {
   const Match({super.key});

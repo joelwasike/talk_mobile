@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'package:getwidget/components/shimmer/gf_shimmer.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:inview_notifier_list/inview_notifier_list.dart';
+import 'package:http/http.dart' as http;
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/photo_user_posts.dart';
 import 'package:usersms/resources/video_user_post.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'package:getwidget/components/shimmer/gf_shimmer.dart';
 
 class SearchPostPage extends StatefulWidget {
   final int postId;
@@ -20,15 +20,7 @@ class _SearchPostPageState extends State<SearchPostPage> {
   final ScrollController _scrollController = ScrollController();
   List<Map<String, dynamic>> data = [];
   bool isloading = false;
-  String? content;
-  String? email;
-  int? id;
-  int? likes;
-  String? media;
-  String? pdf;
-  String? title;
 
-  //get posts
   Future<void> fetchData() async {
     try {
       setState(() {
@@ -39,22 +31,11 @@ class _SearchPostPageState extends State<SearchPostPage> {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
-
         setState(() {
           data = jsonData.cast<Map<String, dynamic>>();
         });
 
-        // Now you can access the data as needed.
-        for (final item in data) {
-          content = item['content'];
-          email = item['email'];
-          id = item['id'];
-          likes = item['likes'];
-          media = item['media'];
-          title = item['username'];
-        }
-
-        // Manipulate the data list to ensure the chosen post is at index 0
+        // Ensure the chosen post is at index 0
         data.insert(
             0,
             data.removeAt(
@@ -65,20 +46,17 @@ class _SearchPostPageState extends State<SearchPostPage> {
     } catch (e) {
       print(e);
     } finally {
-      setState(() {
-        isloading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isloading = false;
+        });
+      }
     }
   }
 
   bool isVideoLink(String link) {
     final videoExtensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv'];
-    for (final extension in videoExtensions) {
-      if (link.toLowerCase().endsWith(extension)) {
-        return true;
-      }
-    }
-    return false;
+    return videoExtensions.any((ext) => link.toLowerCase().endsWith(ext));
   }
 
   @override
@@ -98,101 +76,117 @@ class _SearchPostPageState extends State<SearchPostPage> {
     return Scaffold(
       body: isloading
           ? ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                final item = data[index];
-                return Column(
-                  children: [
-                    SizedBox(
-                      height: 10,
-                    ),
-                    GFShimmer(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 300,
-                            color: Colors.grey.shade800.withOpacity(0.4),
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            width: double.infinity,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.4),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.4),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.25,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.4),
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    )
-                  ],
-                );
-              },
+              itemCount: 5,
+              itemBuilder: (context, index) => _buildShimmer(),
             )
-          : InViewNotifierList(
-              scrollDirection: Axis.vertical,
-              initialInViewIds: const ['0'],
-              isInViewPortCondition: (double deltaTop, double deltaBottom,
-                  double viewPortDimension) {
-                return deltaTop < (0.5 * viewPortDimension) &&
-                    deltaBottom > (0.5 * viewPortDimension);
-              },
-              itemCount: data.length,
-              builder: (BuildContext context, int index) {
-                return LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    return InViewNotifierWidget(
-                      id: '$index',
-                      builder:
-                          (BuildContext context, bool isInView, Widget? child) {
+          : Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
                         final item = data[index];
-                        return isVideoLink(item["media"])
-                            ? VUserPost(
-                                profilepic: item['profilepicture'],
-                                scrollController: _scrollController,
-                                addlikelink: "postlikes",
-                                minuslikelink: "postlikesminus",
-                                id: item['id'],
-                                play: isInView,
-                                name: item['username'],
-                                url: item['media'],
-                                content: item['content'],
-                                likes: item['likes'],
-                                getcommenturl: 'getpostcomments',
-                                postcommenturl: 'comments',
+                        return index == 0
+                            ? Hero(
+                                tag: widget.postId,
+                                child: _buildPostItem(item, isFirst: true),
                               )
-                            : UserPost(
-                                profilepic: item['profilepicture'],
-                                addlikelink: "postlikes",
-                                minuslikelink: "postlikesminus",
-                                scrollController: _scrollController,
-                                id: item["id"],
-                                name: item['username'],
-                                image: item['media'],
-                                content: item['content'],
-                                likes: item['likes'],
-                                getcommenturl: 'getpostcomments',
-                                postcommenturl: 'comments',
-                              );
+                            : _buildPostItem(item);
                       },
-                    );
-                  },
-                );
-              },
+                      childCount: data.length,
+                    ),
+                  ),
+                ],
+              ),
             ),
+    );
+  }
+
+  Widget _buildShimmer() {
+    return Column(
+      children: [
+        SizedBox(height: 10),
+        GFShimmer(
+          child: Column(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 300,
+                color: Colors.grey.shade800.withOpacity(0.4),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                height: 8,
+                color: Colors.grey.shade800.withOpacity(0.4),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                height: 8,
+                color: Colors.grey.shade800.withOpacity(0.4),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.25,
+                height: 8,
+                color: Colors.grey.shade800.withOpacity(0.4),
+              )
+            ],
+          ),
+        ),
+        SizedBox(height: 10),
+      ],
+    );
+  }
+
+  Widget _buildPostItem(Map<String, dynamic> item, {bool isFirst = false}) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (isVideoLink(item["media"])) {
+          return VisibilityDetector(
+            key: Key(item['id'].toString()),
+            onVisibilityChanged: (visibilityInfo) {
+              bool isVisible = visibilityInfo.visibleFraction > 0.5;
+              if (mounted) {
+                setState(() {
+                  item['isVisible'] = isVisible;
+                });
+              }
+            },
+            child: VUserPost(
+              profilepic: item['profilepicture'],
+              scrollController: _scrollController,
+              addlikelink: "postlikes",
+              minuslikelink: "postlikesminus",
+              id: item['id'],
+              play: isFirst || (item['isVisible'] ?? false),
+              name: item['username'],
+              url: item['media'],
+              content: item['content'],
+              likes: item['likes'],
+              getcommenturl: 'getpostcomments',
+              postcommenturl: 'comments',
+            ),
+          );
+        } else {
+          return UserPost(
+            profilepic: item['profilepicture'],
+            addlikelink: "postlikes",
+            minuslikelink: "postlikesminus",
+            scrollController: _scrollController,
+            id: item["id"],
+            name: item['username'],
+            image: item['media'],
+            content: item['content'],
+            likes: item['likes'],
+            getcommenturl: 'getpostcomments',
+            postcommenturl: 'comments',
+          );
+        }
+      },
     );
   }
 }

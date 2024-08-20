@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -72,6 +73,9 @@ class _PortalState extends State<Portal> {
               children: [
                 InAppWebView(
                   key: webViewKey,
+                  gestureRecognizers: Set()
+                    ..add(Factory<VerticalDragGestureRecognizer>(
+                        () => VerticalDragGestureRecognizer())),
                   initialUrlRequest:
                       URLRequest(url: WebUri("https://portal.kibu.ac.ke/")),
                   initialSettings: settings,
@@ -159,7 +163,10 @@ class _PortalState extends State<Portal> {
                           borderRadius: BorderRadius.circular(
                               30.0), // Adjust the radius as needed
                         ),
-                        child: const Icon(Icons.arrow_back, color: LightColor.maincolor,),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: LightColor.maincolor,
+                        ),
                         onPressed: () {
                           webViewController?.goBack();
                         },
@@ -171,7 +178,10 @@ class _PortalState extends State<Portal> {
                           borderRadius: BorderRadius.circular(
                               30.0), // Adjust the radius as needed
                         ),
-                        child: const Icon(Icons.arrow_forward, color: LightColor.maincolor,),
+                        child: const Icon(
+                          Icons.arrow_forward,
+                          color: LightColor.maincolor,
+                        ),
                         onPressed: () {
                           webViewController?.goForward();
                         },

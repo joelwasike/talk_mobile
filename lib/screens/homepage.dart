@@ -1,11 +1,12 @@
 import 'package:animate_do/animate_do.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-import 'package:getwidget/components/shimmer/gf_shimmer.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:inview_notifier_list/inview_notifier_list.dart';
+import 'package:usersms/cubit/fetchdatacubit.dart';
+import 'package:usersms/cubit/fetchdatastate.dart';
 import 'package:usersms/match/match.dart';
 import 'package:usersms/menu/clubs.dart';
 import 'package:usersms/menu/forums.dart';
@@ -16,10 +17,12 @@ import 'package:usersms/menu/notices.dart';
 import 'package:usersms/menu/portal.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/photo_user_posts.dart';
+import 'package:usersms/resources/postsloading.dart';
 import 'package:usersms/resources/video_user_post.dart';
-import '../utils/colors.dart';
+import 'package:usersms/utils/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:visibility_detector/visibility_detector.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
@@ -91,54 +94,37 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController =
       ScrollController(); // Add this line
-  List<Map<String, dynamic>> data = [];
+  // List<Map<String, dynamic>> data = [];
   bool isloading = false;
-  String? content;
-  String? email;
-  int? id;
-  int? likes;
-  String? media;
-  String? pdf;
-  String? title;
 
   //get posts
-  Future<void> fetchData() async {
-    try {
-      setState(() {
-        // isloading = true;
-      });
-      final url = Uri.parse('$baseUrl/getposts'); // Replace with your JSON URL
-      final response = await http.get(url);
+  // Future<void> fetchData() async {
+  //   try {
+  //     setState(() {
+  //       // isloading = true;
+  //     });
+  //     final url = Uri.parse('$baseUrl/getposts'); // Replace with your JSON URL
+  //     final response = await http.get(url);
 
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
+  //     if (response.statusCode == 200) {
+  //       final List<dynamic> jsonData = json.decode(response.body);
 
-        setState(() {
-          data = jsonData.cast<Map<String, dynamic>>();
-        });
-
-        // Now you can access the data as needed.
-        for (final item in data) {
-          content = item['content'];
-          email = item['email'];
-          id = item['id'];
-          likes = item['likes'];
-          media = item['media'];
-          title = item['username'];
-        }
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      print(e);
-    } finally {
-      if (mounted) {
-        setState(() {
-          isloading = false;
-        });
-      }
-    }
-  }
+  //       setState(() {
+  //         data = jsonData.cast<Map<String, dynamic>>();
+  //       });
+  //     } else {
+  //       throw Exception('Failed to load data');
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   } finally {
+  //     if (mounted) {
+  //       setState(() {
+  //         isloading = false;
+  //       });
+  //     }
+  //   }
+  // }
 
   Future<void> profiledetails() async {
     var box = Hive.box("Talk");
@@ -172,7 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    fetchData().then((_) => profiledetails());
+    context.read<Fetchdatacubit>().fetchdata();
+    profiledetails();
   }
 
   @override
@@ -184,133 +171,122 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 40,
-        leading: FadeInLeft(child: const DrawerWidget()),
-        backgroundColor: Colors.black,
-        flexibleSpace: FlexibleSpaceBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              FadeInRight(
-                  child: Text('Kibabii Campus Talk',
+      body: CustomScrollView(
+        controller: _scrollController,
+        slivers: <Widget>[
+          SliverAppBar(
+            floating: true,
+            snap: true,
+            toolbarHeight: 40,
+            leading: FadeInLeft(child: const DrawerWidget()),
+            backgroundColor: Colors.black,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  FadeInRight(
+                    child: Text(
+                      'Kibabii Campus Talk',
                       style: GoogleFonts.aguafinaScript(
                         textStyle: TextStyle(
                           color: Colors.grey.shade300,
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
                         ),
-                      ))),
-            ],
-          ),
-        ),
-      ),
-      body: isloading
-          ? ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    SizedBox(
-                      height: 10,
-                    ),
-                    GFShimmer(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 300,
-                            color: Colors.grey.shade800.withOpacity(0.4),
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            width: double.infinity,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.4),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.4),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.25,
-                            height: 8,
-                            color: Colors.grey.shade800.withOpacity(0.4),
-                          )
-                        ],
                       ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    )
-                  ],
-                );
-              },
-            )
-          : RefreshIndicator(
-              onRefresh: () async {
-                fetchData();
-              },
-              backgroundColor: LightColor.scaffold,
-              color: LightColor.maincolor,
-              child: InViewNotifierList(
-                physics: BouncingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                initialInViewIds: const ['0'],
-                isInViewPortCondition: (double deltaTop, double deltaBottom,
-                    double viewPortDimension) {
-                  return deltaTop < (0.5 * viewPortDimension) &&
-                      deltaBottom > (0.5 * viewPortDimension);
-                },
-                itemCount: data.length,
-                builder: (BuildContext context, int index) {
-                  return LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return InViewNotifierWidget(
-                        id: '$index',
-                        builder: (BuildContext context, bool isInView,
-                            Widget? child) {
-                          final item = data[index];
-                          return isVideoLink(item["media"])
-                              ? VUserPost(
-                                  scrollController: _scrollController,
-                                  profilepic: item['profilepicture'],
-                                  addlikelink: "postlikes",
-                                  minuslikelink: "postlikesminus",
-                                  id: item['id'],
-                                  play: isInView,
-                                  name: item['username'],
-                                  url: item['media'],
-                                  content: item['content'],
-                                  likes: item['likes'],
-                                  getcommenturl: 'getpostcomments',
-                                  postcommenturl: 'comments',
-                                )
-                              : UserPost(
-                                  profilepic: item['profilepicture'],
-                                  addlikelink: "postlikes",
-                                  minuslikelink: "postlikesminus",
-                                  scrollController: _scrollController,
-                                  id: item["id"],
-                                  name: item['username'],
-                                  image: item['media'],
-                                  content: item['content'],
-                                  likes: item['likes'],
-                                  getcommenturl: 'getpostcomments',
-                                  postcommenturl: 'comments',
-                                );
-                        },
-                      );
-                    },
-                  );
-                },
+                  ),
+                ],
               ),
             ),
+          ),
+          BlocBuilder<Fetchdatacubit, Getdatastate>(
+            builder: (context, state) {
+              if (state is Getdataloading || state is Getdatainitial) {
+                var box = Hive.box("Talk");
+                var posts = box.get("posts");
+                if (posts != null && posts.isNotEmpty) {
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        final item = posts[index];
+                        return buildPostItem(item);
+                      },
+                      childCount: posts.length,
+                    ),
+                  );
+                } else {
+                  return SliverToBoxAdapter(child: Postsloading());
+                }
+              } else if (state is Getdataloaded) {
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      final item = state.data[index];
+                      return buildPostItem(item);
+                    },
+                    childCount: state.data.length,
+                  ),
+                );
+              } else {
+                return SliverToBoxAdapter(
+                  child: Center(
+                    child: Text("Please check your internet"),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildPostItem(Map<dynamic, dynamic> item) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (isVideoLink(item["media"])) {
+          return VisibilityDetector(
+            key: Key(item['id'].toString()),
+            onVisibilityChanged: (visibilityInfo) {
+              bool isVisible = visibilityInfo.visibleFraction > 0.5;
+              if (mounted) {
+                setState(() {
+                  item['isVisible'] = isVisible;
+                });
+              }
+            },
+            child: VUserPost(
+              scrollController: _scrollController,
+              profilepic: item['profilepicture'],
+              addlikelink: "postlikes",
+              minuslikelink: "postlikesminus",
+              id: item['id'],
+              play: item['isVisible'] ?? false,
+              name: item['username'],
+              url: item['media'],
+              content: item['content'],
+              likes: item['likes'],
+              getcommenturl: 'getpostcomments',
+              postcommenturl: 'comments',
+            ),
+          );
+        } else {
+          return UserPost(
+            profilepic: item['profilepicture'],
+            addlikelink: "postlikes",
+            minuslikelink: "postlikesminus",
+            scrollController: _scrollController,
+            id: item["id"],
+            name: item['username'],
+            image: item['media'],
+            content: item['content'],
+            likes: item['likes'],
+            getcommenturl: 'getpostcomments',
+            postcommenturl: 'comments',
+          );
+        }
+      },
     );
   }
 }
@@ -333,39 +309,45 @@ class _DrawerScreenState extends State<DrawerScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            drawerList(Icons.home, "Home", 0),
+            drawerList(FontAwesomeIcons.house, "Home", 0,
+                Colors.green.withOpacity(.4)),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.message, "Messenger", 1),
+            drawerList(FontAwesomeIcons.comment, "Messenger", 1,
+                Colors.blue.withOpacity(.4)),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.group, "Groups", 2),
+            drawerList(FontAwesomeIcons.comments, "Groups", 2,
+                Colors.red.withOpacity(.4)),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.forum, "Forums", 3),
+            // drawerList(FontAwesomeIcons.users, "Forums", 3,
+            //     Colors.green.withOpacity(.4)),
+            // const SizedBox(
+            //   height: 10,
+            // ),
+            drawerList(FontAwesomeIcons.bell, "Notices", 4,
+                Colors.yellow.withOpacity(.4)),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.notification_add, "Notices", 4),
+            drawerList(FontAwesomeIcons.volumeHigh, " Trendings", 5,
+                Colors.blue.withOpacity(.4)),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.people_alt, " Gossip", 5),
+            drawerList(
+                FontAwesomeIcons.play, "Clubs", 6, Colors.red.withOpacity(.4)),
             const SizedBox(
               height: 10,
             ),
-            drawerList(Icons.speaker, "Clubs", 6),
-            const SizedBox(
-              height: 10,
-            ),
-            drawerList(Icons.favorite, "Match", 7),
-            const SizedBox(
-              height: 10,
-            ),
-            drawerList(Icons.school, "School Portal", 8),
+            drawerList(FontAwesomeIcons.graduationCap, "Portal", 8,
+                Colors.blue.withOpacity(.4)),
+            // drawerList(
+            //     FontAwesomeIcons.heart, "Match", 7, Colors.red.withOpacity(.4)),
             const SizedBox(
               height: 20,
             ),
@@ -376,7 +358,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
     );
   }
 
-  Widget drawerList(IconData icon, String text, int index) {
+  Widget drawerList(IconData icon, String text, int index, Color color) {
     return GestureDetector(
       onTap: () {
         widget.setIndex(index);
@@ -389,7 +371,8 @@ class _DrawerScreenState extends State<DrawerScreen> {
           children: [
             Icon(
               icon,
-              color: Colors.white,
+              color: color,
+              size: 20,
             ),
             const SizedBox(
               width: 12,
@@ -397,7 +380,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
             Text(
               text,
               style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold),
+                  color: Colors.white, fontWeight: FontWeight.normal),
             ),
           ],
         ),
@@ -431,12 +414,10 @@ class Logout extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: GestureDetector(
-        onTap: () async {
-          await FirebaseAuth.instance.signOut();
-        },
+        onTap: () async {},
         child: Container(
             decoration: BoxDecoration(
-                color: LightColor.maincolor,
+                color: Colors.blue.withOpacity(.4),
                 borderRadius: BorderRadius.circular(6)),
             height: 40.0,
             width: 100.0,
