@@ -1,21 +1,75 @@
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
 import 'package:usersms/resources/comments.dart';
 import 'package:usersms/resources/sharepost.dart';
 import 'package:usersms/utils/colors.dart';
+import 'package:usersms/utils/error_handler.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'heartanimationwidget.dart';
-import 'image_data.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:page_transition/page_transition.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree }
+
+class ImageCard extends StatelessWidget {
+  final String imageData;
+  final double? width;
+  final double? height;
+  final BoxFit fit;
+
+  const ImageCard({
+    Key? key,
+    required this.imageData,
+    this.width,
+    this.height,
+    this.fit = BoxFit.cover,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: CachedNetworkImage(
+        imageUrl: imageData,
+        width: width,
+        height: height,
+        fit: fit,
+        placeholder: (context, url) => Container(
+          color: Colors.grey[300],
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+        errorWidget: (context, url, error) => Container(
+          color: Colors.grey[300],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.red),
+              const SizedBox(height: 4),
+              Text(
+                'Failed to load image',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+        memCacheWidth: 300, // Optimize memory cache
+        memCacheHeight: 300,
+        maxWidthDiskCache: 600, // Optimize disk cache
+        maxHeightDiskCache: 600,
+      ),
+    );
+  }
+}
 
 class UserPost extends StatefulWidget {
   final String profilepic;
@@ -28,7 +82,7 @@ class UserPost extends StatefulWidget {
   final String content;
   final int likes;
   final String? image;
-  final ScrollController scrollController; // Add this line
+  final ScrollController scrollController;
 
   const UserPost({
     super.key,
@@ -50,396 +104,272 @@ class UserPost extends StatefulWidget {
 }
 
 class _UserPostState extends State<UserPost> {
-  bool boom = false;
-  int likes = 1;
-  bool isliked = false;
-  bool isHeartAnimating = false;
-  SampleItem? selectedMenu;
+  bool _isLiked = false;
+  bool _isHeartAnimating = false;
+  bool _isLoading = false;
+  String? _error;
   final TextEditingController _messageController = TextEditingController();
-  var userid;
-
-  Future likepost() async {
-    Map body = {"userid": userid, "postid": widget.id};
-    final url = Uri.parse('$baseUrl/${widget.addlikelink}');
-    final response = await http.post(url, body: jsonEncode(body));
-    print(response.body);
-
-    if (response.statusCode == 200) {
-      print("liked succesfully");
-    } else {
-      print('HTTP Request Error: ${response.statusCode}');
-    }
-  }
-
-  Future minuslikepost() async {
-    Map body = {"userid": userid, "postid": widget.id};
-    final url = Uri.parse('$baseUrl/${widget.addlikelink}');
-    final response = await http.post(url, body: jsonEncode(body));
-    print(response.body);
-
-    if (response.statusCode == 200) {
-      print("liked succesfully");
-    } else {
-      print('HTTP Request Error: ${response.statusCode}');
-    }
-  }
-
-  void func() {
-    setState(() {
-      likes = widget.likes;
-    });
-  }
-
-  void id() {
-    var box = Hive.box("Talk");
-    setState(() {
-      userid = box.get("id");
-      print(userid);
-    });
-  }
+  String? _userId;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    func();
-    id();
+    _loadUserId();
   }
 
-  double? _progress;
+  void _loadUserId() {
+    final box = Hive.box("Talk");
+    setState(() => _userId = box.get("id"));
+  }
 
-  List people = [
-    "Joel",
-    "Delan",
-    "Wicky",
-    "Salim",
-    "Benna",
-    "Chalo",
-    "Wasike",
-    "Fello",
-    "Joel",
-    "Delan",
-    "Wicky",
-    "Salim",
-    "Benna",
-    "Chalo",
-    "Wasike",
-    "Fello"
-  ];
+  Future<void> _likePost() async {
+    if (_isLoading || _userId == null) return;
+
+    try {
+      setState(() => _isLoading = true);
+      final response = await http.post(
+        Uri.parse('$baseUrl/${widget.addlikelink}'),
+        body: jsonEncode({
+          "userid": _userId,
+          "postid": widget.id,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() => _isLiked = true);
+      } else {
+        throw Exception('Failed to like post: ${response.statusCode}');
+      }
+    } catch (e) {
+      setState(() => _error = e.toString());
+      ErrorHandler.showError(context, 'Failed to like post');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _unlikePost() async {
+    if (_isLoading || _userId == null) return;
+
+    try {
+      setState(() => _isLoading = true);
+      final response = await http.post(
+        Uri.parse('$baseUrl/${widget.minuslikelink}'),
+        body: jsonEncode({
+          "userid": _userId,
+          "postid": widget.id,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() => _isLiked = false);
+      } else {
+        throw Exception('Failed to unlike post: ${response.statusCode}');
+      }
+    } catch (e) {
+      setState(() => _error = e.toString());
+      ErrorHandler.showError(context, 'Failed to unlike post');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8, top: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    maxRadius: 17,
-                    backgroundImage:
-                        CachedNetworkImageProvider(widget.profilepic),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    widget.name,
-                    style: TextStyle(
-                      color: Colors.grey.shade300,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              PopupMenuButton<SampleItem>(
-                color: Colors.grey.shade300,
-                initialValue: selectedMenu,
-                onSelected: (SampleItem item) {
-                  setState(() {
-                    selectedMenu = item;
-                  });
-                },
-                itemBuilder: (BuildContext context) =>
-                    <PopupMenuEntry<SampleItem>>[
-                  const PopupMenuItem<SampleItem>(
-                    value: SampleItem.itemOne,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Follow'),
-                        Icon(Icons.person),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(),
+          if (widget.image != null) _buildImage(),
+          _buildContent(),
+          _buildActions(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: CachedNetworkImageProvider(widget.profilepic),
+      ),
+      title: Text(widget.name),
+      trailing: _buildMenu(),
+    );
+  }
+
+  Widget _buildImage() {
+    return GestureDetector(
+      onDoubleTap: () {
+        setState(() => _isHeartAnimating = true);
+        _likePost();
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          ImageCard(
+            imageData: widget.image!,
+            width: double.infinity,
+            height: 300,
           ),
-        ),
-        GestureDetector(
-          onDoubleTap: () {
-            setState(() {
-              isHeartAnimating = true;
-              isliked = true;
-              if (!boom) {
-                if (isliked) {
-                  setState(() {
-                    likes++;
-                  });
-                  likepost();
-                }
-                if (!isliked) {
-                  setState(() {
-                    likes--;
-                  });
-                  minuslikepost();
-                }
-              }
-              boom = true;
-            });
-          },
-          child: Stack(alignment: Alignment.center, children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height / 1.3,
-                  minWidth: MediaQuery.of(context).size.width),
-              child: CachedNetworkImage(
-                imageUrl: widget.image!,
-                fadeInCurve: Curves.easeIn,
-                fit: BoxFit.fitWidth,
-                placeholder: (context, url) => Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 300,
-                ),
-                // Placeholder while loading
+          if (_isHeartAnimating)
+            HeartAnimationWidget(
+              isAnimating: true,
+              duration: const Duration(milliseconds: 700),
+              onEnd: () {
+                setState(() => _isHeartAnimating = false);
+              },
+              child: const Icon(
+                Icons.favorite,
+                color: Colors.red,
+                size: 100,
               ),
             ),
-            Opacity(
-              opacity: isHeartAnimating ? 1 : 0,
-              child: HeartAnimationWidget(
-                  isAnimating: isHeartAnimating,
-                  duration: const Duration(milliseconds: 700),
-                  onEnd: () => setState(() {
-                        isHeartAnimating = false;
-                      }),
-                  child: Icon(
-                    Icons.favorite,
-                    color: Colors.grey.shade300,
-                    size: 100,
-                  )),
-            )
-          ]),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Stack(
-                    children: [
-                      HeartAnimationWidget(
-                        alwaysAnimate: true,
-                        isAnimating: isliked,
-                        child: IconButton(
-                          icon: Icon(
-                            isliked ? Icons.favorite : FontAwesomeIcons.heart,
-                            color: isliked ? Colors.red : Colors.grey.shade300,
-                            size: 25,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isliked = !isliked;
-                              if (isliked) {
-                                setState(() {
-                                  likes++;
-                                });
-                                likepost();
-                              }
-                              if (!isliked) {
-                                setState(() {
-                                  likes--;
-                                });
-                                minuslikepost();
-                              }
-                            });
-                          },
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Text(
-                            likes.toString(),
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Stack(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            PageTransition(
-                              type: PageTransitionType.rightToLeft,
-                              child: Comments(
-                                getcommenturl: widget.getcommenturl,
-                                postcommenturl: widget.postcommenturl,
-                                postid: widget.id,
-                              ),
-                            ),
-                          );
-                        },
-                        icon: Icon(
-                          FontAwesomeIcons.comment,
-                          size: 23,
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Text(
-                            likes.toString(),
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(
-                          type: PageTransitionType.rightToLeft,
-                          child: Sharepost(
-                            getcommenturl: widget.getcommenturl,
-                            postcommenturl: widget.postcommenturl,
-                            postid: widget.id,
-                          ),
-                        ),
-                      );
-                    },
-                    icon: Icon(
-                      FontAwesomeIcons.paperPlane,
-                      size: 21,
-                      color: Colors.grey.shade300,
-                    ),
-                  ),
-                ],
-              ),
-              Flexible(
-                // Wrapping the Column with Flexible
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _progress != null
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            LinearProgressIndicator(
-                              // Removed SizedBox
-                              value: _progress,
-                              backgroundColor: Colors.grey.shade300,
-                              color: Colors.blue,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "${(_progress! * 100).toStringAsFixed(0)}%",
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        )
-                      : IconButton(
-                          onPressed: () async {
-                            setState(() {
-                              _progress = 0.0; // Initialize progress
-                            });
-                            try {
-                              //You can download a single file
-                              await FileDownloader.downloadFile(
-                                url: widget.image!.trim(),
-                                onProgress: (name, progress) {
-                                  setState(() {
-                                    _progress = progress;
-                                  });
-                                },
-                                onDownloadCompleted: (value) {
-                                  print('Downloaded to path: $value');
-                                  setState(() {
-                                    _progress = null;
-                                  });
-                                  CherryToast.success(
-                                    title: const Text(""),
-                                    backgroundColor:
-                                        Colors.black.withOpacity(0.9),
-                                    description: const Text(
-                                      "Download complete",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    animationDuration:
-                                        const Duration(milliseconds: 500),
-                                    autoDismiss: true,
-                                  ).show(context);
-                                },
-                              );
-                            } catch (e) {
-                              setState(() {
-                                _progress = null;
-                              });
-                              CherryToast.error(
-                                title: const Text("Download Failed"),
-                                backgroundColor: Colors.red.withOpacity(0.9),
-                                description: Text(
-                                  e.toString(),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                animationDuration:
-                                    const Duration(milliseconds: 500),
-                                autoDismiss: true,
-                              ).show(context);
-                            }
-                          },
-                          icon: Icon(
-                            FontAwesomeIcons.download,
-                            color: Colors.grey.shade300,
-                            size: 21,
-                          ),
-                        ),
-                ),
-              ),
-            ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Text(widget.content),
+    );
+  }
+
+  Widget _buildActions() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: Icon(
+            _isLiked ? Icons.favorite : Icons.favorite_border,
+            color: _isLiked ? Colors.red : null,
           ),
+          onPressed: _isLoading
+              ? null
+              : () {
+                  if (_isLiked) {
+                    _unlikePost();
+                  } else {
+                    _likePost();
+                  }
+                },
         ),
-        Align(
-          alignment: Alignment.topLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: RichText(
-                text: TextSpan(children: [
-              TextSpan(
-                  text: widget.content,
-                  style: TextStyle(color: Colors.grey.shade300, fontSize: 14)),
-            ])),
-          ),
-        )
+        IconButton(
+          icon: const Icon(Icons.comment),
+          onPressed: () => _showComments(),
+        ),
+        IconButton(
+          icon: const Icon(Icons.share),
+          onPressed: () => _sharePost(),
+        ),
       ],
     );
+  }
+
+  Widget _buildMenu() {
+    return PopupMenuButton<SampleItem>(
+      onSelected: (SampleItem item) {
+        switch (item) {
+          case SampleItem.itemOne:
+            _downloadImage();
+            break;
+          case SampleItem.itemTwo:
+            _reportPost();
+            break;
+          case SampleItem.itemThree:
+            _blockUser();
+            break;
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<SampleItem>>[
+        const PopupMenuItem<SampleItem>(
+          value: SampleItem.itemOne,
+          child: Text('Download'),
+        ),
+        const PopupMenuItem<SampleItem>(
+          value: SampleItem.itemTwo,
+          child: Text('Report'),
+        ),
+        const PopupMenuItem<SampleItem>(
+          value: SampleItem.itemThree,
+          child: Text('Block User'),
+        ),
+      ],
+    );
+  }
+
+  void _showComments() {
+    Navigator.push(
+      context,
+      PageTransition(
+        type: PageTransitionType.rightToLeft,
+        child: Comments(
+          getcommenturl: widget.getcommenturl,
+          postcommenturl: widget.postcommenturl,
+          postid: widget.id,
+        ),
+      ),
+    );
+  }
+
+  void _sharePost() {
+    Navigator.push(
+      context,
+      PageTransition(
+        type: PageTransitionType.rightToLeft,
+        child: Sharepost(
+          getcommenturl: widget.getcommenturl,
+          postcommenturl: widget.postcommenturl,
+          postid: widget.id,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _downloadImage() async {
+    if (widget.image == null) return;
+
+    try {
+      await FileDownloader.downloadFile(
+        url: widget.image!,
+        name: 'post_${widget.id}.jpg',
+        onProgress: (name, progress) {
+          // Show download progress
+        },
+        onDownloadCompleted: (path) {
+          ErrorHandler.showSuccess(context, 'Image downloaded successfully');
+        },
+        onDownloadError: (error) {
+          ErrorHandler.showError(context, 'Failed to download image');
+        },
+      );
+    } catch (e) {
+      ErrorHandler.showError(context, 'Failed to download image');
+    }
+  }
+
+  void _reportPost() {
+    // Implement report functionality
+    ErrorHandler.showError(context, 'Report functionality not implemented');
+  }
+
+  void _blockUser() {
+    // Implement block user functionality
+    ErrorHandler.showError(context, 'Block user functionality not implemented');
   }
 }
 

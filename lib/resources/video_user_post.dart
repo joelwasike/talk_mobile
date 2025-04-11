@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:http/http.dart' as http;
@@ -14,7 +13,6 @@ import 'package:usersms/resources/sharepost.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:video_player/video_player.dart';
 import 'heartanimationwidget.dart';
-import 'image_data.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 

@@ -153,7 +153,7 @@ class _PortalState extends State<Portal> {
                     : Container(),
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: ButtonBar(
+                  child: OverflowBar(
                     alignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       FloatingActionButton(

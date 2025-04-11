@@ -11,468 +11,237 @@ import 'package:usersms/resources/comments.dart';
 import 'package:usersms/resources/heartanimationwidget.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'package:usersms/screens/reels.dart';
+import '../../utils/constants.dart' hide baseUrl;
 
 class ShortsPlayer extends StatefulWidget {
-  final String previousvidvidurl;
-  final String nextvidurl;
   final String shortsUrl;
-  final int likes;
-  final String content;
-  final int userid;
-  final int id;
-  final String username;
-  final String profilepic;
+  final String nextvidurl;
+  final String previousvidvidurl;
   final bool play;
+  final String profilepic;
+  final String username;
+  final String userid;
+  final int likes;
+  final String id;
+  final String content;
 
-  const ShortsPlayer(
-      {Key? key,
-      required this.shortsUrl,
-      required this.likes,
-      required this.content,
-      required this.userid,
-      required this.id,
-      required this.username,
-      required this.profilepic,
-      required this.play,
-      required this.previousvidvidurl,
-      required this.nextvidurl})
-      : super(key: key);
+  const ShortsPlayer({
+    Key? key,
+    required this.shortsUrl,
+    required this.nextvidurl,
+    required this.previousvidvidurl,
+    required this.play,
+    required this.profilepic,
+    required this.username,
+    required this.userid,
+    required this.likes,
+    required this.id,
+    required this.content,
+  }) : super(key: key);
 
   @override
   State<ShortsPlayer> createState() => _ShortsPlayerState();
 }
 
 class _ShortsPlayerState extends State<ShortsPlayer> {
-  double? _progress;
-  VideoPlayerController? nextVideoController;
-  VideoPlayerController? previousVideoController;
-
-  late VideoPlayerController? videoPlayerController;
-  bool isHeartAnimating = false;
-  bool isliked = false;
-  Color likeBtnColor = Colors.white,
-      dislikeBtnColor = Colors.white,
-      subscribeBtnColor = Colors.red;
-  double iconSize = 33;
-  TextStyle textStyle1 = const TextStyle(
-    color: Colors.white,
-    fontSize: 15,
-  );
-  bool boom = false;
-  int likes = 1;
-  var userid;
-
-  bool isExpanded = false;
-
-  void func() {
-    setState(() {
-      likes = widget.likes;
-    });
-  }
-
-  void id() {
-    var box = Hive.box("Talk");
-    setState(() {
-      userid = box.get("id");
-      print(userid);
-    });
-  }
-
-  Future likepost() async {
-    Map body = {"userid": userid, "postid": widget.id};
-    final url = Uri.parse('$baseUrl/postlikes');
-    final response = await http.post(url, body: jsonEncode(body));
-    print(response.body);
-
-    if (response.statusCode == 200) {
-      print("liked succesfully");
-    } else {
-      print('HTTP Request Error: ${response.statusCode}');
-    }
-  }
-
-  Future minuslikepost() async {
-    Map body = {"userid": userid, "postid": widget.id};
-    final url = Uri.parse('$baseUrl/postlikesminus');
-    final response = await http.post(url, body: jsonEncode(body));
-    print(response.body);
-
-    if (response.statusCode == 200) {
-      print("liked succesfully");
-    } else {
-      print('HTTP Request Error: ${response.statusCode}');
-    }
-  }
+  late VideoPlayerController _controller;
+  bool _isInitialized = false;
+  bool _isLiked = false;
+  int _currentLikes = 0;
 
   @override
   void initState() {
     super.initState();
-    initVideoController();
+    _currentLikes = widget.likes;
+    _initializeVideo();
+  }
 
-    func();
-    id();
+  Future<void> _initializeVideo() async {
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.shortsUrl));
+    
+    try {
+      await _controller.initialize();
+      _controller.setLooping(true);
+      _controller.setVolume(1.0);
+      
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error initializing video: $e');
+    }
   }
 
   @override
   void didUpdateWidget(ShortsPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.play != oldWidget.play) {
-      if (widget.play) {
-        videoPlayerController!.play();
-      } else {
-        videoPlayerController!.pause();
-      }
+    if (widget.shortsUrl != oldWidget.shortsUrl) {
+      _controller.dispose();
+      _initializeVideo();
     }
-  }
-
-  void initVideoController() {
-    videoPlayerController =
-        VideoPlayerController.networkUrl(Uri.parse(widget.shortsUrl))
-          ..initialize().then((_) {
-            videoPlayerController!.setLooping(true);
-            videoPlayerController!.setVolume(1);
-            // Play or pause based on the value of widget.play
-            if (widget.play) {
-              videoPlayerController!.play();
-            } else {
-              videoPlayerController!.pause();
-            }
-            setState(
-                () {}); // Ensure the first frame is shown after video initialization
-          });
-  }
-
-  void initNextVideoController() {
-    nextVideoController =
-        VideoPlayerController.networkUrl(Uri.parse(widget.nextvidurl))
-          ..initialize().then((_) {
-            nextVideoController!.setLooping(true);
-            nextVideoController!.setVolume(1);
-            if (widget.play) {
-              videoPlayerController!.pause();
-            } else {
-              videoPlayerController!.play();
-            }
-            setState(() {});
-          });
-  }
-
-  void initPrevVideoController() {
-    previousVideoController =
-        VideoPlayerController.networkUrl(Uri.parse(widget.previousvidvidurl))
-          ..initialize().then((_) {
-            previousVideoController!.setLooping(true);
-            previousVideoController!.setVolume(1);
-            if (widget.play) {
-              videoPlayerController!.pause();
-            } else {
-              videoPlayerController!.play();
-            }
-            setState(() {});
-          });
   }
 
   @override
   void dispose() {
-    videoPlayerController!.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
-  int tapCount = 0;
-  bool playIconVisible = true;
+  Future<void> _likePost() async {
+    if (!_isLiked) {
+      setState(() {
+        _isLiked = true;
+        _currentLikes++;
+      });
+      
+      try {
+        final response = await http.post(
+          Uri.parse('$baseUrl/postlikes'),
+          body: jsonEncode({
+            "userid": widget.userid,
+            "postid": widget.id
+          }),
+        );
+        
+        if (response.statusCode != 200) {
+          throw Exception('Failed to like post');
+        }
+      } catch (e) {
+        debugPrint('Error liking post: $e');
+        setState(() {
+          _isLiked = false;
+          _currentLikes--;
+        });
+      }
+    }
+  }
+
+  Future<void> _unlikePost() async {
+    if (_isLiked) {
+      setState(() {
+        _isLiked = false;
+        _currentLikes--;
+      });
+      
+      try {
+        final response = await http.post(
+          Uri.parse('$baseUrl/postlikesminus'),
+          body: jsonEncode({
+            "userid": widget.userid,
+            "postid": widget.id
+          }),
+        );
+        
+        if (response.statusCode != 200) {
+          throw Exception('Failed to unlike post');
+        }
+      } catch (e) {
+        debugPrint('Error unliking post: $e');
+        setState(() {
+          _isLiked = true;
+          _currentLikes++;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          tapCount++;
-        });
-        if (tapCount % 2 == 0) {
-          videoPlayerController!.play();
-          setState(() {
-            playIconVisible = true;
-          });
-        } else {
-          videoPlayerController!.pause();
-          setState(() {
-            playIconVisible = false;
-          });
-        }
-      },
-      onDoubleTap: () {
-        isHeartAnimating = true;
-        isliked = true;
-        if (!boom) {
-          if (isliked) {
-            setState(() {
-              likes++;
-            });
-            likepost();
-          }
-          if (!isliked) {
-            setState(() {
-              likes--;
-            });
-            minuslikepost();
-          }
-        }
-        boom = true;
-      },
-      child: Container(
-        height: size.height,
-        width: size.width,
-        color: LightColor.maincolor1,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            VideoPlayer(videoPlayerController!),
-            Opacity(
-              opacity: isHeartAnimating ? 1 : 0,
-              child: HeartAnimationWidget(
-                  isAnimating: isHeartAnimating,
-                  duration: const Duration(milliseconds: 700),
-                  onEnd: () => setState(() {
-                        isHeartAnimating = false;
-                      }),
-                  child: const Icon(
-                    Icons.favorite,
-                    color: Colors.white,
-                    size: 100,
-                  )),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (!_isInitialized)
+          const Center(
+            child: CircularProgressIndicator(
+              color: LightColor.scaffold,
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                //upper options row
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [],
-                ),
-
-                //lower-operations row
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 40, horizontal: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      //video content details
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // user profile details
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage("${widget.profilepic}"),
-                                radius: 20,
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                child: Text(
-                                  '@${widget.username}',
-                                  style: TextStyle(
-                                    color: Colors.grey.shade200,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width / 1.4,
-                              child: Text(
-                                widget.content,
-                                softWrap:
-                                    true, // Allow text to wrap to the next line
-                                maxLines: isExpanded
-                                    ? null
-                                    : 3, // Limit the text to 3 lines
-                                style: TextStyle(
-                                  color: Colors.grey.shade100,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (!isExpanded)
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isExpanded = true;
-                                });
-                              },
-                              child: Text(
-                                'Read more',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-
-                      //like + dislike + comments + share options
-                      SizedBox(
-                        child: Column(
-                          children: [
-                            //like btn
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 25),
-                              child: InkWell(
-                                child: Column(
-                                  children: [
-                                    HeartAnimationWidget(
-                                      alwaysAnimate: true,
-                                      isAnimating: isliked,
-                                      child: IconButton(
-                                        icon: Icon(
-                                          isliked
-                                              ? Icons.favorite
-                                              : Icons.favorite_outline,
-                                          color: isliked
-                                              ? Colors.red
-                                              : Colors.white,
-                                          size: 30,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            isliked = !isliked;
-                                            if (isliked) {
-                                              setState(() {
-                                                likes++;
-                                              });
-                                              likepost();
-                                            }
-                                            if (!isliked) {
-                                              setState(() {
-                                                likes--;
-                                              });
-                                              minuslikepost();
-                                            }
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    Text(
-                                      likes.toString(),
-                                      style: textStyle1,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                            //dislike btn
-
-                            //comment btn
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 25),
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(
-                                        type: PageTransitionType.rightToLeft,
-                                        child: Comments(
-                                          getcommenturl: "getpostcomments",
-                                          postcommenturl: "comments",
-                                          postid: widget.id,
-                                        )),
-                                  );
-                                },
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.comment_rounded,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                    Text(
-                                      "3",
-                                      style: textStyle1,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                            //save btn
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 25),
-                              child: _progress != null
-                                  ? SpinKitThreeBounce(
-                                      color: Colors.white,
-                                      size: 25,
-                                    )
-                                  : IconButton(
-                                      onPressed: () async {
-                                        FileDownloader.downloadFile(
-                                            url: widget.shortsUrl.trim(),
-                                            onProgress: (name, progress) {
-                                              setState(() {
-                                                _progress = progress;
-                                              });
-                                            },
-                                            onDownloadCompleted: (value) {
-                                              print('path  $value ');
-                                              setState(() {
-                                                _progress = null;
-                                              });
-                                              CherryToast.success(
-                                                      title: const Text(""),
-                                                      backgroundColor: Colors
-                                                          .black
-                                                          .withOpacity(0.9),
-                                                      description: Text(
-                                                        "Download complete",
-                                                        style: const TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                      animationDuration:
-                                                          const Duration(
-                                                              milliseconds:
-                                                                  500),
-                                                      autoDismiss: true)
-                                                  .show(context);
-                                            });
-                                      },
-                                      icon: Icon(
-                                        Icons.download_rounded,
-                                        color: Colors.grey.shade300,
-                                      ),
-                                    ),
-                            ),
-
-                            // share btn
-                          ],
-                        ),
-                      ),
-                    ],
+          )
+        else
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                if (_controller.value.isPlaying) {
+                  _controller.pause();
+                } else {
+                  _controller.play();
+                }
+              });
+            },
+            child: VideoPlayer(_controller),
+          ),
+        if (widget.play && _isInitialized)
+          Builder(
+            builder: (context) {
+              _controller.play();
+              return const SizedBox.shrink();
+            },
+          )
+        else
+          Builder(
+            builder: (context) {
+              _controller.pause();
+              return const SizedBox.shrink();
+            },
+          ),
+        Positioned(
+          bottom: 20,
+          left: 20,
+          right: 20,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(widget.profilepic),
+                    radius: 20,
                   ),
+                  const SizedBox(width: 10),
+                  Text(
+                    widget.username,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                widget.content,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      _isLiked ? Icons.favorite : Icons.favorite_border,
+                      color: _isLiked ? Colors.red : Colors.white,
+                    ),
+                    onPressed: _isLiked ? _unlikePost : _likePost,
+                  ),
+                  Text(
+                    _currentLikes.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

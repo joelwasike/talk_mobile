@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
-import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';

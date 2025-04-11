@@ -20,6 +20,7 @@ import 'package:usersms/resources/photo_user_posts.dart';
 import 'package:usersms/resources/postsloading.dart';
 import 'package:usersms/resources/video_user_post.dart';
 import 'package:usersms/utils/colors.dart';
+import 'package:usersms/utils/error_handler.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:visibility_detector/visibility_detector.dart';
@@ -92,56 +93,91 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ScrollController _scrollController =
-      ScrollController(); // Add this line
-  // List<Map<String, dynamic>> data = [];
-  bool isloading = false;
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoading = false;
+  bool _isRefreshing = false;
+  String? _error;
 
-  //get posts
-  // Future<void> fetchData() async {
-  //   try {
-  //     setState(() {
-  //       // isloading = true;
-  //     });
-  //     final url = Uri.parse('$baseUrl/getposts'); // Replace with your JSON URL
-  //     final response = await http.get(url);
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+    _setupScrollListener();
+  }
 
-  //     if (response.statusCode == 200) {
-  //       final List<dynamic> jsonData = json.decode(response.body);
+  Future<void> _initializeData() async {
+    try {
+      setState(() => _isLoading = true);
+      await context.read<Fetchdatacubit>().fetchdata();
+      await _fetchProfileDetails();
+    } catch (e) {
+      setState(() => _error = e.toString());
+      ErrorHandler.showError(context, 'Failed to load data');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
-  //       setState(() {
-  //         data = jsonData.cast<Map<String, dynamic>>();
-  //       });
-  //     } else {
-  //       throw Exception('Failed to load data');
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   } finally {
-  //     if (mounted) {
-  //       setState(() {
-  //         isloading = false;
-  //       });
-  //     }
-  //   }
-  // }
+  void _setupScrollListener() {
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+        _loadMorePosts();
+      }
+    });
+  }
 
-  Future<void> profiledetails() async {
-    var box = Hive.box("Talk");
-    var email = box.get("id");
-    Map body = {"userid": email};
-    final url = Uri.parse('$baseUrl/showprofiledetails');
-    final response = await http.post(url, body: jsonEncode(body));
-    print(response.body);
+  Future<void> _loadMorePosts() async {
+    if (_isLoading) return;
+    
+    try {
+      setState(() => _isLoading = true);
+      // TODO: Implement pagination in Fetchdatacubit
+      await context.read<Fetchdatacubit>().fetchdata();
+    } catch (e) {
+      ErrorHandler.showError(context, 'Failed to load more posts');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
-    if (response.statusCode == 200) {
-      var jsonData = jsonDecode(response.body);
-      var box = Hive.box("Talk");
-      box.put("followerscount", jsonData["followerscount"]);
-      box.put("followingscount", jsonData["followingscount"]);
-      box.put("postscount", jsonData["postscount"]);
-    } else {
-      print('HTTP Request Error: ${response.statusCode}');
+  Future<void> _refreshData() async {
+    if (_isRefreshing) return;
+    
+    try {
+      setState(() => _isRefreshing = true);
+      await _initializeData();
+    } finally {
+      if (mounted) {
+        setState(() => _isRefreshing = false);
+      }
+    }
+  }
+
+  Future<void> _fetchProfileDetails() async {
+    try {
+      final box = Hive.box("Talk");
+      final email = box.get("id");
+      final response = await http.post(
+        Uri.parse('$baseUrl/showprofiledetails'),
+        body: jsonEncode({"userid": email}),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final box = Hive.box("Talk");
+        box.put("followerscount", jsonData["followerscount"]);
+        box.put("followingscount", jsonData["followingscount"]);
+        box.put("postscount", jsonData["postscount"]);
+      } else {
+        throw Exception('Failed to load profile details');
+      }
+    } catch (e) {
+      ErrorHandler.showError(context, 'Failed to load profile details');
+      rethrow;
     }
   }
 
@@ -156,88 +192,132 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    context.read<Fetchdatacubit>().fetchdata();
-    profiledetails();
-  }
-
-  @override
   void dispose() {
-    _scrollController.dispose(); // Dispose the scroll controller
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: <Widget>[
-          SliverAppBar(
-            floating: true,
-            snap: true,
-            toolbarHeight: 40,
-            leading: FadeInLeft(child: const DrawerWidget()),
-            backgroundColor: Colors.black,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  FadeInRight(
-                    child: Text(
-                      'Kibabii Campus Talk',
-                      style: GoogleFonts.aguafinaScript(
-                        textStyle: TextStyle(
-                          color: Colors.grey.shade300,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: <Widget>[
+            _buildAppBar(),
+            _buildContent(),
+            if (_isLoading && !_isRefreshing)
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return SliverAppBar(
+      floating: true,
+      snap: true,
+      toolbarHeight: 40,
+      leading: FadeInLeft(child: const DrawerWidget()),
+      backgroundColor: Colors.black,
+      flexibleSpace: FlexibleSpaceBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FadeInRight(
+              child: Text(
+                'Kibabii Campus Talk',
+                style: GoogleFonts.aguafinaScript(
+                  textStyle: TextStyle(
+                    color: Colors.grey.shade300,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
                   ),
-                ],
+                ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    if (_error != null) {
+      return SliverToBoxAdapter(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(_error!),
+              ElevatedButton(
+                onPressed: _initializeData,
+                child: const Text('Retry'),
+              ),
+            ],
           ),
-          BlocBuilder<Fetchdatacubit, Getdatastate>(
-            builder: (context, state) {
-              if (state is Getdataloading || state is Getdatainitial) {
-                var box = Hive.box("Talk");
-                var posts = box.get("posts");
-                if (posts != null && posts.isNotEmpty) {
-                  return SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                        final item = posts[index];
-                        return buildPostItem(item);
-                      },
-                      childCount: posts.length,
-                    ),
-                  );
-                } else {
-                  return SliverToBoxAdapter(child: Postsloading());
-                }
-              } else if (state is Getdataloaded) {
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      final item = state.data[index];
-                      return buildPostItem(item);
-                    },
-                    childCount: state.data.length,
-                  ),
-                );
-              } else {
-                return SliverToBoxAdapter(
-                  child: Center(
-                    child: Text("Please check your internet"),
-                  ),
-                );
-              }
-            },
-          ),
-        ],
+        ),
+      );
+    }
+
+    return BlocBuilder<Fetchdatacubit, Getdatastate>(
+      builder: (context, state) {
+        if (state is Getdataloading || state is Getdatainitial) {
+          return _buildLoadingState();
+        } else if (state is Getdataloaded) {
+          return _buildLoadedState(state);
+        } else {
+          return _buildErrorState();
+        }
+      },
+    );
+  }
+
+  Widget _buildLoadingState() {
+    final box = Hive.box("Talk");
+    final posts = box.get("posts");
+    
+    if (posts != null && posts.isNotEmpty) {
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => buildPostItem(posts[index]),
+          childCount: posts.length,
+        ),
+      );
+    }
+    
+    return const SliverToBoxAdapter(child: Postsloading());
+  }
+
+  Widget _buildLoadedState(Getdataloaded state) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => buildPostItem(state.data[index]),
+        childCount: state.data.length,
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return SliverToBoxAdapter(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Please check your internet connection"),
+            ElevatedButton(
+              onPressed: _initializeData,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
       ),
     );
   }
