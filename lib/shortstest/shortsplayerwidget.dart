@@ -1,19 +1,9 @@
 import 'dart:convert';
-import 'package:cherry_toast/cherry_toast.dart';
-import 'package:flutter_file_downloader/flutter_file_downloader.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:usersms/resources/apiconstatnts.dart';
-import 'package:usersms/resources/comments.dart';
-import 'package:usersms/resources/heartanimationwidget.dart';
 import 'package:usersms/utils/colors.dart';
 import 'package:video_player/video_player.dart';
-import 'package:visibility_detector/visibility_detector.dart';
-import 'package:usersms/screens/reels.dart';
-import '../../utils/constants.dart' hide baseUrl;
 
 class ShortsPlayer extends StatefulWidget {
   final String shortsUrl;
